@@ -1,1 +1,1 @@
-# Flutter Deltachat Core
+# Flutter Deltachat Core Plugin
