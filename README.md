@@ -1,1 +1,1 @@
-# flutter-deltachat-core
+# Flutter Deltachat Core
