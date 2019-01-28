@@ -1,4 +1,4 @@
-# delta_chat_core
+# Delta Chat Core Plugin
 
 The Delta Chat core plugin provides a Flutter / Dart wrapper for the [Delta Chat Core](https://github.com/deltachat/deltachat-core). 
 It interacts with the native interfaces provided by the Android and iOS platform to enable IMAP / SMTP based chatting.
@@ -8,7 +8,7 @@ It interacts with the native interfaces provided by the Android and iOS platform
 
 ## Relevant information
 - [Documentation](https://confluence-public.open-xchange.com/display/COIPublic/OX+Talk+Mobile+App)
-- Everything located in the [com.openxchange.deltachatcore.wrapper](https://gitlab.open-xchange.com/mobile/talk/tree/develop/delta_chat_core/android/src/main/java/com/openxchange/deltachatcore/wrapper) is mainly provided by the Delta Chat core team. This code should not get altered.
+- Everything located in the [com.b44t.messenger](https://github.com/open-xchange/flutter-deltachat-core/tree/master/android/src/main/java/com/b44t/messenger) package is mainly provided by the Delta Chat core team. This code should not get altered.
 - Within this repository only Flutter / Dart files should get edited. Java and C files shouldn't get changed as they are provided by sub repositories or other sources.
 
 ## Execution of the Flutter app
