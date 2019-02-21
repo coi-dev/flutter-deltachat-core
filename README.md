@@ -26,7 +26,7 @@ To be able to edit / extend this project the following steps are important:
 
 - Perform all actions mentioned under **Execution of the Flutter app**
 - Within this repository only Flutter / Dart and Java files should get edited. C files shouldn't get changed as they are provided by sub repositories or other sources
-- Everything located in the [com.b44t.messenger](https://github.com/open-xchange/flutter-deltachat-core/tree/master/android/src/main/java/com/b44t/messenger) package is mainly provided by the Delta Chat core team. This code should not get altered. The only exception is *flutter-deltachat-core/android/src/main/java/com/b44t/messenger/ApplicationDcContext.java*
+- Everything located in the [com.b44t.messenger](https://github.com/open-xchange/flutter-deltachat-core/tree/master/android/src/main/java/com/b44t/messenger) package is mainly provided by the Delta Chat core team. This code should not get altered. The only exception is the file [ApplicationDcContext.java](https://github.com/open-xchange/flutter-deltachat-core/blob/master/android/src/main/java/com/b44t/messenger/ApplicationDcContext.java)
 - Implement your changes (if the Java part is changed a rebuild of the Android project could be needed)
 - Add tests and code for the test suite
 - Create a pull request
