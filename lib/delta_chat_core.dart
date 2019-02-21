@@ -49,7 +49,6 @@ export 'src/base.dart';
 export 'src/chat.dart';
 export 'src/chatlist.dart';
 export 'src/context.dart';
-export 'src/dc.dart';
 export 'src/event.dart';
 export 'src/contact.dart';
 export 'src/chatmsg.dart';

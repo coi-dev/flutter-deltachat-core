@@ -40,6 +40,8 @@
  * for more details.
  */
 
+import 'dart:async';
+
 import 'package:delta_chat_core/src/base.dart';
 
 class ChatMsg extends Base{
@@ -47,7 +49,7 @@ class ChatMsg extends Base{
   static const String methodMessageGetText = "msg_getText";
   static const String methodMessageGetTimestamp = "msg_getTimestamp";
   static const String methodMessageGetType = "msg_getType";
-  static const String methodMessageGetStatte = "msg_getState";
+  static const String methodMessageGetState = "msg_getState";
   static const String methodMessageGetChatId = "msg_getChatId";
   static const String methodMessageGetFromId = "msg_getFromId";
   static const String methodMessageGetWidth = "msg_getWidth";
@@ -55,23 +57,32 @@ class ChatMsg extends Base{
   static const String methodMessageGetDuration = "msg_getDuration";
   static const String methodMessageLateFilingMediaSize = "msg_lateFilingMediaSize";
   static const String methodMessageGetSummary = "msg_getSummary";
-  static const String methodMessageGetSumaryText = "msg_getSummaryText";
+  static const String methodMessageGetSummaryText = "msg_getSummaryText";
   static const String methodMessageShowPadlock = "msg_showPadlock";
   static const String methodMessageHasFile = "msg_hasFile";
   static const String methodMessageGetFile = "msg_getFile";
-  static const String methodMessageGetFilemime = "msg_getFilemime";
+  static const String methodMessageGetFileMime = "msg_getFileMime";
   static const String methodMessageGetFilename = "msg_getFilename";
-  static const String methodMessageGetFilebytes = "msg_getFilebytes";
+  static const String methodMessageGetFileBytes = "msg_getFileBytes";
   static const String methodMessageIsForwarded = "msg_isForwarded";
   static const String methodMessageIsInfo = "msg_isInfo";
   static const String methodMessageIsSetupMessage = "msg_isSetupMessage";
   static const String methodMessageGetSetupCodeBegin = "msg_getSetupCodeBegin";
-  static const String methodMessageIsIncreation = "msg_isIncreation";
+  static const String methodMessageIsInCreation = "msg_isInCreation";
   static const String methodMessageSetText = "msg_setText";
   static const String methodMessageSetFile = "msg_setFile";
   static const String methodMessageSetDimension = "msg_setDimension";
   static const String methodMessageSetDuration = "msg_setDuration";
   static const String methodMessageIsOutgoing = "msg_isOutgoing";
+
+  static const int typeUndefined = 0;
+  static const int typeMessage = 10;
+  static const int typeImage = 20;
+  static const int typeGif = 21;
+  static const int typeAudio = 40;
+  static const int typeVoice = 41;
+  static const int typeVideo = 50;
+  static const int typeFile = 60;
 
   final int _id;
 
@@ -82,29 +93,58 @@ class ChatMsg extends Base{
   }
 
   Future<int> getMessageId() async {
-    return await loadValue(methodMessageGetId, <String, dynamic>{Base.argumentId: _id});
+    return await loadAndGetValue(methodMessageGetId, getDefaultParameters());
   }
+
   Future<String> getText() async {
-    return await loadValue(methodMessageGetText, <String, dynamic>{Base.argumentId: _id});
+    return await loadAndGetValue(methodMessageGetText, getDefaultParameters());
   }
 
   Future<int> getTimestamp() async {
-    return await loadValue(methodMessageGetTimestamp, <String, dynamic>{Base.argumentId: _id});
+    return await loadAndGetValue(methodMessageGetTimestamp, getDefaultParameters());
   }
 
   Future<int> getChatId() async {
-    return await loadValue(methodMessageGetChatId, <String, dynamic>{Base.argumentId: _id});
+    return await loadAndGetValue(methodMessageGetChatId, getDefaultParameters());
   }
 
   Future<int> getFromId() async {
-    return await loadValue(methodMessageGetFromId, <String, dynamic>{Base.argumentId: _id});
+    return await loadAndGetValue(methodMessageGetFromId, getDefaultParameters());
   }
 
   Future<bool> isOutgoing() async {
-    return await loadValue(methodMessageIsOutgoing, <String, dynamic>{Base.argumentId: _id});
+    return await loadAndGetValue(methodMessageIsOutgoing, getDefaultParameters());
   }
+
+  Future<bool> hasFile() async {
+    return await loadAndGetValue(methodMessageHasFile, getDefaultParameters());
+  }
+
+  Future<int> getType() async {
+    return await loadAndGetValue(methodMessageGetType, getDefaultParameters());
+  }
+
+  Future<String> getFile() async {
+    return await loadAndGetValue(methodMessageGetFile, getDefaultParameters());
+  }
+
+  Future<int> getFileBytes() async {
+    return await loadAndGetValue(methodMessageGetFileBytes, getDefaultParameters());
+  }
+
+  Future<String> getFileName() async {
+    return await loadAndGetValue(methodMessageGetFilename, getDefaultParameters());
+  }
+
+  Future<String> getFileMime() async {
+    return await loadAndGetValue(methodMessageGetFileMime, getDefaultParameters());
+  }
+
+  @override
+  getDefaultParameters() => <String, dynamic>{Base.argumentId: _id};
 
   static Function getCreator() {
     return (id) => new ChatMsg._internal(id);
   }
+
 }

@@ -41,6 +41,27 @@
  */
 
 class Event {
+
+  static const int info = 100;
+  static const int warning = 300;
+  static const int error = 400;
+  static const int msgsChanged = 2000;
+  static const int incomingMsg = 2005;
+  static const int msgDelivered = 2010;
+  static const int msgFailed = 2012;
+  static const int msgRead = 2015;
+  static const int chatModified = 2020;
+  static const int contactsChanged = 2030;
+  static const int configureProgress = 2041;
+  static const int imexProgress = 2051;
+  static const int imexFileWrite = 2052;
+  static const int secureJoinInviterProgress = 2060;
+  static const int secureJoinJoinerProgress = 2061;
+  static const int isOffline = 2081;
+  static const int getString = 2091;
+  static const int getQuantityString = 2092;
+  static const int httpGet = 2100;
+
   static const _INDEX_EVENT_ID = 0;
   static const _INDEX_DATA1 = 1;
   static const _INDEX_DATA2 = 2;

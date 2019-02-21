@@ -117,7 +117,6 @@ class _MyAppState extends State<MyApp> {
         _addListItem(text: "setConfigValue send_port 931");
         String getConfigSendPortValue = await context.getConfigValue(Context.configSendPort);
         _addListItem(text: "getConfigValue send_port", assertion: "931", result: getConfigSendPortValue);
-
         int contactId = await context.createContact("Bob", "bob@ox.io");
         _addListItem(text: "createContact bob@ox.io", assertion: 10, result: contactId);
         int contactId2 = await context.createContact(null, "charlie@ox.io");
@@ -130,19 +129,17 @@ class _MyAppState extends State<MyApp> {
         _addListItem(text: "getChatId", assertion: 10, result: id);
         var chatCnt = await chatList.getChatCnt();
         _addListItem(text: "getChatCnt", assertion: 1, result: chatCnt);
-        int chatIndex = await chatList.getChat(index);
-        _addListItem(text: "getChat", assertion: 10, result: chatIndex);
-//        Chat chat = Chat(chatIndex);
-//        var name = await chat.getName();
-//        _addListItem(text: "getName (chat)", assertion: "Bob", result: name);
-        var listenerId = await core.listen(Dc.eventConfigureProgress, _configureSuccess, _configureError);
+        int chatIdFromChatList = await chatList.getChat(index);
+        _addListItem(text: "getChat", assertion: 10, result: chatIdFromChatList);
+        var groupChatId = await context.createGroupChat(false, "The group");
+        _addListItem(text: "createGroupChat", assertion: 11, result: groupChatId);
+        var groupAddResult = await context.addContactToChat(groupChatId, contactId);
+        _addListItem(text: "addContactToChat", assertion: 1, result: groupAddResult);
+        var listenerId = await core.listen(Event.configureProgress, _configureSuccess, _configureError);
         _addListItem(text: "listen (core)", assertion: 1, result: listenerId);
-        await core.removeListener(Dc.eventConfigureProgress, listenerId);
+        await core.removeListener(Event.configureProgress, listenerId);
         var contactIds = await context.getContacts(2, null);
         _addListItem(text: "getContacts (context)", assertion: 3, result: contactIds.length);
-//        Contact contact = Contact(11);
-//        var contactAddressForId11 = await contact.getAddress();
-//        _addListItem(text: "getAddress (contact)", assertion: "charlie@ox.io", result: contactAddressForId11);
       }
     } on PlatformException {
       throw StateError("Test suite failed, forbidden state entered");

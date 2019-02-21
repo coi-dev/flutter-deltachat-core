@@ -42,6 +42,7 @@
 
 package com.openxchange.deltachatcore;
 
+import com.b44t.messenger.DcChat;
 import com.b44t.messenger.DcContact;
 import com.b44t.messenger.DcContext;
 import com.b44t.messenger.DcMsg;
@@ -62,9 +63,12 @@ class ContextCallHandler extends AbstractCallHandler {
     private static final String METHOD_CREATE_CHAT_BY_CONTACT_ID = "context_createChatByContactId";
     private static final String METHOD_CREATE_CHAT_BY_MESSAGE_ID = "context_createChatByMessageId";
     private static final String METHOD_CREATE_GROUP_CHAT = "context_createGroupChat";
+    private static final String METHOD_GET_CONTACT = "context_getContact";
     private static final String METHOD_GET_CONTACTS = "context_getContacts";
+    private static final String METHOD_GET_CHAT = "context_getChat";
     private static final String METHOD_GET_CHAT_MESSAGES = "context_getChatMessages";
     private static final String METHOD_CREATE_CHAT_MESSAGE = "context_createChatMessage";
+    private static final String METHOD_ADD_CONTACT_TO_CHAT = "context_addContactToChat";
 
     private static final String TYPE_INT = "int";
     private static final String TYPE_STRING = "String";
@@ -80,67 +84,82 @@ class ContextCallHandler extends AbstractCallHandler {
 
     private final Cache<DcContact> contactCache;
     private final Cache<DcMsg> messageCache;
+    private final Cache<DcChat> chatCache;
 
-    ContextCallHandler(DcContext dcContext, MethodCall methodCall, MethodChannel.Result result, Cache<DcContact> contactCache, Cache<DcMsg> messageCache) {
-        super(dcContext, methodCall, result);
+    ContextCallHandler(DcContext dcContext, Cache<DcContact> contactCache, Cache<DcMsg> messageCache, Cache<DcChat> chatCache) {
+        super(dcContext);
         this.contactCache = contactCache;
         this.messageCache = messageCache;
+        this.chatCache = chatCache;
+    }
+
+    @Override
+    public void handleCall(MethodCall methodCall, MethodChannel.Result result) {
         switch (methodCall.method) {
             case METHOD_CONFIG_SET:
-                setConfig();
+                setConfig(methodCall, result);
                 break;
             case METHOD_CONFIG_GET:
-                getConfig(TYPE_STRING);
+                getConfig(methodCall, result, TYPE_STRING);
                 break;
             case METHOD_CONFIG_GET_INT:
-                getConfig(TYPE_INT);
+                getConfig(methodCall, result, TYPE_INT);
                 break;
             case METHOD_CONFIGURE:
-                configure();
+                configure(result);
                 break;
             case METHOD_IS_CONFIGURED:
-                isConfigured();
+                isConfigured(result);
                 break;
             case METHOD_ADD_ADDRESS_BOOK:
-                addAddressBook();
+                addAddressBook(methodCall, result);
                 break;
             case METHOD_CREATE_CONTACT:
-                createContact();
+                createContact(methodCall, result);
                 break;
             case METHOD_DELETE_CONTACT:
-                deleteContact();
+                deleteContact(methodCall, result);
                 break;
             case METHOD_CREATE_CHAT_BY_CONTACT_ID:
-                createChatByContactId();
+                createChatByContactId(methodCall, result);
                 break;
             case METHOD_CREATE_CHAT_BY_MESSAGE_ID:
-                createChatByMessageId();
+                createChatByMessageId(methodCall, result);
                 break;
             case METHOD_CREATE_GROUP_CHAT:
-                createGroupChat();
+                createGroupChat(methodCall, result);
+                break;
+            case METHOD_GET_CONTACT:
+                getContact(methodCall, result);
                 break;
             case METHOD_GET_CONTACTS:
-                getContacts();
+                getContacts(methodCall, result);
+                break;
+            case METHOD_GET_CHAT:
+                getChat(methodCall, result);
                 break;
             case METHOD_GET_CHAT_MESSAGES:
-                getChatMessages();
+                getChatMessages(methodCall, result);
                 break;
             case METHOD_CREATE_CHAT_MESSAGE:
-                createChatMessage();
+                createChatMessage(methodCall, result);
+                break;
+            case METHOD_ADD_CONTACT_TO_CHAT:
+                addContactToChat(methodCall, result);
                 break;
             default:
                 result.notImplemented();
         }
     }
 
-    private void setConfig() {
-        if (!hasArgumentKeys(ARGUMENT_KEY_TYPE, ARGUMENT_KEY_KEY, ARGUMENT_KEY_VALUE)) {
-            errorArgumentMissing();
+    private void setConfig(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_KEY_TYPE, ARGUMENT_KEY_KEY, ARGUMENT_KEY_VALUE)) {
+            resultErrorArgumentMissing(result);
             return;
         }
         String type = methodCall.argument(ARGUMENT_KEY_TYPE);
         if (type == null) {
-            errorArgumentMissingValue();
+            resultErrorArgumentMissingValue(result);
             return;
         }
         String key = methodCall.argument(ARGUMENT_KEY_KEY);
@@ -148,7 +167,7 @@ class ContextCallHandler extends AbstractCallHandler {
             case TYPE_INT: {
                 Integer value = methodCall.argument(ARGUMENT_KEY_VALUE);
                 if (value == null) {
-                    errorArgumentMissingValue();
+                    resultErrorArgumentMissingValue(result);
                     return;
                 }
                 dcContext.setConfigInt(key, value);
@@ -160,54 +179,54 @@ class ContextCallHandler extends AbstractCallHandler {
                 break;
             }
             default:
-                errorArgumentTypeMismatch(ARGUMENT_KEY_TYPE);
+                resultErrorArgumentTypeMismatch(result, ARGUMENT_KEY_TYPE);
                 break;
         }
         result.success(null);
     }
 
 
-    private void getConfig(String type) {
-        if (!hasArgumentKeys(ARGUMENT_KEY_KEY)) {
-            errorArgumentMissing();
+    private void getConfig(MethodCall methodCall, MethodChannel.Result result, String type) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_KEY_KEY)) {
+            resultErrorArgumentMissing(result);
             return;
         }
         String key = methodCall.argument(ARGUMENT_KEY_KEY);
         switch (type) {
             case TYPE_INT: {
-                int resultValue = dcContext.getConfigInt(key, -1);
+                int resultValue = dcContext.getConfigInt(key, Integer.MIN_VALUE);
                 result.success(resultValue);
                 break;
             }
             case TYPE_STRING: {
-                String resultValue = dcContext.getConfig(key, "");
+                String resultValue = dcContext.getConfig(key, null);
                 result.success(resultValue);
                 break;
             }
             default:
-                errorArgumentTypeMismatch(ARGUMENT_KEY_TYPE);
+                resultErrorArgumentTypeMismatch(result, ARGUMENT_KEY_TYPE);
                 break;
         }
     }
 
-    private void configure() {
+    private void configure(MethodChannel.Result result) {
         dcContext.configure();
         result.success(null);
     }
 
-    private void isConfigured() {
+    private void isConfigured(MethodChannel.Result result) {
         boolean configured = dcContext.isConfigured() == 1;
         result.success(configured);
     }
 
-    private void addAddressBook() {
-        if (!hasArgumentKeys(ARGUMENT_ADDRESS_BOOK)) {
-            errorArgumentMissing();
+    private void addAddressBook(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_ADDRESS_BOOK)) {
+            resultErrorArgumentMissing(result);
             return;
         }
         String addressBook = methodCall.argument(ARGUMENT_ADDRESS_BOOK);
         if (addressBook == null || addressBook.isEmpty()) {
-            errorArgumentMissingValue();
+            resultErrorArgumentMissingValue(result);
             return;
         }
         contactCache.clear();
@@ -215,9 +234,9 @@ class ContextCallHandler extends AbstractCallHandler {
         result.success(changedCount);
     }
 
-    private void createContact() {
-        if (!hasArgumentKeys(ARGUMENT_ADDRESS)) {
-            errorArgumentMissing();
+    private void createContact(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_ADDRESS)) {
+            resultErrorArgumentMissing(result);
             return;
         }
         String name = methodCall.argument(ARGUMENT_NAME);
@@ -227,14 +246,14 @@ class ContextCallHandler extends AbstractCallHandler {
         result.success(contactId);
     }
 
-    private void deleteContact() {
-        if (!hasArgumentKeys(ARGUMENT_ID)) {
-            errorArgumentMissing();
+    private void deleteContact(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_ID)) {
+            resultErrorArgumentMissing(result);
             return;
         }
         Integer contactId = methodCall.argument(ARGUMENT_ID);
         if (contactId == null) {
-            errorArgumentMissingValue();
+            resultErrorArgumentMissingValue(result);
             return;
         }
         boolean deleted = dcContext.deleteContact(contactId);
@@ -244,100 +263,146 @@ class ContextCallHandler extends AbstractCallHandler {
         result.success(deleted);
     }
 
-    private void createChatByContactId() {
-        if (!hasArgumentKeys(ARGUMENT_ID)) {
-            errorArgumentMissing();
+    private void createChatByContactId(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_ID)) {
+            resultErrorArgumentMissing(result);
             return;
         }
         Integer contactId = methodCall.argument(ARGUMENT_ID);
         if (contactId == null) {
-            errorArgumentMissingValue();
+            resultErrorArgumentMissingValue(result);
             return;
         }
         int chatId = dcContext.createChatByContactId(contactId);
+        chatCache.put(chatId, dcContext.getChat(chatId));
         result.success(chatId);
     }
 
-    private void createChatByMessageId() {
-        if (!hasArgumentKeys(ARGUMENT_ID)) {
-            errorArgumentMissing();
+    private void createChatByMessageId(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_ID)) {
+            resultErrorArgumentMissing(result);
             return;
         }
         Integer messageId = methodCall.argument(ARGUMENT_ID);
         if (messageId == null) {
-            errorArgumentMissingValue();
+            resultErrorArgumentMissingValue(result);
             return;
         }
         int chatId = dcContext.createChatByMsgId(messageId);
+        chatCache.put(chatId, dcContext.getChat(chatId));
         result.success(chatId);
     }
 
-    private void createGroupChat() {
-        if (!hasArgumentKeys(ARGUMENT_VERIFIED, ARGUMENT_NAME)) {
-            errorArgumentMissing();
+    private void createGroupChat(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_VERIFIED, ARGUMENT_NAME)) {
+            resultErrorArgumentMissing(result);
             return;
         }
         Boolean verified = methodCall.argument(ARGUMENT_VERIFIED);
         if (verified == null) {
-            errorArgumentMissingValue();
+            resultErrorArgumentMissingValue(result);
             return;
         }
         String name = methodCall.argument(ARGUMENT_NAME);
         int chatId = dcContext.createGroupChat(verified, name);
+        chatCache.put(chatId, dcContext.getChat(chatId));
         result.success(chatId);
     }
 
 
-    private void getContacts() {
-        if (!hasArgumentKeys(ARGUMENT_FLAGS, ARGUMENT_QUERY)) {
-            errorArgumentMissing();
+    private void getContact(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_ID)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        Integer id = methodCall.argument(ARGUMENT_ID);
+        if (id == null) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        DcContact contact = loadAndCacheContact(id);
+        result.success(contact.getId());
+    }
+
+    DcContact loadAndCacheContact(Integer id) {
+        DcContact contact = contactCache.get(id);
+        if (contact == null) {
+            contact = dcContext.getContact(id);
+            contactCache.put(contact.getId(), contact);
+        }
+        return contact;
+    }
+
+    private void getContacts(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_FLAGS, ARGUMENT_QUERY)) {
+            resultErrorArgumentMissing(result);
             return;
         }
         Integer flags = methodCall.argument(ARGUMENT_FLAGS);
         String query = methodCall.argument(ARGUMENT_QUERY);
         if (flags == null) {
-            errorArgumentMissingValue();
+            resultErrorArgumentMissingValue(result);
             return;
         }
         int[] contactIds = dcContext.getContacts(flags, query);
         for (int contactId : contactIds) {
-            DcContact contact = contactCache.get(contactId);
-            if (contact == null) {
-                contactCache.put(contactId, dcContext.getContact(contactId));
-            }
+            loadAndCacheContact(contactId);
         }
         result.success(contactIds);
     }
 
-    private void getChatMessages() {
-        if (!hasArgumentKeys(ARGUMENT_ID)) {
-            errorArgumentMissing();
+    private void getChat(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_ID)) {
+            resultErrorArgumentMissing(result);
             return;
         }
         Integer id = methodCall.argument(ARGUMENT_ID);
         if (id == null) {
-            errorArgumentMissingValue();
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        DcChat chat = loadAndCacheChat(id);
+        result.success(chat.getId());
+    }
+
+    DcChat loadAndCacheChat(Integer id) {
+        DcChat chat = chatCache.get(id);
+        if (chat == null) {
+            chat = dcContext.getChat(id);
+            chatCache.put(chat.getId(), chat);
+        }
+        return chat;
+    }
+
+    private void getChatMessages(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_ID)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        Integer id = methodCall.argument(ARGUMENT_ID);
+        if (id == null) {
+            resultErrorArgumentMissingValue(result);
             return;
         }
 
         int[] messageIds = dcContext.getChatMsgs(id, 0, 0);
         for (int messageId : messageIds) {
-            DcMsg msg = messageCache.get(messageId);
-            if (msg == null) {
+            DcMsg message = messageCache.get(messageId);
+            if (message == null) {
                 messageCache.put(messageId, dcContext.getMsg(messageId));
             }
         }
         result.success(messageIds);
     }
 
-    private void createChatMessage() {
-        if (!hasArgumentKeys(ARGUMENT_ID, ARGUMENT_KEY_VALUE)) {
-            errorArgumentMissing();
+    private void createChatMessage(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_ID, ARGUMENT_KEY_VALUE)) {
+            resultErrorArgumentMissing(result);
             return;
         }
         Integer id = methodCall.argument(ARGUMENT_ID);
         if (id == null) {
-            errorArgumentMissingValue();
+            resultErrorArgumentMissingValue(result);
             return;
         }
 
@@ -345,8 +410,22 @@ class ContextCallHandler extends AbstractCallHandler {
 
         DcMsg newMsg = new DcMsg(dcContext, DcMsg.DC_MSG_TEXT);
         newMsg.setText(text);
-        int msgId = dcContext.sendMsg(id, newMsg);
-        result.success(msgId);
+        int messageId = dcContext.sendMsg(id, newMsg);
+        result.success(messageId);
     }
 
+    private void addContactToChat(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_CHAT_ID, ARGUMENT_CONTACT_ID)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        Integer chatId = methodCall.argument(ARGUMENT_CHAT_ID);
+        Integer contactId = methodCall.argument(ARGUMENT_CONTACT_ID);
+        if (chatId == null || contactId == null) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        int successfullyAdded = dcContext.addContactToChat(chatId, contactId);
+        result.success(successfullyAdded);
+    }
 }

@@ -60,41 +60,45 @@ abstract class AbstractCallHandler {
     static final String ARGUMENT_FLAGS = "flags";
     static final String ARGUMENT_QUERY = "query";
     static final String ARGUMENT_ADDRESS_BOOK = "addressBook";
+    static final String ARGUMENT_CONTACT_ID = "contactId";
+    static final String ARGUMENT_CHAT_ID = "chatId";
     private static final String ERROR_ARGUMENT_MISSING = "1";
     private static final String ERROR_ARGUMENT_TYPE_MISMATCH = "2";
     private static final String ERROR_ARGUMENT_MISSING_VALUE = "3";
     private static final String ERROR_ARGUMENT_NO_INT = "4";
     final DcContext dcContext;
 
-    final MethodCall methodCall;
-
-    final MethodChannel.Result result;
-
-    AbstractCallHandler(DcContext dcContext, MethodCall methodCall, MethodChannel.Result result) {
+    AbstractCallHandler(DcContext dcContext) {
         this.dcContext = dcContext;
-        this.methodCall = methodCall;
-        this.result = result;
     }
 
-    void errorArgumentMissing() {
+    void resultErrorArgumentMissing(MethodChannel.Result result) {
         result.error(ERROR_ARGUMENT_MISSING, "Argument is missing", null);
     }
 
     @SuppressWarnings("SameParameterValue")
-    void errorArgumentTypeMismatch(String argument) {
+    void resultErrorArgumentTypeMismatch(MethodChannel.Result result, String argument) {
         result.error(ERROR_ARGUMENT_TYPE_MISMATCH, "Wrong type for argument " + argument, null);
     }
 
-    void errorArgumentMissingValue() {
+    void resultErrorArgumentMissingValue(MethodChannel.Result result) {
         result.error(ERROR_ARGUMENT_MISSING_VALUE, "Argument value is missing or null", null);
     }
 
-    void errorArgumentNoInt(String argument) {
+    void resultErrorArgumentNoInt(MethodChannel.Result result, String argument) {
         result.error(ERROR_ARGUMENT_NO_INT, "Argument is no integer: " + argument, null);
     }
 
+    void resultErrorArgumentNoValidInt(MethodChannel.Result result, String argument) {
+        result.error(ERROR_ARGUMENT_NO_INT, "Argument has no valid int value: " + argument, null);
+    }
+
+    void resultErrorGeneric(MethodCall methodCall, MethodChannel.Result result) {
+        result.error(methodCall.method, null, null);
+    }
+
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    boolean hasArgumentKeys(String... arguments) {
+    boolean hasArgumentKeys(MethodCall methodCall, String... arguments) {
         for (String argument : arguments) {
             if (!methodCall.hasArgument(argument)) {
                 return false;
@@ -103,22 +107,28 @@ abstract class AbstractCallHandler {
         return true;
     }
 
-    Integer getArgumentValueAsInt(String argument) {
+    Integer getArgumentValueAsInt(MethodCall methodCall, MethodChannel.Result result, String argument) {
         Integer id;
-        if (!hasArgumentKeys(argument)) {
-            errorArgumentMissing();
+        if (!hasArgumentKeys(methodCall, argument)) {
+            resultErrorArgumentMissing(result);
             return null;
         }
         if (!(methodCall.argument(argument) instanceof Integer)) {
-            errorArgumentNoInt(argument);
+            resultErrorArgumentNoInt(result, argument);
             return null;
         }
         id = methodCall.argument(argument);
+        if (!isArgumentIntValueValid(id)) {
+            resultErrorArgumentMissingValue(result);
+            return null;
+        }
         return id;
     }
 
     boolean isArgumentIntValueValid(Integer value) {
-        return value != null && value != -1;
+        return value != null;
     }
+
+    abstract void handleCall(MethodCall methodCall, MethodChannel.Result result);
 
 }

@@ -40,6 +40,9 @@
  * for more details.
  */
 
+import 'dart:async';
+
+import 'package:delta_chat_core/delta_chat_core.dart';
 import 'package:delta_chat_core/src/base.dart';
 
 class ChatList extends Base {
@@ -50,33 +53,37 @@ class ChatList extends Base {
   static const String methodChatListGetMsg = "chatList_getMsg";
   static const String methodChatListGetSummary = "chatList_getSummary";
 
-  ChatList() : super();
+  final DeltaChatCore core = DeltaChatCore();
 
   Future<int> getChatCnt() async {
-    return await loadValue(methodChatListGetCnt, null);
+    return await core.invokeMethod(methodChatListGetCnt, null);
   }
 
   Future<int> getChatId(int index) async {
-    return await loadValue(methodChatListGetId, <String, dynamic>{Base.argumentIndex: index});
+    return await core.invokeMethod(methodChatListGetId, <String, dynamic>{Base.argumentIndex: index});
   }
 
   Future<int> getChatMsgId(int index) async {
-    return await loadValue(methodChatListGetMsgId, <String, dynamic>{Base.argumentIndex: index});
+    return await core.invokeMethod(methodChatListGetMsgId, <String, dynamic>{Base.argumentIndex: index});
   }
 
   Future<int> getChat(int index) async {
-    return await loadValue(methodChatListGetChat, <String, dynamic>{Base.argumentIndex: index});
+    return await core.invokeMethod(methodChatListGetChat, <String, dynamic>{Base.argumentIndex: index});
   }
 
   Future<dynamic> getChatMsg(int index) async {
-    return await loadValue(methodChatListGetMsg, <String, dynamic>{Base.argumentIndex: index});
+    return await core.invokeMethod(methodChatListGetMsg, <String, dynamic>{Base.argumentIndex: index});
   }
 
   Future<dynamic> getChatSummary(int index) async {
-    return await loadValue(methodChatListGetSummary, <String, dynamic>{Base.argumentIndex: index});
+    return await core.invokeMethod(methodChatListGetSummary, <String, dynamic>{Base.argumentIndex: index});
   }
 
-  static Function getCreator() {
-    return () => new ChatList();
+  @override
+  getDefaultParameters() {
+    // TODO: implement getDefaultParameters
+    return null;
   }
+
+
 }

@@ -53,6 +53,7 @@ class ChatCallHandler extends AbstractCallHandler {
     private static final String METHOD_CHAT_GET_ID = "chat_getId";
     private static final String METHOD_CHAT_IS_GROUP = "chat_isGroup";
     private static final String METHOD_CHAT_GET_ARCHIVED = "chat_getArchived";
+    private static final String METHOD_CHAT_GET_COLOR = "chat_getColor";
     private static final String METHOD_CHAT_GET_NAME = "chat_getName";
     private static final String METHOD_CHAT_GET_SUBTITLE = "chat_getSubtitle";
     private static final String METHOD_CHAT_GET_PROFILE_IMAGE = "chat_getProfileImage";
@@ -61,113 +62,151 @@ class ChatCallHandler extends AbstractCallHandler {
     private static final String METHOD_CHAT_IS_VERIFIED = "chat_isVerified";
 
     private final Cache<DcChat> chatCache;
+    private final ContextCallHandler contextCallHandler;
 
-    ChatCallHandler(DcContext dcContext, MethodCall methodCall, MethodChannel.Result result, Cache<DcChat> chatCache) {
-        super(dcContext, methodCall, result);
-
+    ChatCallHandler(DcContext dcContext, Cache<DcChat> chatCache, ContextCallHandler contextCallHandler) {
+        super(dcContext);
         this.chatCache = chatCache;
+        this.contextCallHandler = contextCallHandler;
+    }
+
+    @Override
+    public void handleCall(MethodCall methodCall, MethodChannel.Result result) {
         switch (methodCall.method) {
             case METHOD_CHAT_GET_ID:
-                getChatId();
+                getChatId(methodCall, result);
                 break;
             case METHOD_CHAT_IS_GROUP:
-                isGroup();
+                isGroup(methodCall, result);
                 break;
             case METHOD_CHAT_GET_ARCHIVED:
-                getArchived();
+                getArchived(methodCall, result);
+                break;
+            case METHOD_CHAT_GET_COLOR:
+                getColor(methodCall, result);
                 break;
             case METHOD_CHAT_GET_NAME:
-                getName();
+                getName(methodCall, result);
                 break;
             case METHOD_CHAT_GET_SUBTITLE:
-                getSubtitle();
+                getSubtitle(methodCall, result);
                 break;
             case METHOD_CHAT_GET_PROFILE_IMAGE:
-                getProfileImage();
+                getProfileImage(methodCall, result);
                 break;
             case METHOD_CHAT_IS_UNPROMOTED:
-                isUnpromoted();
+                isUnpromoted(methodCall, result);
                 break;
             case METHOD_CHAT_IS_SELF_TALK:
-                isSelfTalk();
+                isSelfTalk(methodCall, result);
                 break;
             case METHOD_CHAT_IS_VERIFIED:
-                isVerified();
+                isVerified(methodCall, result);
                 break;
             default:
                 result.notImplemented();
         }
     }
 
-    private void isSelfTalk() {
-        DcChat chat = getChat();
-        if (chat != null) {
-            result.success(chat.isSelfTalk());
+    private void isSelfTalk(MethodCall methodCall, MethodChannel.Result result) {
+        DcChat chat = getChat(methodCall, result);
+        if (chat == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
         }
+        result.success(chat.isSelfTalk());
     }
 
-    private void isUnpromoted() {
-        DcChat chat = getChat();
-        if (chat != null) {
-            result.success(chat.isUnpromoted());
+    private void isUnpromoted(MethodCall methodCall, MethodChannel.Result result) {
+        DcChat chat = getChat(methodCall, result);
+        if (chat == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
         }
+        result.success(chat.isUnpromoted());
     }
 
-    private void getProfileImage() {
-        DcChat chat = getChat();
-        if (chat != null) {
-            result.success(chat.getProfileImage());
+    private void getProfileImage(MethodCall methodCall, MethodChannel.Result result) {
+        DcChat chat = getChat(methodCall, result);
+        if (chat == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
         }
+        result.success(chat.getProfileImage());
     }
 
-    private void getSubtitle() {
-        DcChat chat = getChat();
-        if (chat != null) {
-            result.success(chat.getSubtitle());
+    private void getSubtitle(MethodCall methodCall, MethodChannel.Result result) {
+        DcChat chat = getChat(methodCall, result);
+        if (chat == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
         }
+        result.success(chat.getSubtitle());
     }
 
-    private void getName() {
-        DcChat chat = getChat();
-        if (chat != null) {
-            result.success(chat.getName());
+    private void getName(MethodCall methodCall, MethodChannel.Result result) {
+        DcChat chat = getChat(methodCall, result);
+        if (chat == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
         }
+        result.success(chat.getName());
     }
 
-    private void getArchived() {
-        DcChat chat = getChat();
-        if (chat != null) {
-            result.success(chat.getArchived());
+    private void getArchived(MethodCall methodCall, MethodChannel.Result result) {
+        DcChat chat = getChat(methodCall, result);
+        if (chat == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
         }
+        result.success(chat.getArchived());
     }
 
-    private void isGroup() {
-        DcChat chat = getChat();
-        if (chat != null) {
-            result.success(chat.isGroup());
+    private void getColor(MethodCall methodCall, MethodChannel.Result result) {
+        DcChat chat = getChat(methodCall, result);
+        if (chat == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
         }
+        result.success(chat.getColor());
     }
 
-    private void getChatId() {
-        DcChat chat = getChat();
-        if (chat != null) {
-            result.success(chat.getId());
+    private void isGroup(MethodCall methodCall, MethodChannel.Result result) {
+        DcChat chat = getChat(methodCall, result);
+        if (chat == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
         }
+        result.success(chat.isGroup());
     }
 
-    private void isVerified() {
-        DcChat chat = getChat();
-        if (chat != null) {
-            result.success(chat.isVerified());
+    private void getChatId(MethodCall methodCall, MethodChannel.Result result) {
+        DcChat chat = getChat(methodCall, result);
+        if (chat == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
         }
+        result.success(chat.getId());
     }
 
-    private DcChat getChat() {
-        Integer id = getArgumentValueAsInt(ARGUMENT_ID);
+    private void isVerified(MethodCall methodCall, MethodChannel.Result result) {
+        DcChat chat = getChat(methodCall, result);
+        if (chat == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
+        }
+        result.success(chat.isVerified());
+    }
+
+    private DcChat getChat(MethodCall methodCall, MethodChannel.Result result) {
+        Integer id = getArgumentValueAsInt(methodCall, result, ARGUMENT_ID);
+        DcChat chat = null;
         if (isArgumentIntValueValid(id)) {
-            return chatCache.get(id);
+            chat = chatCache.get(id);
+            if (chat == null) {
+                chat = contextCallHandler.loadAndCacheChat(id);
+            }
         }
-        return null;
+        return chat;
     }
-
 }

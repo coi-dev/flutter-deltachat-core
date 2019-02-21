@@ -57,122 +57,160 @@ class ContactCallHandler extends AbstractCallHandler {
     private static final String METHOD_CONTACT_GET_ADDRESS = "contact_getAddress";
     private static final String METHOD_CONTACT_GET_NAME_AND_ADDRESS = "contact_getNameAndAddress";
     private static final String METHOD_CONTACT_GET_PROFILE_IMAGE = "contact_getProfileImage";
+    private static final String METHOD_CONTACT_GET_COLOR = "contact_getColor";
     private static final String METHOD_CONTACT_IS_BLOCKED = "contact_isBlocked";
     private static final String METHOD_CONTACT_IS_VERIFIED = "contact_isVerified";
 
     private final Cache<DcContact> contactCache;
+    private final ContextCallHandler contextCallHandler;
 
-    ContactCallHandler(DcContext dcContext, MethodCall methodCall, MethodChannel.Result result, Cache<DcContact> contactCache) {
-        super(dcContext, methodCall, result);
+    ContactCallHandler(DcContext dcContext, Cache<DcContact> contactCache, ContextCallHandler contextCallHandler) {
+        super(dcContext);
         this.contactCache = contactCache;
+        this.contextCallHandler = contextCallHandler;
+    }
+
+    @Override
+    public void handleCall(MethodCall methodCall, MethodChannel.Result result) {
         switch (methodCall.method) {
             case METHOD_CONTACT_GET_ID:
-                getId();
+                getId(methodCall, result);
                 break;
             case METHOD_CONTACT_GET_NAME:
-                getName();
+                getName(methodCall, result);
                 break;
             case METHOD_CONTACT_GET_DISPLAY_NAME:
-                getDisplayName();
+                getDisplayName(methodCall, result);
                 break;
             case METHOD_CONTACT_GET_FIRST_NAME:
-                getFirstName();
+                getFirstName(methodCall, result);
                 break;
             case METHOD_CONTACT_GET_ADDRESS:
-                getAddress();
+                getAddress(methodCall, result);
                 break;
             case METHOD_CONTACT_GET_NAME_AND_ADDRESS:
-                getNameAndAddress();
+                getNameAndAddress(methodCall, result);
                 break;
             case METHOD_CONTACT_GET_PROFILE_IMAGE:
-                getProfileImage();
+                getProfileImage(methodCall, result);
+                break;
+            case METHOD_CONTACT_GET_COLOR:
+                getColor(methodCall, result);
                 break;
             case METHOD_CONTACT_IS_BLOCKED:
-                isBlocked();
+                isBlocked(methodCall, result);
                 break;
             case METHOD_CONTACT_IS_VERIFIED:
-                isVerified();
+                isVerified(methodCall, result);
                 break;
             default:
                 result.notImplemented();
         }
     }
 
-    private void getId() {
-        DcContact contact = getContact();
-        if (contact != null) {
-            result.success(contact.getId());
+    private void getId(MethodCall methodCall, MethodChannel.Result result) {
+        DcContact contact = getContact(methodCall, result);
+        if (contact == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
         }
+        result.success(contact.getId());
     }
 
-    private void getName() {
-        DcContact contact = getContact();
-        if (contact != null) {
-            result.success(contact.getName());
+    private void getName(MethodCall methodCall, MethodChannel.Result result) {
+        DcContact contact = getContact(methodCall, result);
+        if (contact == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
         }
+        result.success(contact.getName());
     }
 
-
-    private void getDisplayName() {
-        DcContact contact = getContact();
-        if (contact != null) {
-            result.success(contact.getDisplayName());
+    private void getDisplayName(MethodCall methodCall, MethodChannel.Result result) {
+        DcContact contact = getContact(methodCall, result);
+        if (contact == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
         }
+        result.success(contact.getDisplayName());
     }
 
-
-    private void getFirstName() {
-        DcContact contact = getContact();
-        if (contact != null) {
-            result.success(contact.getFirstName());
+    private void getFirstName(MethodCall methodCall, MethodChannel.Result result) {
+        DcContact contact = getContact(methodCall, result);
+        if (contact == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
         }
-    }
-
-
-    private void getAddress() {
-        DcContact contact = getContact();
-        if (contact != null) {
-            result.success(contact.getAddr());
-        }
-    }
-
-
-    private void getNameAndAddress() {
-        DcContact contact = getContact();
-        if (contact != null) {
-            result.success(contact.getNameNAddr());
-        }
+        result.success(contact.getFirstName());
     }
 
 
-    private void getProfileImage() {
-        DcContact contact = getContact();
-        if (contact != null) {
-            result.success(contact.getProfileImage());
+    private void getAddress(MethodCall methodCall, MethodChannel.Result result) {
+        DcContact contact = getContact(methodCall, result);
+        if (contact == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
         }
+        result.success(contact.getAddr());
     }
 
 
-    private void isBlocked() {
-        DcContact contact = getContact();
-        if (contact != null) {
-            result.success(contact.isBlocked());
+    private void getNameAndAddress(MethodCall methodCall, MethodChannel.Result result) {
+        DcContact contact = getContact(methodCall, result);
+        if (contact == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
         }
+        result.success(contact.getNameNAddr());
+    }
+
+    private void getProfileImage(MethodCall methodCall, MethodChannel.Result result) {
+        DcContact contact = getContact(methodCall, result);
+        if (contact == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
+        }
+        result.success(contact.getProfileImage());
+    }
+
+    private void getColor(MethodCall methodCall, MethodChannel.Result result) {
+        DcContact contact = getContact(methodCall, result);
+        if (contact == null) {
+            result.error(methodCall.method, null, null);
+            return;
+        }
+        result.success(contact.getColor());
+    }
+
+    private void isBlocked(MethodCall methodCall, MethodChannel.Result result) {
+        DcContact contact = getContact(methodCall, result);
+        if (contact == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
+        }
+        result.success(contact.isBlocked());
+
     }
 
 
-    private void isVerified() {
-        DcContact contact = getContact();
-        if (contact != null) {
-            result.success(contact.isVerified());
+    private void isVerified(MethodCall methodCall, MethodChannel.Result result) {
+        DcContact contact = getContact(methodCall, result);
+        if (contact == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
         }
+        result.success(contact.isVerified());
     }
 
-    private DcContact getContact() {
-        Integer id = getArgumentValueAsInt(ARGUMENT_ID);
+    private DcContact getContact(MethodCall methodCall, MethodChannel.Result result) {
+        Integer id = getArgumentValueAsInt(methodCall, result, ARGUMENT_ID);
+        DcContact contact = null;
         if (isArgumentIntValueValid(id)) {
-            return contactCache.get(id);
+            contact = contactCache.get(id);
+            if (contact == null) {
+                contact = contextCallHandler.loadAndCacheContact(id);
+            }
         }
-        return null;
+        return contact;
     }
 }

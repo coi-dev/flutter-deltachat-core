@@ -40,13 +40,16 @@
  * for more details.
  */
 
+import 'dart:async';
+
+import 'package:delta_chat_core/delta_chat_core.dart';
 import 'package:delta_chat_core/src/base.dart';
 
 enum ObjectType { String, int }
 
-class Context extends Base {
+class Context {
   static const String methodConfigGet = "context_configGet";
-  static const String methodConfigGetInt = "context_configGetint";
+  static const String methodConfigGetInt = "context_configGetInt";
   static const String methodConfigSet = "context_configSet";
   static const String methodConfigure = "context_configure";
   static const String methodIsConfigured = "context_isConfigured";
@@ -59,6 +62,7 @@ class Context extends Base {
   static const String methodGetContacts = "context_getContacts";
   static const String methodGetChatMessages = "context_getChatMessages";
   static const String methodCreateChatMessage = "context_createChatMessage";
+  static const String methodAddContactToChat = "context_addContactToChat";
 
   static const String configAddress = "addr";
   static const String configMailServer = "mail_server";
@@ -76,7 +80,7 @@ class Context extends Base {
   static const String configE2eeEnabled = "e2ee_enabled";
   static const String configQrOverlayLogo = "qr_overlay_logo";
 
-  Context() : super();
+  final DeltaChatCore core = DeltaChatCore();
 
   Future<dynamic> getConfigValue(String key, [ObjectType type]) async {
     var method;
@@ -130,7 +134,7 @@ class Context extends Base {
 
   Future<int> createGroupChat(bool verified, String name) async {
     var arguments = <String, dynamic>{Base.argumentVerified: verified, Base.argumentName: name};
-    return await core.invokeMethod(methodCreateChatByMessageId, arguments);
+    return await core.invokeMethod(methodCreateGroupChat, arguments);
   }
 
   Future<List> getContacts(int flags, String query) async {
@@ -147,4 +151,10 @@ class Context extends Base {
     var arguments = <String, dynamic>{Base.argumentId: chatId, Base.argumentValue: text};
     return await core.invokeMethod(methodCreateChatMessage, arguments);
   }
+
+  Future<int> addContactToChat(int chatId, int contactId) async {
+    var arguments = <String, dynamic>{Base.argumentChatId: chatId, Base.argumentContactId: contactId};
+    return await core.invokeMethod(methodAddContactToChat, arguments);
+  }
+
 }

@@ -42,14 +42,13 @@
 
 package com.openxchange.deltachatcore;
 
-import com.b44t.messenger.DcChat;
 import com.b44t.messenger.DcContext;
 import com.b44t.messenger.DcMsg;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
-public class MessageCallHandler extends AbstractCallHandler{
+public class MessageCallHandler extends AbstractCallHandler {
     private static final String METHOD_MESSAGE_GET_ID = "msg_getId";
     private static final String METHOD_MESSAGE_GET_TEXT = "msg_getText";
     private static final String METHOD_MESSAGE_GET_TIMESTAMP = "msg_getTimestamp";
@@ -66,14 +65,14 @@ public class MessageCallHandler extends AbstractCallHandler{
     private static final String METHOD_MESSAGE_SHOW_PADLOCK = "msg_showPadlock";
     private static final String METHOD_MESSAGE_HAS_FILE = "msg_hasFile";
     private static final String METHOD_MESSAGE_GET_FILE = "msg_getFile";
-    private static final String METHOD_MESSAGE_GET_FILEMIME = "msg_getFilemime";
+    private static final String METHOD_MESSAGE_GET_FILE_MIME = "msg_getFileMime";
     private static final String METHOD_MESSAGE_GET_FILENAME = "msg_getFilename";
-    private static final String METHOD_MESSAGE_GET_FILEBYTES = "msg_getFilebytes";
+    private static final String METHOD_MESSAGE_GET_FILE_BYTES = "msg_getFileBytes";
     private static final String METHOD_MESSAGE_IS_FORWARDED = "msg_isForwarded";
     private static final String METHOD_MESSAGE_IS_INFO = "msg_isInfo";
     private static final String METHOD_MESSAGE_IS_SETUP_MESSAGE = "msg_isSetupMessage";
     private static final String METHOD_MESSAGE_GET_SETUP_CODE_BEGIN = "msg_getSetupCodeBegin";
-    private static final String METHOD_MESSAGE_IS_INCREATION = "msg_isIncreation";
+    private static final String METHOD_MESSAGE_IS_INCREATION = "msg_isInCreation";
     private static final String METHOD_MESSAGE_SET_TEXT = "msg_setText";
     private static final String METHOD_MESSAGE_SET_FILE = "msg_setFile";
     private static final String METHOD_MESSAGE_SET_DIMENSION = "msg_setDimension";
@@ -82,124 +81,165 @@ public class MessageCallHandler extends AbstractCallHandler{
 
     private Cache<DcMsg> messageCache;
 
-    MessageCallHandler(DcContext dcContext, MethodCall methodCall, MethodChannel.Result result, Cache<DcMsg> messageCache) {
-        super(dcContext, methodCall, result);
+    MessageCallHandler(DcContext dcContext, Cache<DcMsg> messageCache) {
+        super(dcContext);
         this.messageCache = messageCache;
+    }
 
+    @Override
+    public void handleCall(MethodCall methodCall, MethodChannel.Result result) {
         switch (methodCall.method) {
             case METHOD_MESSAGE_GET_ID:
-                getId();
+                getId(methodCall, result);
                 break;
             case METHOD_MESSAGE_GET_TEXT:
-                getText();
+                getText(methodCall, result);
                 break;
             case METHOD_MESSAGE_GET_TIMESTAMP:
-                getTimestamp();
-                break;
-            case METHOD_MESSAGE_GET_TYPE:
-                break;
-            case METHOD_MESSAGE_GET_STATE:
+                getTimestamp(methodCall, result);
                 break;
             case METHOD_MESSAGE_GET_CHAT_ID:
-                getChatId();
+                getChatId(methodCall, result);
                 break;
             case METHOD_MESSAGE_GET_FROM_ID:
-                getFromId();
-                break;
-            case METHOD_MESSAGE_GET_WIDTH:
-                break;
-            case METHOD_MESSAGE_GET_HEIGHT:
-                break;
-            case METHOD_MESSAGE_GET_DURATION:
-                break;
-            case METHOD_MESSAGE_LATE_FILING_MEDIA_SIZE:
-                break;
-            case METHOD_MESSAGE_GET_SUMMARY:
-                break;
-            case METHOD_MESSAGE_GET_SUMMARY_TEXT:
-                break;
-            case METHOD_MESSAGE_SHOW_PADLOCK:
-                break;
-            case METHOD_MESSAGE_HAS_FILE:
-                break;
-            case METHOD_MESSAGE_GET_FILE:
-                break;
-            case METHOD_MESSAGE_GET_FILEMIME:
-                break;
-            case METHOD_MESSAGE_GET_FILENAME:
-                break;
-            case METHOD_MESSAGE_GET_FILEBYTES:
-                break;
-            case METHOD_MESSAGE_IS_FORWARDED:
-                break;
-            case METHOD_MESSAGE_IS_INFO:
-                break;
-            case METHOD_MESSAGE_IS_SETUP_MESSAGE:
-                break;
-            case METHOD_MESSAGE_GET_SETUP_CODE_BEGIN:
-                break;
-            case METHOD_MESSAGE_IS_INCREATION:
-                break;
-            case METHOD_MESSAGE_SET_TEXT:
-                break;
-            case METHOD_MESSAGE_SET_FILE:
-                break;
-            case METHOD_MESSAGE_SET_DIMENSION:
-                break;
-            case METHOD_MESSAGE_SET_DURATION:
+                getFromId(methodCall, result);
                 break;
             case METHOD_MESSAGE_IS_OUTGOING:
-                isOutgoing();
+                isOutgoing(methodCall, result);
+                break;
+            case METHOD_MESSAGE_HAS_FILE:
+                hasFile(methodCall, result);
+                break;
+            case METHOD_MESSAGE_GET_TYPE:
+                getType(methodCall, result);
+                break;
+            case METHOD_MESSAGE_GET_FILE:
+                getFile(methodCall, result);
+                break;
+            case METHOD_MESSAGE_GET_FILE_BYTES:
+                getFileBytes(methodCall, result);
+                break;
+            case METHOD_MESSAGE_GET_FILENAME:
+                getFileName(methodCall, result);
+                break;
+            case METHOD_MESSAGE_GET_FILE_MIME:
+                getFileMime(methodCall, result);
                 break;
             default:
-                    result.notImplemented();
+                result.notImplemented();
         }
     }
 
-    private void isOutgoing() {
-        DcMsg msg = getMsg();
-        if(msg != null){
-            result.success(msg.isOutgoing());
+    private void isOutgoing(MethodCall methodCall, MethodChannel.Result result) {
+        DcMsg message = getMessage(methodCall, result);
+        if (message == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
         }
+        result.success(message.isOutgoing());
     }
 
-    private void getFromId() {
-        DcMsg msg = getMsg();
-        if(msg != null){
-            result.success(msg.getFromId());
+    private void hasFile(MethodCall methodCall, MethodChannel.Result result) {
+        DcMsg message = getMessage(methodCall, result);
+        if (message == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
         }
+        result.success(message.hasFile());
     }
 
-    private void getChatId() {
-        DcMsg msg = getMsg();
-        if(msg != null){
-            result.success(msg.getChatId());
+    private void getType(MethodCall methodCall, MethodChannel.Result result) {
+        DcMsg message = getMessage(methodCall, result);
+        if (message == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
         }
+        result.success(message.getType());
     }
 
-    private void getTimestamp() {
-        DcMsg msg = getMsg();
-        if(msg != null){
-            result.success(msg.getTimestamp());
+    private void getFile(MethodCall methodCall, MethodChannel.Result result) {
+        DcMsg message = getMessage(methodCall, result);
+        if (message == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
         }
+        result.success(message.getFile());
     }
 
-    private void getText() {
-        DcMsg msg = getMsg();
-        if(msg != null){
-            result.success(msg.getText());
+    private void getFileBytes(MethodCall methodCall, MethodChannel.Result result) {
+        DcMsg message = getMessage(methodCall, result);
+        if (message == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
         }
+        result.success(message.getFilebytes());
     }
 
-    private void getId() {
-        DcMsg msg = getMsg();
-        if(msg != null){
-            result.success(msg.getId());
+    private void getFileName(MethodCall methodCall, MethodChannel.Result result) {
+        DcMsg message = getMessage(methodCall, result);
+        if (message == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
         }
+        result.success(message.getFilename());
     }
 
-    private DcMsg getMsg() {
-        Integer id = getArgumentValueAsInt(ARGUMENT_ID);
+    private void getFileMime(MethodCall methodCall, MethodChannel.Result result) {
+        DcMsg message = getMessage(methodCall, result);
+        if (message == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
+        }
+        result.success(message.getFilemime());
+    }
+
+    private void getFromId(MethodCall methodCall, MethodChannel.Result result) {
+        DcMsg message = getMessage(methodCall, result);
+        if (message == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
+        }
+        result.success(message.getFromId());
+    }
+
+    private void getChatId(MethodCall methodCall, MethodChannel.Result result) {
+        DcMsg message = getMessage(methodCall, result);
+        if (message == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
+        }
+        result.success(message.getChatId());
+    }
+
+    private void getTimestamp(MethodCall methodCall, MethodChannel.Result result) {
+        DcMsg message = getMessage(methodCall, result);
+        if (message == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
+        }
+        result.success(message.getTimestamp());
+    }
+
+    private void getText(MethodCall methodCall, MethodChannel.Result result) {
+        DcMsg message = getMessage(methodCall, result);
+        if (message == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
+        }
+        result.success(message.getText());
+    }
+
+    private void getId(MethodCall methodCall, MethodChannel.Result result) {
+        DcMsg message = getMessage(methodCall, result);
+        if (message == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
+        }
+        result.success(message.getId());
+    }
+
+    private DcMsg getMessage(MethodCall methodCall, MethodChannel.Result result) {
+        Integer id = getArgumentValueAsInt(methodCall, result, ARGUMENT_ID);
         if (isArgumentIntValueValid(id)) {
             return messageCache.get(id);
         }

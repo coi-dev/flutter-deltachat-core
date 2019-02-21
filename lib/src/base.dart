@@ -40,6 +40,8 @@
  * for more details.
  */
 
+import 'dart:async';
+
 import 'package:delta_chat_core/delta_chat_core.dart';
 
 abstract class Base {
@@ -48,12 +50,14 @@ abstract class Base {
   static const String argumentValue = "value";
   static const String argumentAddress = "address";
   static const String argumentId = "id";
-  static const String argumentVerified = "verfied";
+  static const String argumentVerified = "verified";
   static const String argumentName = "name";
   static const String argumentIndex = "index";
   static const String argumentFlags = "flags";
   static const String argumentQuery = "query";
   static const String argumentAddressBook = "addressBook";
+  static const String argumentContactId = "contactId";
+  static const String argumentChatId = "chatId";
 
   final DeltaChatCore core = DeltaChatCore();
 
@@ -67,26 +71,42 @@ abstract class Base {
     setLastUpdate();
   }
 
-  dynamic loadValue(String value, var parameters) async {
-    if (!isValueLoaded(value)) {
-      _storedValues[value] = await core.invokeMethod(value, parameters);
-      _loadedValues[value] = true;
+  Future<void> loadValue(String key, var parameters) async {
+    if (!isValueLoaded(key)) {
+      _storedValues[key] = await core.invokeMethod(key, parameters);
+      _loadedValues[key] = true;
     }
-    return _storedValues[value];
   }
 
-  prepareReloadValue(String value) {
-    unloadValue(value);
+  Future<dynamic> loadAndGetValue(String key, var parameters) async  {
+    await loadValue(key, parameters);
+    return _storedValues[key];
+  }
+
+  void loadValues({List<String> keys, Map<String, Map<String, dynamic>> keysAndParameters}) async {
+    if (keys != null && keys.isNotEmpty) {
+      Future.forEach(keys, (key) async {
+        await loadValue(key, getDefaultParameters());
+      });
+    } else if (keysAndParameters != null && keysAndParameters.isNotEmpty) {
+      for (int index = 0; index < keysAndParameters.length; index++) {
+        await loadValue(keysAndParameters.keys.elementAt(index), keysAndParameters.values.elementAt(index));
+      }
+    }
+  }
+
+  prepareReloadValue(String key) {
+    unloadValue(key);
     setLastUpdate();
   }
 
-  unloadValue(String value) {
-    _storedValues[value] = null;
-    _loadedValues[value] = null;
+  unloadValue(String key) {
+    _storedValues[key] = null;
+    _loadedValues[key] = null;
   }
 
-  bool isValueLoaded(String value) {
-    return _loadedValues[value] != null && _loadedValues[value] != false;
+  bool isValueLoaded(String key) {
+    return _loadedValues[key] != null && _loadedValues[key] != false;
   }
 
   resetValues() {
@@ -99,5 +119,7 @@ abstract class Base {
   void setLastUpdate() {
     _lastUpdate = DateTime.now().millisecondsSinceEpoch;
   }
+
+  getDefaultParameters();
 
 }

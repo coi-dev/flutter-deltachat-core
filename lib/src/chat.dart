@@ -40,18 +40,21 @@
  * for more details.
  */
 
+import 'dart:async';
+
 import 'package:delta_chat_core/src/base.dart';
 
 class Chat extends Base {
   static const String methodChatGetId = "chat_getId";
   static const String methodChatIsGroup = "chat_isGroup";
   static const String methodChatGetArchived = "chat_getArchived";
+  static const String methodChatGetColor = "chat_getColor";
   static const String methodChatGetName = "chat_getName";
   static const String methodChatGetSubtitle = "chat_getSubtitle";
   static const String methodChatGetProfileImage = "chat_getProfileImage";
   static const String methodChatIsUnpromoted = "chat_isUnpromoted";
-  static const String methodChatIsSelfTalk = "chat_isSelfTalk";
   static const String methodChatIsVerified = "chat_isVerified";
+  static const String methodChatIsSelfTalk = "chat_isSelfTalk";
 
   final int _id;
 
@@ -62,40 +65,47 @@ class Chat extends Base {
   }
 
   Future<int> getChatId() async {
-    return await loadValue(methodChatGetId, <String, dynamic>{Base.argumentId: _id});
+    return await loadAndGetValue(methodChatGetId, getDefaultParameters());
   }
 
   Future<bool> isGroup() async {
-    return await loadValue(methodChatIsGroup, <String, dynamic>{Base.argumentId: _id});
+    return await loadAndGetValue(methodChatIsGroup, getDefaultParameters());
   }
 
   Future<int> getArchived() async {
-    return await loadValue(methodChatGetArchived, <String, dynamic>{Base.argumentId: _id});
+    return await loadAndGetValue(methodChatGetArchived, getDefaultParameters());
+  }
+
+  Future<int> getColor() async {
+    return await loadAndGetValue(methodChatGetColor, getDefaultParameters());
   }
 
   Future<String> getName() async {
-    return await loadValue(methodChatGetName, <String, dynamic>{Base.argumentId: _id});
+    return await loadAndGetValue(methodChatGetName, getDefaultParameters());
   }
 
   Future<String> getSubtitle() async {
-    return await loadValue(methodChatGetSubtitle, <String, dynamic>{Base.argumentId: _id});
+    return await loadAndGetValue(methodChatGetSubtitle, getDefaultParameters());
   }
 
   Future<String> getProfileImage() async {
-    return await loadValue(methodChatGetProfileImage, <String, dynamic>{Base.argumentId: _id});
+    return await loadAndGetValue(methodChatGetProfileImage, getDefaultParameters());
   }
 
   Future<bool> isUnpromoted() async {
-    return await loadValue(methodChatIsUnpromoted, <String, dynamic>{Base.argumentId: _id});
+    return await loadAndGetValue(methodChatIsUnpromoted, getDefaultParameters());
   }
 
   Future<bool> isVerified() async {
-    return await loadValue(methodChatIsVerified, <String, dynamic>{Base.argumentId: _id});
+    return await loadAndGetValue(methodChatIsVerified, getDefaultParameters());
   }
 
   Future<bool> isSelfTalk() async {
-    return await loadValue(methodChatIsSelfTalk, <String, dynamic>{Base.argumentId: _id});
+    return await loadAndGetValue(methodChatIsSelfTalk, getDefaultParameters());
   }
+
+  @override
+  Map<String, dynamic> getDefaultParameters() => <String, dynamic>{Base.argumentId: _id};
 
   static Function getCreator() {
     return (id) => new Chat._internal(id);

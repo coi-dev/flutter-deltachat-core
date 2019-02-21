@@ -42,8 +42,6 @@
 
 package com.openxchange.deltachatcore;
 
-import android.util.Log;
-
 import com.b44t.messenger.DcChat;
 import com.b44t.messenger.DcChatlist;
 import com.b44t.messenger.DcContext;
@@ -64,85 +62,98 @@ class ChatListCallHandler extends AbstractCallHandler {
     private static final String METHOD_CHAT_GET_MSG = "chatList_getMsg";
     private static final String METHOD_CHAT_GET_SUMMARY = "chatList_getSummary";
 
-    private final DcChatlist dcChatlist;
+    private DcChatlist dcChatlist;
 
     private Cache<DcChat> chatCache;
 
-    ChatListCallHandler(DcContext dcContext, MethodCall methodCall, MethodChannel.Result result, Cache<DcChat> chatCache) {
-        super(dcContext, methodCall, result);
+    ChatListCallHandler(DcContext dcContext, Cache<DcChat> chatCache) {
+        super(dcContext);
         this.chatCache = chatCache;
+    }
+
+    @Override
+    public void handleCall(MethodCall methodCall, MethodChannel.Result result) {
         dcChatlist = dcContext.getChatlist(0, null, 0);
         switch (methodCall.method) {
             case METHOD_CHAT_GET_CNT:
-                getChatCnt();
+                getChatCnt(result);
                 break;
             case METHOD_CHAT_GET_ID:
-                getChatId();
+                getChatId(methodCall, result);
                 break;
             case METHOD_CHAT_GET_MSG_ID:
-                getChatMsgId();
+                getChatMsgId(methodCall, result);
                 break;
             case METHOD_CHAT_GET_CHAT:
-                getChat();
+                getChat(methodCall, result);
                 break;
             case METHOD_CHAT_GET_MSG:
-                getChatMsg();
+                getChatMsg(methodCall, result);
                 break;
             case METHOD_CHAT_GET_SUMMARY:
-                getChatSummary();
+                getChatSummary(methodCall, result);
                 break;
             default:
                 result.notImplemented();
         }
     }
 
-    private void getChatSummary() {
-        Integer index = getArgumentValueAsInt(ARGUMENT_INDEX);
-        if (isArgumentIntValueValid(index)) {
-            DcChat chat = dcChatlist.getChat(index);
-            DcLot summary = dcChatlist.getSummary(index, chat);
-            List<Object> summaryResult = Collections.singletonList(summary);
-            result.success(summaryResult);
+    private void getChatSummary(MethodCall methodCall, MethodChannel.Result result) {
+        Integer index = getArgumentValueAsInt(methodCall, result, ARGUMENT_INDEX);
+        if (!isArgumentIntValueValid(index)) {
+            resultErrorArgumentNoValidInt(result, ARGUMENT_INDEX);
+            return;
         }
+        DcChat chat = dcChatlist.getChat(index);
+        DcLot summary = dcChatlist.getSummary(index, chat);
+        List<Object> summaryResult = Collections.singletonList(summary);
+        result.success(summaryResult);
     }
 
-    private void getChatMsg() {
-        Integer index = getArgumentValueAsInt(ARGUMENT_INDEX);
-        if (isArgumentIntValueValid(index)) {
-            DcMsg msg = dcChatlist.getMsg(index);
-            List<Object> msgResult = Collections.singletonList(msg);
-            result.success(msgResult);
+    private void getChatMsg(MethodCall methodCall, MethodChannel.Result result) {
+        Integer index = getArgumentValueAsInt(methodCall, result, ARGUMENT_INDEX);
+        if (!isArgumentIntValueValid(index)) {
+            resultErrorArgumentNoValidInt(result, ARGUMENT_INDEX);
+            return;
         }
+        DcMsg msg = dcChatlist.getMsg(index);
+        List<Object> msgResult = Collections.singletonList(msg);
+        result.success(msgResult);
     }
 
-    private void getChat() {
-        Integer index = getArgumentValueAsInt(ARGUMENT_INDEX);
-        if (isArgumentIntValueValid(index)) {
-            DcChat chat = chatCache.get(index);
-            if (chat == null) {
-                chat = dcChatlist.getChat(index);
-                chatCache.put(chat.getId(), chat);
-            }
-            result.success(chat.getId());
+    private void getChat(MethodCall methodCall, MethodChannel.Result result) {
+        Integer index = getArgumentValueAsInt(methodCall, result, ARGUMENT_INDEX);
+        if (!isArgumentIntValueValid(index)) {
+            resultErrorArgumentNoValidInt(result, ARGUMENT_INDEX);
+            return;
         }
+        DcChat chat = chatCache.get(index);
+        if (chat == null) {
+            chat = dcChatlist.getChat(index);
+            chatCache.put(chat.getId(), chat);
+        }
+        result.success(chat.getId());
     }
 
-    private void getChatMsgId() {
-        Integer index = getArgumentValueAsInt(ARGUMENT_INDEX);
-        if (isArgumentIntValueValid(index)) {
-            result.success(dcChatlist.getMsgId(index));
+    private void getChatMsgId(MethodCall methodCall, MethodChannel.Result result) {
+        Integer index = getArgumentValueAsInt(methodCall, result, ARGUMENT_INDEX);
+        if (!isArgumentIntValueValid(index)) {
+            resultErrorArgumentNoValidInt(result, ARGUMENT_INDEX);
+            return;
         }
+        result.success(dcChatlist.getMsgId(index));
     }
 
-    private void getChatId() {
-        Integer index = getArgumentValueAsInt(ARGUMENT_INDEX);
-        if (isArgumentIntValueValid(index)) {
-            result.success(dcChatlist.getChatId(index));
+    private void getChatId(MethodCall methodCall, MethodChannel.Result result) {
+        Integer index = getArgumentValueAsInt(methodCall, result, ARGUMENT_INDEX);
+        if (!isArgumentIntValueValid(index)) {
+            resultErrorArgumentNoValidInt(result, ARGUMENT_INDEX);
+            return;
         }
+        result.success(dcChatlist.getChatId(index));
     }
 
-    private void getChatCnt() {
+    private void getChatCnt(MethodChannel.Result result) {
         result.success(dcChatlist.getCnt());
     }
-
 }

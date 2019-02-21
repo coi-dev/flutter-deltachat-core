@@ -58,7 +58,7 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.flutter.plugin.common.StringCodec;
 
 public class DeltaChatCorePlugin implements MethodCallHandler {
-    public static final String LIBRARY_NAME = "native-utils";
+    private static final String LIBRARY_NAME = "native-utils";
 
     private static final String CHANNEL_DELTA_CHAT_CORE = "deltaChatCore";
     private static final String CHANNEL_DELTA_CHAT_CORE_MESSAGES = "deltaChatCoreMessages";
@@ -90,6 +90,12 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
     private Cache<DcContact> contactCache = new Cache<>();
     private Cache<DcMsg> messageCache = new Cache<>();
 
+    private ChatCallHandler chatCallHandler;
+    private ChatListCallHandler chatListCallHandler;
+    private ContactCallHandler contactCallHandler;
+    private ContextCallHandler contextCallHandler;
+    private MessageCallHandler messageCallHandler;
+
     private DeltaChatCorePlugin(Registrar registrar) {
         this.registrar = registrar;
         messageChannel = new BasicMessageChannel<>(registrar.messenger(), CHANNEL_DELTA_CHAT_CORE_MESSAGES, StringCodec.INSTANCE);
@@ -100,21 +106,9 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
         channel.setMethodCallHandler(new DeltaChatCorePlugin(registrar));
     }
 
-    public static void showToast(String message) {
-        if (messageChannel != null) {
-            messageChannel.send(message);
-        } else {
-            throw new IllegalStateException("Call to uninitialized message channel in DeltaChatCorePlugin");
-        }
-    }
-
     @Override
     public void onMethodCall(MethodCall call, Result result) {
         delegateMethodCall(call, result);
-    }
-
-    private String extractMethodPrefix(String methodCall) {
-        return methodCall.split(METHOD_PREFIX_SEPARATOR)[0];
     }
 
     private void delegateMethodCall(MethodCall call, Result result) {
@@ -147,6 +141,10 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
         }
     }
 
+    private String extractMethodPrefix(String methodCall) {
+        return methodCall.split(METHOD_PREFIX_SEPARATOR)[0];
+    }
+
     private void handleBaseCalls(MethodCall call, Result result) {
         switch (call.method) {
             case METHOD_BASE_INIT:
@@ -167,6 +165,11 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
         System.loadLibrary(LIBRARY_NAME);
         applicationDcContext = new ApplicationDcContext(registrar.activity());
         result.success(null);
+        contextCallHandler = new ContextCallHandler(applicationDcContext, contactCache, messageCache, chatCache);
+        chatListCallHandler = new ChatListCallHandler(applicationDcContext, chatCache);
+        messageCallHandler = new MessageCallHandler(applicationDcContext, messageCache);
+        contactCallHandler = new ContactCallHandler(applicationDcContext, contactCache, contextCallHandler);
+        chatCallHandler = new ChatCallHandler(applicationDcContext, chatCache, contextCallHandler);
     }
 
     private void systemInfo(Result result) {
@@ -200,23 +203,31 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
     }
 
     private void handleContextCalls(MethodCall call, Result result) {
-        new ContextCallHandler(applicationDcContext, call, result, contactCache, messageCache);
+        contextCallHandler.handleCall(call, result);
     }
 
     private void handleChatListCalls(MethodCall call, Result result) {
-        new ChatListCallHandler(applicationDcContext, call, result, chatCache);
+        chatListCallHandler.handleCall(call, result);
     }
 
     private void handleChatCalls(MethodCall call, Result result) {
-        new ChatCallHandler(applicationDcContext, call, result, chatCache);
+        chatCallHandler.handleCall(call, result);
     }
 
     private void handleContactCalls(MethodCall call, Result result) {
-        new ContactCallHandler(applicationDcContext, call, result, contactCache);
+        contactCallHandler.handleCall(call, result);
     }
 
     private void handleMessageCalls(MethodCall call, Result result) {
-        new MessageCallHandler(applicationDcContext, call, result, messageCache);
+        messageCallHandler.handleCall(call, result);
+    }
+
+    public static void showToast(String message) {
+        if (messageChannel != null) {
+            messageChannel.send(message);
+        } else {
+            throw new IllegalStateException("Call to uninitialized message channel in DeltaChatCorePlugin");
+        }
     }
 
 }
