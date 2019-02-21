@@ -19,7 +19,7 @@ It interacts with the native interfaces provided by the Android and iOS platform
 - Download the [Android NDK](https://developer.android.com/ndk/downloads/older_releases) in version Android NDK, Revision 14b (March 2017) as newer versions are currently not supported 
 - Execute *git submodule update --init --recursive*
 - Navigate in the *delta_chat_core/android* folder and execute *ndk-build* inside that folder
-- Build and run the project via your IDE / Flutter CLI (it contains an example app to test the plugin)
+- Build and run the project via your IDE / Flutter CLI (the project contains an example app to test the plugin)
 
 ## Development
 To be able to edit / extend this project the following steps are important:
