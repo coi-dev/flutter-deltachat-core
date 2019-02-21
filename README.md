@@ -6,7 +6,7 @@ It interacts with the native interfaces provided by the Android and iOS platform
 - **Android state:** Currently in development
 - **iOS state:** Pending
 
-## Relevant information
+## Information
 - [Documentation](https://confluence-public.open-xchange.com/display/COIPublic/OX+Talk+Mobile+App)
 
 ## Requirements
@@ -15,7 +15,7 @@ It interacts with the native interfaces provided by the Android and iOS platform
 - The used Delta Chat Core is currently only out of the box buildable using Linux (Debian / Ubuntu is recommended)
 - Android NDK Revision 14b is used to build the Delta Chat Core
 
-## Execution of the Flutter app
+## Execution
 - Download the [Android NDK](https://developer.android.com/ndk/downloads/older_releases) in version Android NDK, Revision 14b (March 2017) as newer versions are currently not supported 
 - Execute *git submodule update --init --recursive*
 - Navigate in the *delta_chat_core/android* folder and execute *ndk-build* inside that folder
