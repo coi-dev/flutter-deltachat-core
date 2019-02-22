@@ -8,17 +8,17 @@ It interacts with the native interfaces provided by the Android and iOS platform
 
 ## Information
 - [Documentation](https://confluence-public.open-xchange.com/display/COIPublic/OX+Talk+Mobile+App)
+- The IMAP / SMTP interactions are managed by the [delta_chat_core plugin](https://github.com/open-xchange/flutter-deltachat-core)
 
 ## Requirements
-- The latest Flutter stable release (1.0) is used
+- Flutter 1.0 is used (if problems occur try the [Flutter Dev Channel](https://github.com/flutter/flutter/wiki/Flutter-build-release-channels))
 - Delta Chat Core v0.40.0 is used
 - The used Delta Chat Core is currently only out of the box buildable using Linux (Debian / Ubuntu is recommended)
-- Android NDK Revision 14b is used to build the Delta Chat Core
+- Download the [Android NDK](https://developer.android.com/ndk/downloads/older_releases) in version Android NDK, Revision 14b (March 2017) as newer versions are currently not supported to build the Delta Chat Core
+- The Android NDK must be on the PATH (*ndk-build* must be callable)
 
 ## Execution
-- Download the [Android NDK](https://developer.android.com/ndk/downloads/older_releases) in version Android NDK, Revision 14b (March 2017) as newer versions are currently not supported 
 - Execute *git submodule update --init --recursive*
-- Navigate in the *delta_chat_core/android* folder and execute *ndk-build* inside that folder
 - Build and run the project via your IDE / Flutter CLI (the project contains an example app to test the plugin)
 
 ## Development
