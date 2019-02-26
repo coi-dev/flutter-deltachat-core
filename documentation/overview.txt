@@ -1,0 +1,13 @@
+digraph G {
+	node [	
+		shape = polygon,
+		sides = 4,
+		style = filled,
+		fontname = "Helvetica-Outline" 
+		];
+    "Dart plugin context" [fillcolor=cadetblue1]
+    "Java plugin context" [fillcolor=cadetblue3]
+    "Delta Chat Core (DCC) context" [fillcolor=lightpink2]
+    "Dart / Flutter app context" [fillcolor=lightgrey] 
+    
+}
