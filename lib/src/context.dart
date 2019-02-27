@@ -44,6 +44,7 @@ import 'dart:async';
 
 import 'package:delta_chat_core/delta_chat_core.dart';
 import 'package:delta_chat_core/src/base.dart';
+import 'package:flutter/foundation.dart';
 
 enum ObjectType { String, int }
 
@@ -94,8 +95,13 @@ class Context {
     return await core.invokeMethod(method, arguments);
   }
 
-  Future<dynamic> setConfigValue(String key, value) async {
-    String type = value.runtimeType.toString();
+  Future<dynamic> setConfigValue(String key, value, [ObjectType enforceType]) async {
+    String type;
+    if (enforceType != null) {
+      type = describeEnum(enforceType);
+    } else {
+      type = value != null ? value.runtimeType.toString() : null;
+    }
     var arguments = <String, dynamic>{Base.argumentType: type, Base.argumentKey: key, Base.argumentValue: value};
     await core.invokeMethod(methodConfigSet, arguments);
   }
@@ -162,5 +168,4 @@ class Context {
     var arguments = <String, dynamic>{Base.argumentChatId: chatId, Base.argumentContactId: contactId};
     return await core.invokeMethod(methodAddContactToChat, arguments);
   }
-
 }
