@@ -11,7 +11,7 @@ It interacts with the native interfaces provided by the Android and iOS platform
 - The IMAP / SMTP interactions are managed by the [delta_chat_core plugin](https://github.com/open-xchange/flutter-deltachat-core)
 
 ## Requirements
-- Flutter 1.0 is used (if problems occur try the [Flutter Dev Channel](https://github.com/flutter/flutter/wiki/Flutter-build-release-channels))
+- The latest Flutter stable version is used (if problems occur try the [Flutter Dev Channel](https://github.com/flutter/flutter/wiki/Flutter-build-release-channels))
 - Delta Chat Core v0.40.0 is used
 - The used Delta Chat Core is currently only out of the box buildable using Linux (Debian / Ubuntu is recommended)
 - Download the [Android NDK](https://developer.android.com/ndk/downloads/older_releases) in version Android NDK, Revision 14b (March 2017) as newer versions are currently not supported to build the Delta Chat Core
