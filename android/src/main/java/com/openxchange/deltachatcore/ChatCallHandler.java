@@ -202,10 +202,7 @@ class ChatCallHandler extends AbstractCallHandler {
         Integer id = getArgumentValueAsInt(methodCall, result, ARGUMENT_ID);
         DcChat chat = null;
         if (isArgumentIntValueValid(id)) {
-            chat = chatCache.get(id);
-            if (chat == null) {
-                chat = contextCallHandler.loadAndCacheChat(id);
-            }
+            chat = contextCallHandler.loadAndCacheChat(id);
         }
         return chat;
     }

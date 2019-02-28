@@ -167,7 +167,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
         result.success(null);
         contextCallHandler = new ContextCallHandler(applicationDcContext, contactCache, messageCache, chatCache);
         chatListCallHandler = new ChatListCallHandler(applicationDcContext, chatCache);
-        messageCallHandler = new MessageCallHandler(applicationDcContext, messageCache);
+        messageCallHandler = new MessageCallHandler(applicationDcContext, messageCache, contextCallHandler);
         contactCallHandler = new ContactCallHandler(applicationDcContext, contactCache, contextCallHandler);
         chatCallHandler = new ChatCallHandler(applicationDcContext, chatCache, contextCallHandler);
     }

@@ -80,10 +80,12 @@ public class MessageCallHandler extends AbstractCallHandler {
     private static final String METHOD_MESSAGE_IS_OUTGOING = "msg_isOutgoing";
 
     private Cache<DcMsg> messageCache;
+    private final ContextCallHandler contextCallHandler;
 
-    MessageCallHandler(DcContext dcContext, Cache<DcMsg> messageCache) {
+    MessageCallHandler(DcContext dcContext, Cache<DcMsg> messageCache, ContextCallHandler contextCallHandler) {
         super(dcContext);
         this.messageCache = messageCache;
+        this.contextCallHandler = contextCallHandler;
     }
 
     @Override
@@ -240,9 +242,10 @@ public class MessageCallHandler extends AbstractCallHandler {
 
     private DcMsg getMessage(MethodCall methodCall, MethodChannel.Result result) {
         Integer id = getArgumentValueAsInt(methodCall, result, ARGUMENT_ID);
+        DcMsg message = null;
         if (isArgumentIntValueValid(id)) {
-            return messageCache.get(id);
+            message = contextCallHandler.loadAndCacheChatMessage(id);
         }
-        return null;
+        return message;
     }
 }

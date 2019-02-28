@@ -395,6 +395,15 @@ class ContextCallHandler extends AbstractCallHandler {
         result.success(messageIds);
     }
 
+    DcMsg loadAndCacheChatMessage(Integer id) {
+        DcMsg message = messageCache.get(id);
+        if (message == null) {
+            message = dcContext.getMsg(id);
+            messageCache.put(message.getId(), message);
+        }
+        return message;
+    }
+
     private void createChatMessage(MethodCall methodCall, MethodChannel.Result result) {
         if (!hasArgumentKeys(methodCall, ARGUMENT_ID, ARGUMENT_KEY_VALUE)) {
             resultErrorArgumentMissing(result);

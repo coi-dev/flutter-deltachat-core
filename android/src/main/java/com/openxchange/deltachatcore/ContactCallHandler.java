@@ -206,10 +206,7 @@ class ContactCallHandler extends AbstractCallHandler {
         Integer id = getArgumentValueAsInt(methodCall, result, ARGUMENT_ID);
         DcContact contact = null;
         if (isArgumentIntValueValid(id)) {
-            contact = contactCache.get(id);
-            if (contact == null) {
-                contact = contextCallHandler.loadAndCacheContact(id);
-            }
+            contact = contextCallHandler.loadAndCacheContact(id);
         }
         return contact;
     }
