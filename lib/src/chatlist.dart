@@ -52,31 +52,41 @@ class ChatList extends Base {
   static const String methodChatListGetMsgId = "chatList_getMsgId";
   static const String methodChatListGetMsg = "chatList_getMsg";
   static const String methodChatListGetSummary = "chatList_getSummary";
+  static const String chatListNoSpecial = "chatList_noSpecial";
+  static const String chatListAll = "chatList_all";
+
+  static const int typeVerifiedOnly = 1;
+  static const int typeAddSelf = 2;
+  static const int typeArchivedOnly = 0x01;
+  static const int typeNoSpecials = 0x02;
+  static const int typeAddAllDoneHint = 0x04;
+
+  static const int specialInvite = 1;
 
   final DeltaChatCore core = DeltaChatCore();
 
-  Future<int> getChatCnt() async {
-    return await core.invokeMethod(methodChatListGetCnt, null);
+  Future<int> getChatCnt([int chatListType]) async {
+    return await core.invokeMethod(methodChatListGetCnt, <String, dynamic>{Base.argumentType: chatListType});
   }
 
-  Future<int> getChatId(int index) async {
-    return await core.invokeMethod(methodChatListGetId, <String, dynamic>{Base.argumentIndex: index});
+  Future<int> getChatId(int index, [int chatListType]) async {
+    return await core.invokeMethod(methodChatListGetId, <String, dynamic>{Base.argumentType: chatListType, Base.argumentIndex: index});
   }
 
-  Future<int> getChatMsgId(int index) async {
-    return await core.invokeMethod(methodChatListGetMsgId, <String, dynamic>{Base.argumentIndex: index});
+  Future<int> getChatMsgId(int index, [int chatListType]) async {
+    return await core.invokeMethod(methodChatListGetMsgId, <String, dynamic>{Base.argumentType: chatListType, Base.argumentIndex: index});
   }
 
-  Future<int> getChat(int index) async {
-    return await core.invokeMethod(methodChatListGetChat, <String, dynamic>{Base.argumentIndex: index});
+  Future<int> getChat(int index, [int chatListType]) async {
+    return await core.invokeMethod(methodChatListGetChat, <String, dynamic>{Base.argumentType: chatListType, Base.argumentIndex: index});
   }
 
-  Future<dynamic> getChatMsg(int index) async {
-    return await core.invokeMethod(methodChatListGetMsg, <String, dynamic>{Base.argumentIndex: index});
+  Future<dynamic> getChatMsg(int index, [int chatListType]) async {
+    return await core.invokeMethod(methodChatListGetMsg, <String, dynamic>{Base.argumentType: chatListType, Base.argumentIndex: index});
   }
 
-  Future<dynamic> getChatSummary(int index) async {
-    return await core.invokeMethod(methodChatListGetSummary, <String, dynamic>{Base.argumentIndex: index});
+  Future<dynamic> getChatSummary(int index, [int chatListType]) async {
+    return await core.invokeMethod(methodChatListGetSummary, <String, dynamic>{Base.argumentType: chatListType, Base.argumentIndex: index});
   }
 
   @override
@@ -84,6 +94,4 @@ class ChatList extends Base {
     // TODO: implement getDefaultParameters
     return null;
   }
-
-
 }

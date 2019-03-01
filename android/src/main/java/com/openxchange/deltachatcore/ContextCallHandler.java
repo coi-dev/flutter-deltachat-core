@@ -60,6 +60,7 @@ class ContextCallHandler extends AbstractCallHandler {
     private static final String METHOD_ADD_ADDRESS_BOOK = "context_addAddressBook";
     private static final String METHOD_CREATE_CONTACT = "context_createContact";
     private static final String METHOD_DELETE_CONTACT = "context_deleteContact";
+    private static final String METHOD_BLOCK_CONTACT = "context_blockContact";
     private static final String METHOD_CREATE_CHAT_BY_CONTACT_ID = "context_createChatByContactId";
     private static final String METHOD_CREATE_CHAT_BY_MESSAGE_ID = "context_createChatByMessageId";
     private static final String METHOD_CREATE_GROUP_CHAT = "context_createGroupChat";
@@ -119,6 +120,9 @@ class ContextCallHandler extends AbstractCallHandler {
                 break;
             case METHOD_DELETE_CONTACT:
                 deleteContact(methodCall, result);
+                break;
+            case METHOD_BLOCK_CONTACT:
+                blockContact(methodCall, result);
                 break;
             case METHOD_CREATE_CHAT_BY_CONTACT_ID:
                 createChatByContactId(methodCall, result);
@@ -262,6 +266,22 @@ class ContextCallHandler extends AbstractCallHandler {
         }
         result.success(deleted);
     }
+
+    private void blockContact(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_ID)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        Integer contactId = methodCall.argument(ARGUMENT_ID);
+        if (contactId == null) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        dcContext.blockContact(contactId, 1);
+        contactCache.delete(contactId);
+        result.success(null);
+    }
+
 
     private void createChatByContactId(MethodCall methodCall, MethodChannel.Result result) {
         if (!hasArgumentKeys(methodCall, ARGUMENT_ID)) {

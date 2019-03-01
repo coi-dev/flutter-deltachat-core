@@ -125,11 +125,11 @@ class _MyAppState extends State<MyApp> {
         _addListItem(text: "createChatByContactId", assertion: 10, result: chatId);
         ChatList chatList = ChatList();
         int index = 0;
-        int id = await chatList.getChatId(index);
+        int id = await chatList.getChatId(index, ChatList.typeNoSpecials);
         _addListItem(text: "getChatId", assertion: 10, result: id);
-        var chatCnt = await chatList.getChatCnt();
+        var chatCnt = await chatList.getChatCnt(ChatList.typeNoSpecials);
         _addListItem(text: "getChatCnt", assertion: 1, result: chatCnt);
-        int chatIdFromChatList = await chatList.getChat(index);
+        int chatIdFromChatList = await chatList.getChat(index, ChatList.typeNoSpecials);
         _addListItem(text: "getChat", assertion: 10, result: chatIdFromChatList);
         var groupChatId = await context.createGroupChat(false, "The group");
         _addListItem(text: "createGroupChat", assertion: 11, result: groupChatId);
@@ -196,9 +196,7 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  _configureSuccess() {
-  }
+  _configureSuccess() {}
 
-  _configureError() {
-  }
+  _configureError() {}
 }

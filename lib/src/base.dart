@@ -114,7 +114,7 @@ abstract class Base {
     _loadedValues.clear();
   }
 
-  get lastUpdate => _lastUpdate;
+  int get lastUpdate => _lastUpdate;
 
   void setLastUpdate() {
     _lastUpdate = DateTime.now().millisecondsSinceEpoch;

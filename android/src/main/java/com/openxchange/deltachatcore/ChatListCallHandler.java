@@ -73,7 +73,14 @@ class ChatListCallHandler extends AbstractCallHandler {
 
     @Override
     public void handleCall(MethodCall methodCall, MethodChannel.Result result) {
-        dcChatlist = dcContext.getChatlist(0, null, 0);
+        int chatListFlag;
+        Integer type = methodCall.argument(ARGUMENT_KEY_TYPE);
+        if (type != null) {
+            chatListFlag = type;
+        } else {
+            chatListFlag = 0;
+        }
+        dcChatlist = dcContext.getChatlist(chatListFlag, null, 0);
         switch (methodCall.method) {
             case METHOD_CHAT_GET_CNT:
                 getChatCnt(result);

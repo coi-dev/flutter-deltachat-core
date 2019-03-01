@@ -56,6 +56,7 @@ class Context {
   static const String methodAddAddressBook = "context_addAddressBook";
   static const String methodCreateContact = "context_createContact";
   static const String methodDeleteContact = "context_deleteContact";
+  static const String methodBlockContact = "context_blockContact";
   static const String methodCreateChatById = "context_createChatByContactId";
   static const String methodCreateChatByMessageId = "context_createChatByMessageId";
   static const String methodCreateGroupChat = "context_createGroupChat";
@@ -120,6 +121,11 @@ class Context {
   Future<bool> deleteContact(int id) async {
     var arguments = <String, dynamic>{Base.argumentId: id};
     return await core.invokeMethod(methodDeleteContact, arguments);
+  }
+
+  Future<bool> blockContact(int id) async {
+    var arguments = <String, dynamic>{Base.argumentId: id};
+    return await core.invokeMethod(methodBlockContact, arguments);
   }
 
   Future<int> createChatByContactId(int id) async {
