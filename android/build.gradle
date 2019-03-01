@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 group 'com.openxchange.deltachatcore'
 version '1.0-SNAPSHOT'
 
@@ -49,8 +51,12 @@ dependencies {
 }
 
 task buildDcc << {
-    exec {
-        commandLine './tools/buildDcc.sh'
+    if (OperatingSystem.current().isLinux()) {
+        exec {
+            commandLine './tools/buildDcc.sh'
+        }
+    } else {
+        println("Couldn't build Delta Core Core automatically (this feature is only supported in Linux environments)")
     }
 }
 preBuild.dependsOn buildDcc
