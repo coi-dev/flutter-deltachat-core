@@ -40,10 +40,11 @@
  * for more details.
  */
 
-package com.openxchange.deltachatcore;
+package com.openxchange.deltachatcore.handlers;
 
 import com.b44t.messenger.DcContext;
 import com.b44t.messenger.DcMsg;
+import com.openxchange.deltachatcore.Cache;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -78,11 +79,10 @@ public class MessageCallHandler extends AbstractCallHandler {
     private static final String METHOD_MESSAGE_SET_DIMENSION = "msg_setDimension";
     private static final String METHOD_MESSAGE_SET_DURATION = "msg_setDuration";
     private static final String METHOD_MESSAGE_IS_OUTGOING = "msg_isOutgoing";
-
-    private Cache<DcMsg> messageCache;
     private final ContextCallHandler contextCallHandler;
+    private Cache<DcMsg> messageCache;
 
-    MessageCallHandler(DcContext dcContext, Cache<DcMsg> messageCache, ContextCallHandler contextCallHandler) {
+    public MessageCallHandler(DcContext dcContext, Cache<DcMsg> messageCache, ContextCallHandler contextCallHandler) {
         super(dcContext);
         this.messageCache = messageCache;
         this.contextCallHandler = contextCallHandler;

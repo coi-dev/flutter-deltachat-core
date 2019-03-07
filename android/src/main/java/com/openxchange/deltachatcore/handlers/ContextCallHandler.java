@@ -40,17 +40,18 @@
  * for more details.
  */
 
-package com.openxchange.deltachatcore;
+package com.openxchange.deltachatcore.handlers;
 
 import com.b44t.messenger.DcChat;
 import com.b44t.messenger.DcContact;
 import com.b44t.messenger.DcContext;
 import com.b44t.messenger.DcMsg;
+import com.openxchange.deltachatcore.Cache;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
-class ContextCallHandler extends AbstractCallHandler {
+public class ContextCallHandler extends AbstractCallHandler {
 
     private static final String METHOD_CONFIG_SET = "context_configSet";
     private static final String METHOD_CONFIG_GET = "context_configGet";
@@ -87,7 +88,7 @@ class ContextCallHandler extends AbstractCallHandler {
     private final Cache<DcMsg> messageCache;
     private final Cache<DcChat> chatCache;
 
-    ContextCallHandler(DcContext dcContext, Cache<DcContact> contactCache, Cache<DcMsg> messageCache, Cache<DcChat> chatCache) {
+    public ContextCallHandler(DcContext dcContext, Cache<DcContact> contactCache, Cache<DcMsg> messageCache, Cache<DcChat> chatCache) {
         super(dcContext);
         this.contactCache = contactCache;
         this.messageCache = messageCache;
@@ -198,12 +199,12 @@ class ContextCallHandler extends AbstractCallHandler {
         String key = methodCall.argument(ARGUMENT_KEY_KEY);
         switch (type) {
             case TYPE_INT: {
-                int resultValue = dcContext.getConfigInt(key, Integer.MIN_VALUE);
+                int resultValue = dcContext.getConfigInt(key);
                 result.success(resultValue);
                 break;
             }
             case TYPE_STRING: {
-                String resultValue = dcContext.getConfig(key, null);
+                String resultValue = dcContext.getConfig(key);
                 result.success(resultValue);
                 break;
             }

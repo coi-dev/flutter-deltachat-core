@@ -60,6 +60,7 @@ class DeltaChatCore {
 
   static const String methodBaseInit = 'base_init';
   static const String methodBaseCoreListener = "base_coreListener";
+  static const String methodBaseSetCoreStrings = "base_setCoreStrings";
 
   static const String argumentAdd = "add";
   static const String argumentEventId = "eventId";
@@ -69,8 +70,6 @@ class DeltaChatCore {
 
   final MethodChannel _methodChannel;
 
-  final BasicMessageChannel<String> _messageChannel;
-
   final _eventListenerRegistry = Map<String, StreamSubscription>();
 
   bool _init = false;
@@ -78,13 +77,12 @@ class DeltaChatCore {
   factory DeltaChatCore() {
     if (_instance == null) {
       final MethodChannel _methodChannel = MethodChannel(channelDeltaChatCore);
-      final _messageChannel = BasicMessageChannel(channelDeltaChatCoreMessages, StringCodec());
-      _instance = new DeltaChatCore._createInstance(_methodChannel, _messageChannel);
+      _instance = new DeltaChatCore._createInstance(_methodChannel);
     }
     return _instance;
   }
 
-  DeltaChatCore._createInstance(this._methodChannel, this._messageChannel);
+  DeltaChatCore._createInstance(this._methodChannel);
 
   Future<dynamic> invokeMethod(String method, [dynamic arguments]) async {
     if (!_init) {
@@ -95,18 +93,14 @@ class DeltaChatCore {
 
   Future<bool> init() async {
     if (!_init) {
-      _messageChannel.setMessageHandler((String message) async {
-        _showToast(message);
-      });
       await _methodChannel.invokeMethod(methodBaseInit);
       _init = true;
     }
     return _init;
   }
 
-  void _showToast(String messageCode) {
-    String message = messageCode;
-    //Fluttertoast.showToast(msg: message, toastLength: Toast.LENGTH_LONG, gravity: ToastGravity.BOTTOM, timeInSecForIos: 4);
+  Future<void> setCoreStrings(Map<int, String> coreStrings) async {
+    await _methodChannel.invokeMethod(methodBaseSetCoreStrings, coreStrings);
   }
 
   Future<int> listen(int eventId, Function function, [Function errorFunction]) async {

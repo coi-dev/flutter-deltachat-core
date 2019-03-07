@@ -44,24 +44,28 @@ package com.openxchange.deltachatcore;
 
 import android.util.SparseArray;
 
-import com.b44t.messenger.ApplicationDcContext;
 import com.b44t.messenger.DcChat;
 import com.b44t.messenger.DcContact;
 import com.b44t.messenger.DcMsg;
+import com.openxchange.deltachatcore.handlers.ChatCallHandler;
+import com.openxchange.deltachatcore.handlers.ChatListCallHandler;
+import com.openxchange.deltachatcore.handlers.ContactCallHandler;
+import com.openxchange.deltachatcore.handlers.ContextCallHandler;
+import com.openxchange.deltachatcore.handlers.EventChannelHandler;
+import com.openxchange.deltachatcore.handlers.MessageCallHandler;
 
-import io.flutter.plugin.common.BasicMessageChannel;
+import java.util.Map;
+
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
-import io.flutter.plugin.common.StringCodec;
 
 public class DeltaChatCorePlugin implements MethodCallHandler {
     private static final String LIBRARY_NAME = "native-utils";
 
     private static final String CHANNEL_DELTA_CHAT_CORE = "deltaChatCore";
-    private static final String CHANNEL_DELTA_CHAT_CORE_MESSAGES = "deltaChatCoreMessages";
 
     private static final String METHOD_PREFIX_SEPARATOR = "_";
     private static final String METHOD_PREFIX_BASE = "base";
@@ -76,14 +80,14 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
     private static final String METHOD_BASE_INIT = "base_init";
     private static final String METHOD_BASE_SYSTEM_INFO = "base_systemInfo";
     private static final String METHOD_BASE_CORE_LISTENER = "base_coreListener";
+    private static final String METHOD_BASE_SET_CORE_STRINGS = "base_setCoreStrings";
 
     private static final String ARGUMENT_ADD = "add";
     private static final String ARGUMENT_EVENT_ID = "eventId";
     private static final String ARGUMENT_LISTENER_ID = "listenerId";
 
-    private static BasicMessageChannel<String> messageChannel;
     private Registrar registrar;
-    private ApplicationDcContext applicationDcContext;
+    private com.openxchange.deltachatcore.NativeInteractionManager nativeInteractionManager;
     private SparseArray<EventChannelHandler> eventHandlers = new SparseArray<>();
 
     private Cache<DcChat> chatCache = new Cache<>();
@@ -98,7 +102,6 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
 
     private DeltaChatCorePlugin(Registrar registrar) {
         this.registrar = registrar;
-        messageChannel = new BasicMessageChannel<>(registrar.messenger(), CHANNEL_DELTA_CHAT_CORE_MESSAGES, StringCodec.INSTANCE);
     }
 
     public static void registerWith(Registrar registrar) {
@@ -129,10 +132,6 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
             case METHOD_PREFIX_CONTEXT:
                 handleContextCalls(call, result);
                 break;
-            case METHOD_PREFIX_LOT:
-                break;
-            case METHOD_PREFIX_MEDIA:
-                break;
             case METHOD_PREFIX_MSG:
                 handleMessageCalls(call, result);
                 break;
@@ -156,6 +155,9 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
             case METHOD_BASE_CORE_LISTENER:
                 coreListener(call, result);
                 break;
+            case METHOD_BASE_SET_CORE_STRINGS:
+                setCoreStrings(call, result);
+                break;
             default:
                 result.notImplemented();
         }
@@ -163,13 +165,19 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
 
     private void init(Result result) {
         System.loadLibrary(LIBRARY_NAME);
-        applicationDcContext = new ApplicationDcContext(registrar.activity());
+        nativeInteractionManager = new com.openxchange.deltachatcore.NativeInteractionManager(registrar.activity());
         result.success(null);
-        contextCallHandler = new ContextCallHandler(applicationDcContext, contactCache, messageCache, chatCache);
-        chatListCallHandler = new ChatListCallHandler(applicationDcContext, chatCache);
-        messageCallHandler = new MessageCallHandler(applicationDcContext, messageCache, contextCallHandler);
-        contactCallHandler = new ContactCallHandler(applicationDcContext, contactCache, contextCallHandler);
-        chatCallHandler = new ChatCallHandler(applicationDcContext, chatCache, contextCallHandler);
+        contextCallHandler = new ContextCallHandler(nativeInteractionManager, contactCache, messageCache, chatCache);
+        chatListCallHandler = new ChatListCallHandler(nativeInteractionManager, chatCache);
+        messageCallHandler = new MessageCallHandler(nativeInteractionManager, messageCache, contextCallHandler);
+        contactCallHandler = new ContactCallHandler(nativeInteractionManager, contactCache, contextCallHandler);
+        chatCallHandler = new ChatCallHandler(nativeInteractionManager, chatCache, contextCallHandler);
+    }
+
+    private void setCoreStrings(MethodCall call, Result result) {
+        Map<Long, String> coreStrings = call.arguments();
+        nativeInteractionManager.setCoreStrings(coreStrings);
+        result.success(null);
     }
 
     private void systemInfo(Result result) {
@@ -185,13 +193,13 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
         }
         EventChannelHandler eventHandler;
         if (eventHandlers.indexOfKey(eventId) < 0) {
-            eventHandler = new EventChannelHandler(applicationDcContext, registrar.messenger(), eventId);
+            eventHandler = new EventChannelHandler(nativeInteractionManager, registrar.messenger(), eventId);
             eventHandlers.put(eventId, eventHandler);
         } else {
             eventHandler = eventHandlers.get(eventId);
         }
         if (add) {
-            int newObserverId = eventHandler.addObserver();
+            int newObserverId = eventHandler.addListener();
             result.success(newObserverId);
         } else {
             if (listenerId == null) {
@@ -220,14 +228,6 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
 
     private void handleMessageCalls(MethodCall call, Result result) {
         messageCallHandler.handleCall(call, result);
-    }
-
-    public static void showToast(String message) {
-        if (messageChannel != null) {
-            messageChannel.send(message);
-        } else {
-            throw new IllegalStateException("Call to uninitialized message channel in DeltaChatCorePlugin");
-        }
     }
 
 }

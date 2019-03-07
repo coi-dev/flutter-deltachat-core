@@ -40,10 +40,10 @@
  * for more details.
  */
 
-package com.openxchange.deltachatcore;
+package com.openxchange.deltachatcore.handlers;
 
-import com.b44t.messenger.ApplicationDcContext;
 import com.b44t.messenger.DcEventCenter;
+import com.openxchange.deltachatcore.NativeInteractionManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,14 +55,14 @@ import io.flutter.plugin.common.EventChannel;
 public class EventChannelHandler implements EventChannel.StreamHandler {
 
     private static final String CHANNEL_DELTA_CHAT_CORE_EVENT_ = "deltaChatCoreEvent_";
-    private final ApplicationDcContext applicationDcContext;
+    private final NativeInteractionManager applicationDcContext;
     private final int eventId;
     private EventChannel.EventSink eventSink;
     private DcEventCenter.DcEventDelegate dcEventDelegate;
     private List<Integer> listeners = new ArrayList<>();
     private int listenerId = 0;
 
-    EventChannelHandler(ApplicationDcContext applicationDcContext, BinaryMessenger messenger, int eventId) {
+    public EventChannelHandler(NativeInteractionManager applicationDcContext, BinaryMessenger messenger, int eventId) {
         this.applicationDcContext = applicationDcContext;
         this.eventId = eventId;
         EventChannel channel = new EventChannel(messenger, getChannelName());
@@ -71,7 +71,7 @@ public class EventChannelHandler implements EventChannel.StreamHandler {
             @Override
             public void handleEvent(int eventId, Object data1, Object data2) {
                 List<Object> result = Arrays.asList(eventId, data1, data2);
-                if (!hasObservers()) {
+                if (!hasListeners()) {
                     return;
                 }
                 eventSink.success(result);
@@ -84,13 +84,13 @@ public class EventChannelHandler implements EventChannel.StreamHandler {
         };
     }
 
-    int addObserver() {
+    public int addListener() {
         listenerId++;
         listeners.add(listenerId);
         return listenerId;
     }
 
-    void removeListener(Integer listenerId) {
+    public void removeListener(Integer listenerId) {
         listeners.remove(listenerId);
     }
 
@@ -113,7 +113,7 @@ public class EventChannelHandler implements EventChannel.StreamHandler {
         applicationDcContext.eventCenter.removeObservers(dcEventDelegate);
     }
 
-    private boolean hasObservers() {
+    private boolean hasListeners() {
         return listeners.size() > 0;
     }
 }
