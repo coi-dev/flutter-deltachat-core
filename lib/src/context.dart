@@ -82,6 +82,13 @@ class Context {
   static const String configE2eeEnabled = "e2ee_enabled";
   static const String configQrOverlayLogo = "qr_overlay_logo";
 
+  static const int serverFlagsImapStartTls = 0x100;
+  static const int serverFlagsImapSsl = 0x200;
+  static const int serverFlagsImapPlain = 0x400;
+  static const int serverFlagsSmtpStartTls = 0x10000;
+  static const int serverFlagsSmtpSsl= 0x20000;
+  static const int serverFlagsSmtpPlain = 0x40000;
+
   final DeltaChatCore core = DeltaChatCore();
 
   Future<dynamic> getConfigValue(String key, [ObjectType type]) async {
