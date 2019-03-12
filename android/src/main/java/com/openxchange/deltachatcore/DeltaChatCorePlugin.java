@@ -199,8 +199,8 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
             eventHandler = eventHandlers.get(eventId);
         }
         if (add) {
-            int newObserverId = eventHandler.addListener();
-            result.success(newObserverId);
+            int newListenerId = eventHandler.addListener();
+            result.success(newListenerId);
         } else {
             if (listenerId == null) {
                 return;
