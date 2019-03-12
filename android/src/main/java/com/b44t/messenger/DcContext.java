@@ -1,12 +1,10 @@
 package com.b44t.messenger;
 
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class DcContext {
 
-    public final static int DC_PREF_DEFAULT_E2EE_ENABLED = 1;
     public final static int DC_PREF_DEFAULT_MDNS_ENABLED = 1;
     public final static int DC_PREF_DEFAULT_TRIM_ENABLED = 0;
     public final static int DC_PREF_DEFAULT_TRIM_LENGTH  = 500;
@@ -32,6 +30,7 @@ public class DcContext {
     public final static int DC_EVENT_GET_STRING                  = 2091;
     public final static int DC_EVENT_GET_QUANTITIY_STRING        = 2092;
     public final static int DC_EVENT_HTTP_GET                    = 2100;
+    public final static int DC_EVENT_HTTP_POST                   = 2110;
 
     public final static int DC_IMEX_EXPORT_SELF_KEYS = 1;
     public final static int DC_IMEX_IMPORT_SELF_KEYS = 2;
@@ -56,12 +55,18 @@ public class DcContext {
     public final static int DC_QR_URL               = 332;
     public final static int DC_QR_ERROR             = 400;
 
+    public final static int DC_LP_AUTH_OAUTH2          =     0x2;
+    public final static int DC_LP_AUTH_NORMAL          =     0x4;
     public final static int DC_LP_IMAP_SOCKET_STARTTLS =   0x100;
     public final static int DC_LP_IMAP_SOCKET_SSL      =   0x200;
     public final static int DC_LP_IMAP_SOCKET_PLAIN    =   0x400;
     public final static int DC_LP_SMTP_SOCKET_STARTTLS = 0x10000;
     public final static int DC_LP_SMTP_SOCKET_SSL      = 0x20000;
     public final static int DC_LP_SMTP_SOCKET_PLAIN    = 0x40000;
+
+    public final static int DC_SHOW_EMAILS_OFF               = 0;
+    public final static int DC_SHOW_EMAILS_ACCEPTED_CONTACTS = 1;
+    public final static int DC_SHOW_EMAILS_ALL               = 2;
 
     public DcContext(String osName) {
         handleEvent(0,0,0); // call handleEvent() to make sure it is not optimized away and JNI won't find it
@@ -89,9 +94,12 @@ public class DcContext {
     public native void         maybeNetwork         ();
     public native void         setConfig            (String key, String value);
     public void                setConfigInt         (String key, int value) { setConfig(key, Integer.toString(value)); }
-    public native String       getConfig            (String key, String def);
-    public int                 getConfigInt         (String key, int def) { try{return Integer.parseInt(getConfig(key, Integer.toString(def)));} catch(Exception e) {} return 0; }
+    public native String       getConfig            (String key);
+    public int                 getConfigInt         (String key) { try{return Integer.parseInt(getConfig(key));} catch(Exception e) {} return 0; }
+    @Deprecated public String  getConfig            (String key, String def) { return getConfig(key); }
+    @Deprecated public int     getConfigInt         (String key, int def) { return getConfigInt(key); }
     public native String       getInfo              ();
+    public native String       getOauth2Url         (String addr, String redirectUrl);
     public native String       initiateKeyTransfer  ();
     public native boolean      continueKeyTransfer  (int msg_id, String setup_code);
     public native void         imex                 (int what, String dir);

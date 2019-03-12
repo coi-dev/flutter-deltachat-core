@@ -40,16 +40,17 @@
  * for more details.
  */
 
-package com.openxchange.deltachatcore;
+package com.openxchange.deltachatcore.handlers;
 
 import com.b44t.messenger.DcContact;
 import com.b44t.messenger.DcContext;
+import com.openxchange.deltachatcore.Cache;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
 
-class ContactCallHandler extends AbstractCallHandler {
+public class ContactCallHandler extends AbstractCallHandler {
     private static final String METHOD_CONTACT_GET_ID = "contact_getId";
     private static final String METHOD_CONTACT_GET_NAME = "contact_getName";
     private static final String METHOD_CONTACT_GET_DISPLAY_NAME = "contact_getDisplayName";
@@ -64,7 +65,7 @@ class ContactCallHandler extends AbstractCallHandler {
     private final Cache<DcContact> contactCache;
     private final ContextCallHandler contextCallHandler;
 
-    ContactCallHandler(DcContext dcContext, Cache<DcContact> contactCache, ContextCallHandler contextCallHandler) {
+    public ContactCallHandler(DcContext dcContext, Cache<DcContact> contactCache, ContextCallHandler contextCallHandler) {
         super(dcContext);
         this.contactCache = contactCache;
         this.contextCallHandler = contextCallHandler;

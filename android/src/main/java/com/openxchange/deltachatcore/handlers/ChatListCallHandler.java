@@ -40,13 +40,14 @@
  * for more details.
  */
 
-package com.openxchange.deltachatcore;
+package com.openxchange.deltachatcore.handlers;
 
 import com.b44t.messenger.DcChat;
 import com.b44t.messenger.DcChatlist;
 import com.b44t.messenger.DcContext;
 import com.b44t.messenger.DcLot;
 import com.b44t.messenger.DcMsg;
+import com.openxchange.deltachatcore.Cache;
 
 import java.util.Collections;
 import java.util.List;
@@ -54,7 +55,7 @@ import java.util.List;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
-class ChatListCallHandler extends AbstractCallHandler {
+public class ChatListCallHandler extends AbstractCallHandler {
     private static final String METHOD_CHAT_GET_CNT = "chatList_getCnt";
     private static final String METHOD_CHAT_GET_ID = "chatList_getId";
     private static final String METHOD_CHAT_GET_CHAT = "chatList_getChat";
@@ -66,7 +67,7 @@ class ChatListCallHandler extends AbstractCallHandler {
 
     private Cache<DcChat> chatCache;
 
-    ChatListCallHandler(DcContext dcContext, Cache<DcChat> chatCache) {
+    public ChatListCallHandler(DcContext dcContext, Cache<DcChat> chatCache) {
         super(dcContext);
         this.chatCache = chatCache;
     }
