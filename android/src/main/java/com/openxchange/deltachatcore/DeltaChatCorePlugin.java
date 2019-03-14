@@ -88,7 +88,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
 
     private Registrar registrar;
     private com.openxchange.deltachatcore.NativeInteractionManager nativeInteractionManager;
-    private SparseArray<EventChannelHandler> eventHandlers = new SparseArray<>();
+    private SparseArray<EventChannelHandler> eventChannelHandlers = new SparseArray<>();
 
     private Cache<DcChat> chatCache = new Cache<>();
     private Cache<DcContact> contactCache = new Cache<>();
@@ -191,21 +191,21 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
         if (eventId == null || add == null) {
             return;
         }
-        EventChannelHandler eventHandler;
-        if (eventHandlers.indexOfKey(eventId) < 0) {
-            eventHandler = new EventChannelHandler(nativeInteractionManager, registrar.messenger(), eventId);
-            eventHandlers.put(eventId, eventHandler);
+        EventChannelHandler eventChannelHandler;
+        if (eventChannelHandlers.indexOfKey(eventId) < 0) {
+            eventChannelHandler = new EventChannelHandler(nativeInteractionManager, registrar.messenger(), eventId);
+            eventChannelHandlers.put(eventId, eventChannelHandler);
         } else {
-            eventHandler = eventHandlers.get(eventId);
+            eventChannelHandler = eventChannelHandlers.get(eventId);
         }
         if (add) {
-            int newListenerId = eventHandler.addListener();
+            int newListenerId = eventChannelHandler.addListener();
             result.success(newListenerId);
         } else {
             if (listenerId == null) {
                 return;
             }
-            eventHandler.removeListener(listenerId);
+            eventChannelHandler.removeListener(listenerId);
             result.success(null);
         }
     }
