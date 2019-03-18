@@ -42,8 +42,6 @@
 
 package com.openxchange.deltachatcore;
 
-import android.util.SparseArray;
-
 import com.b44t.messenger.DcChat;
 import com.b44t.messenger.DcContact;
 import com.b44t.messenger.DcMsg;
@@ -99,6 +97,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
     private ContactCallHandler contactCallHandler;
     private ContextCallHandler contextCallHandler;
     private MessageCallHandler messageCallHandler;
+    private EventChannelHandler eventChannelHandler;
 
     private DeltaChatCorePlugin(Registrar registrar) {
         this.registrar = registrar;
@@ -172,6 +171,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
         messageCallHandler = new MessageCallHandler(nativeInteractionManager, messageCache, contextCallHandler);
         contactCallHandler = new ContactCallHandler(nativeInteractionManager, contactCache, contextCallHandler);
         chatCallHandler = new ChatCallHandler(nativeInteractionManager, chatCache, contextCallHandler);
+        eventChannelHandler = new EventChannelHandler(nativeInteractionManager, registrar.messenger());
     }
 
     private void setCoreStrings(MethodCall call, Result result) {
@@ -191,15 +191,8 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
         if (eventId == null || add == null) {
             return;
         }
-        EventChannelHandler eventChannelHandler;
-        if (eventChannelHandlers.indexOfKey(eventId) < 0) {
-            eventChannelHandler = new EventChannelHandler(nativeInteractionManager, registrar.messenger(), eventId);
-            eventChannelHandlers.put(eventId, eventChannelHandler);
-        } else {
-            eventChannelHandler = eventChannelHandlers.get(eventId);
-        }
         if (add) {
-            int newListenerId = eventChannelHandler.addListener();
+            int newListenerId = eventChannelHandler.addListener(eventId);
             result.success(newListenerId);
         } else {
             if (listenerId == null) {

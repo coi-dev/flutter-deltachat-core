@@ -42,10 +42,12 @@
 
 package com.openxchange.deltachatcore.handlers;
 
+import android.annotation.SuppressLint;
+import android.util.SparseIntArray;
+
 import com.b44t.messenger.DcEventCenter;
 import com.openxchange.deltachatcore.NativeInteractionManager;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -54,24 +56,23 @@ import io.flutter.plugin.common.EventChannel;
 
 public class EventChannelHandler implements EventChannel.StreamHandler {
 
-    private static final String CHANNEL_DELTA_CHAT_CORE_EVENT_ = "deltaChatCoreEvent_";
-    private final NativeInteractionManager applicationDcContext;
-    private final int eventId;
+    private static final String CHANNEL_DELTA_CHAT_CORE_EVENTS = "deltaChatCoreEvents";
+    private final NativeInteractionManager nativeInteractionManager;
     private EventChannel.EventSink eventSink;
     private DcEventCenter.DcEventDelegate dcEventDelegate;
-    private List<Integer> listeners = new ArrayList<>();
     private int listenerId = 0;
+    @SuppressLint("UseSparseArrays")
+    private SparseIntArray listeners = new SparseIntArray();
 
-    public EventChannelHandler(NativeInteractionManager applicationDcContext, BinaryMessenger messenger, int eventId) {
-        this.applicationDcContext = applicationDcContext;
-        this.eventId = eventId;
-        EventChannel channel = new EventChannel(messenger, getChannelName());
-        channel.setStreamHandler(this);
+    public EventChannelHandler(NativeInteractionManager nativeInteractionManager, BinaryMessenger messenger) {
+        this.nativeInteractionManager = nativeInteractionManager;
+        EventChannel eventChannel = new EventChannel(messenger, CHANNEL_DELTA_CHAT_CORE_EVENTS);
+        eventChannel.setStreamHandler(this);
         dcEventDelegate = new DcEventCenter.DcEventDelegate() {
             @Override
             public void handleEvent(int eventId, Object data1, Object data2) {
                 List<Object> result = Arrays.asList(eventId, data1, data2);
-                if (!hasListeners()) {
+                if (!hasListenersForId(eventId)) {
                     return;
                 }
                 eventSink.success(result);
@@ -84,36 +85,47 @@ public class EventChannelHandler implements EventChannel.StreamHandler {
         };
     }
 
-    public int addListener() {
+    public int addListener(Integer eventId) {
+        if (eventId == null) {
+            return -1;
+        }
+        if (!hasListenersForId(eventId)) {
+            nativeInteractionManager.eventCenter.addObserver(eventId, dcEventDelegate);
+        }
         listenerId++;
-        listeners.add(listenerId);
+        listeners.put(listenerId, eventId);
         return listenerId;
     }
 
     public void removeListener(Integer listenerId) {
-        listeners.remove(listenerId);
-    }
-
-    private String getChannelName() {
-        return CHANNEL_DELTA_CHAT_CORE_EVENT_ + eventId;
+        if (listenerId == null) {
+            return;
+        }
+        int eventId = listeners.get(listenerId);
+        listeners.delete(listenerId);
+        if (!hasListenersForId(eventId)) {
+            nativeInteractionManager.eventCenter.removeObserver(eventId, dcEventDelegate);
+        }
     }
 
     @Override
     public void onListen(Object o, EventChannel.EventSink eventSink) {
+        if (this.eventSink != null) {
+            return;
+        }
         this.eventSink = eventSink;
-        applicationDcContext.eventCenter.addObserver(eventId, dcEventDelegate);
     }
 
     @Override
     public void onCancel(Object o) {
-        applicationDcContext.eventCenter.removeObserver(eventId, dcEventDelegate);
+        if (eventSink == null) {
+            return;
+        }
+        eventSink.endOfStream();
+        eventSink = null;
     }
 
-    public void onCancelAll() {
-        applicationDcContext.eventCenter.removeObservers(dcEventDelegate);
-    }
-
-    private boolean hasListeners() {
-        return listeners.size() > 0;
+    private boolean hasListenersForId(int eventId) {
+        return eventId != 0 && listeners.indexOfValue(eventId) >= 0;
     }
 }

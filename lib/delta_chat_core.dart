@@ -48,15 +48,14 @@ import 'package:flutter/services.dart';
 export 'src/base.dart';
 export 'src/chat.dart';
 export 'src/chatlist.dart';
+export 'src/chatmsg.dart';
+export 'src/contact.dart';
 export 'src/context.dart';
 export 'src/event.dart';
-export 'src/contact.dart';
-export 'src/chatmsg.dart';
 
 class DeltaChatCore {
   static const String channelDeltaChatCore = 'deltaChatCore';
-  static const String channelDeltaChatCoreMessages = 'deltaChatCoreMessages';
-  static const String channelDeltaChatCoreEvent = 'deltaChatCoreEvent';
+  static const String channelDeltaChatCoreEvents = 'deltaChatCoreEvents';
 
   static const String methodBaseInit = 'base_init';
   static const String methodBaseCoreListener = "base_coreListener";
@@ -69,9 +68,10 @@ class DeltaChatCore {
   static DeltaChatCore _instance;
 
   final MethodChannel _methodChannel;
+  final _eventChannel = EventChannel(channelDeltaChatCoreEvents);
+  final _eventChannelSubscribers = Map<int, Map<int, StreamController>>();
 
-  final _eventListenerRegistry = Map<String, StreamSubscription>();
-
+  StreamSubscription _eventChannelSubscription;
   bool _init = false;
 
   factory DeltaChatCore() {
@@ -96,52 +96,50 @@ class DeltaChatCore {
       await _methodChannel.invokeMethod(methodBaseInit);
       _init = true;
     }
+    _setupEventChannelListener();
     return _init;
+  }
+
+  _setupEventChannelListener() {
+    _eventChannelSubscription = _eventChannel.receiveBroadcastStream().listen((dynamic data) {
+      Event event = Event.fromStream(data);
+      delegateEventToSubscribers(event);
+    }, onError: (dynamic error) {
+      delegateErrorToSubscribers(error);
+    });
+  }
+
+  tearDown() {
+    _eventChannelSubscription.cancel();
   }
 
   Future<void> setCoreStrings(Map<int, String> coreStrings) async {
     await _methodChannel.invokeMethod(methodBaseSetCoreStrings, coreStrings);
   }
 
-  Future<int> listen(int eventId, Function function, [Function errorFunction]) async {
+  Future<int> listen(int eventId, StreamController streamController) async {
     int listenerId = await invokeMethod(methodBaseCoreListener, <String, dynamic>{argumentAdd: true, argumentEventId: eventId});
-    var channel = EventChannel(_getChannelName(eventId));
-    StreamSubscription subscription = channel.receiveBroadcastStream().listen((dynamic data) {
-      Event event = Event.fromStream(data);
-      if (event.eventId == eventId) {
-        function(event);
-      }
-    }, onError: (dynamic error) {
-      if (errorFunction != null) {
-        errorFunction(error);
-      }
-    });
-    addListenerToRegistry(eventId, listenerId, subscription);
+    var eventIdSubscribers = _eventChannelSubscribers[eventId];
+    if (eventIdSubscribers == null) {
+      eventIdSubscribers = Map();
+      _eventChannelSubscribers[eventId] = eventIdSubscribers;
+    }
+    eventIdSubscribers[listenerId] = streamController;
     return listenerId;
   }
 
-  addListenerToRegistry(int eventId, int listenerId, StreamSubscription subscription) {
-    String key = getListenerKey(eventId, listenerId);
-    _eventListenerRegistry[key] = subscription;
+  delegateEventToSubscribers(Event event) {
+    _eventChannelSubscribers[event.eventId].forEach((_, streamController) {
+      streamController.add(event);
+    });
   }
 
-  String getListenerKey(int eventId, int listenerId) {
-    return "$eventId-$listenerId";
-  }
+  delegateErrorToSubscribers(error) {}
 
   removeListener(int eventId, int listenerId) async {
+    var eventIdSubscribers = _eventChannelSubscribers[eventId];
+    eventIdSubscribers[listenerId].close();
+    eventIdSubscribers.remove(listenerId);
     await invokeMethod(methodBaseCoreListener, <String, dynamic>{argumentAdd: false, argumentEventId: eventId, argumentListenerId: listenerId});
-    removeListenerFromRegistry(eventId, listenerId);
-  }
-
-  removeListenerFromRegistry(int eventId, int listenerId) {
-    var listenerKey = getListenerKey(eventId, listenerId);
-    if (listenerKey != null) {
-      _eventListenerRegistry[listenerKey].cancel();
-    }
-  }
-
-  String _getChannelName(int eventId) {
-    return channelDeltaChatCoreEvent + "_" + eventId.toString();
   }
 }
