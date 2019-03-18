@@ -42,6 +42,8 @@
 
 package com.openxchange.deltachatcore;
 
+import android.util.SparseArray;
+
 import com.b44t.messenger.DcChat;
 import com.b44t.messenger.DcContact;
 import com.b44t.messenger.DcMsg;
