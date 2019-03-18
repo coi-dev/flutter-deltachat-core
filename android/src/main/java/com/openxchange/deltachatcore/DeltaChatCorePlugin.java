@@ -42,8 +42,6 @@
 
 package com.openxchange.deltachatcore;
 
-import android.util.SparseArray;
-
 import com.b44t.messenger.DcChat;
 import com.b44t.messenger.DcContact;
 import com.b44t.messenger.DcMsg;
@@ -88,7 +86,6 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
 
     private Registrar registrar;
     private com.openxchange.deltachatcore.NativeInteractionManager nativeInteractionManager;
-    private SparseArray<EventChannelHandler> eventChannelHandlers = new SparseArray<>();
 
     private Cache<DcChat> chatCache = new Cache<>();
     private Cache<DcContact> contactCache = new Cache<>();
