@@ -110,8 +110,7 @@ public class DcContext {
     public native int[]        getContacts          (int flags, String query);
     public native int          getBlockedCount      ();
     public native int[]        getBlockedContacts   ();
-    public @NonNull
-    DcContact  getContact           (int contact_id) { return new DcContact(getContactCPtr(contact_id)); }
+    public @NonNull DcContact  getContact           (int contact_id) { return new DcContact(getContactCPtr(contact_id)); }
     public native int          createContact        (String name, String addr);
     public native void         blockContact         (int id, int block);
     public native String       getContactEncrInfo   (int contact_id);
@@ -132,8 +131,7 @@ public class DcContext {
     public native int          addContactToChat     (int chat_id, int contact_id);
     public native int          removeContactFromChat(int chat_id, int contact_id);
     public native void         setDraft             (int chat_id, DcMsg msg/*null=delete*/);
-    public @Nullable
-    DcMsg     getDraft             (int chat_id) { return new DcMsg(getDraftCPtr(chat_id)); }
+    public @Nullable DcMsg     getDraft             (int chat_id) { return new DcMsg(getDraftCPtr(chat_id)); }
     public native int          setChatName          (int chat_id, String name);
     public native int          setChatProfileImage  (int chat_id, String name);
     public native int[]        getChatMsgs          (int chat_id, int flags, int marker1before);
