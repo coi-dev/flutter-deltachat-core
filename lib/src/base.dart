@@ -58,6 +58,8 @@ abstract class Base {
   static const String argumentAddressBook = "addressBook";
   static const String argumentContactId = "contactId";
   static const String argumentChatId = "chatId";
+  static const String argumentPath = "path";
+  static const String argumentText = "text";
 
   final DeltaChatCore core = DeltaChatCore();
 

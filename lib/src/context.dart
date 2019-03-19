@@ -64,6 +64,7 @@ class Context {
   static const String methodGetContacts = "context_getContacts";
   static const String methodGetChatMessages = "context_getChatMessages";
   static const String methodCreateChatMessage = "context_createChatMessage";
+  static const String methodCreateChatAttachmentMessage = "context_createChatAttachmentMessage";
   static const String methodAddContactToChat = "context_addContactToChat";
 
   static const String configAddress = "addr";
@@ -93,6 +94,15 @@ class Context {
   static const int showEmailsOff = 0;
   static const int showEmailsAcceptedContacts = 1;
   static const int showEmailsAll = 2;
+
+  static const int msgUndefined = 0;
+  static const int msgText = 10;
+  static const int msgImage = 20;
+  static const int msgGif = 21;
+  static const int msgAudio = 40;
+  static const int msgVoice = 41;
+  static const int msgVideo = 50;
+  static const int msgFile = 60;
 
   final DeltaChatCore core = DeltaChatCore();
 
@@ -174,6 +184,11 @@ class Context {
   Future<int> createChatMessage(int chatId, String text) async {
     var arguments = <String, dynamic>{Base.argumentId: chatId, Base.argumentValue: text};
     return await core.invokeMethod(methodCreateChatMessage, arguments);
+  }
+
+  Future<int> createChatAttachmentMessage(int chatId, String path, int msgType, [String text]) async {
+    var arguments = <String, dynamic>{Base.argumentId: chatId, Base.argumentPath: path, Base.argumentType: msgType, Base.argumentText: text};
+    return await core.invokeMethod(methodCreateChatAttachmentMessage, arguments);
   }
 
   Future<int> addContactToChat(int chatId, int contactId) async {
