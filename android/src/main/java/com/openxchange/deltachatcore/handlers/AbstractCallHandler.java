@@ -62,6 +62,8 @@ abstract class AbstractCallHandler {
     static final String ARGUMENT_ADDRESS_BOOK = "addressBook";
     static final String ARGUMENT_CONTACT_ID = "contactId";
     static final String ARGUMENT_CHAT_ID = "chatId";
+    static final String ARGUMENT_PATH = "path";
+    static final String ARGUMENT_TEXT = "text";
     private static final String ERROR_ARGUMENT_MISSING = "1";
     private static final String ERROR_ARGUMENT_TYPE_MISMATCH = "2";
     private static final String ERROR_ARGUMENT_MISSING_VALUE = "3";

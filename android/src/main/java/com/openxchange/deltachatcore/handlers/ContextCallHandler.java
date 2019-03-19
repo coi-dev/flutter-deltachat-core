@@ -70,19 +70,11 @@ public class ContextCallHandler extends AbstractCallHandler {
     private static final String METHOD_GET_CHAT = "context_getChat";
     private static final String METHOD_GET_CHAT_MESSAGES = "context_getChatMessages";
     private static final String METHOD_CREATE_CHAT_MESSAGE = "context_createChatMessage";
+    private static final String METHOD_CREATE_CHAT_ATTACHMENT_MESSAGE = "context_createChatAttachmentMessage";
     private static final String METHOD_ADD_CONTACT_TO_CHAT = "context_addContactToChat";
 
     private static final String TYPE_INT = "int";
     private static final String TYPE_STRING = "String";
-
-    private static final int DC_MSG_UNDEFINED = 0;
-    private static final int DC_MSG_TEXT = 10;
-    private static final int DC_MSG_IMAGE = 20;
-    private static final int DC_MSG_GIF = 21;
-    private static final int DC_MSG_AUDIO = 40;
-    private static final int DC_MSG_VOICE = 41;
-    private static final int DC_MSG_VIDEO = 50;
-    private static final int DC_MSG_FILE = 60;
 
     private final Cache<DcContact> contactCache;
     private final Cache<DcMsg> messageCache;
@@ -148,6 +140,9 @@ public class ContextCallHandler extends AbstractCallHandler {
                 break;
             case METHOD_CREATE_CHAT_MESSAGE:
                 createChatMessage(methodCall, result);
+                break;
+            case METHOD_CREATE_CHAT_ATTACHMENT_MESSAGE:
+                createChatAttachmentMessage(methodCall, result);
                 break;
             case METHOD_ADD_CONTACT_TO_CHAT:
                 addContactToChat(methodCall, result);
@@ -441,6 +436,28 @@ public class ContextCallHandler extends AbstractCallHandler {
         DcMsg newMsg = new DcMsg(dcContext, DcMsg.DC_MSG_TEXT);
         newMsg.setText(text);
         int messageId = dcContext.sendMsg(id, newMsg);
+        result.success(messageId);
+    }
+
+    private void createChatAttachmentMessage(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_ID, ARGUMENT_KEY_TYPE, ARGUMENT_PATH, ARGUMENT_TEXT)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        Integer chatId = methodCall.argument(ARGUMENT_ID);
+        String path = methodCall.argument(ARGUMENT_PATH);
+        Integer type = methodCall.argument(ARGUMENT_KEY_TYPE);
+        if (chatId == null || path == null || type == null) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+
+        String text = methodCall.argument(ARGUMENT_TEXT);
+
+        DcMsg newMsg = new DcMsg(dcContext, type);
+        newMsg.setFile(path, null);
+        newMsg.setText(text);
+        int messageId = dcContext.sendMsg(chatId, newMsg);
         result.success(messageId);
     }
 
