@@ -81,13 +81,18 @@ class Context {
   static const String configSelfAvatar = "selfavatar";
   static const String configE2eeEnabled = "e2ee_enabled";
   static const String configQrOverlayLogo = "qr_overlay_logo";
+  static const String configShowEmails = "show_emails";
 
   static const int serverFlagsImapStartTls = 0x100;
   static const int serverFlagsImapSsl = 0x200;
   static const int serverFlagsImapPlain = 0x400;
   static const int serverFlagsSmtpStartTls = 0x10000;
-  static const int serverFlagsSmtpSsl= 0x20000;
+  static const int serverFlagsSmtpSsl = 0x20000;
   static const int serverFlagsSmtpPlain = 0x40000;
+
+  static const int showEmailsOff = 0;
+  static const int showEmailsAcceptedContacts = 1;
+  static const int showEmailsAll = 2;
 
   final DeltaChatCore core = DeltaChatCore();
 

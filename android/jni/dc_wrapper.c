@@ -599,7 +599,7 @@ JNIEXPORT void Java_com_b44t_messenger_DcContext_setConfig(JNIEnv *env, jobject 
 }
 
 
-JNIEXPORT jstring Java_com_b44t_messenger_DcContext_getConfig(JNIEnv *env, jobject obj, jstring key, jstring def/*may be NULL*/)
+JNIEXPORT jstring Java_com_b44t_messenger_DcContext_getConfig(JNIEnv *env, jobject obj, jstring key)
 {
 	CHAR_REF(key);
 		char* temp = dc_get_config(get_dc_context(env, obj), keyPtr);
@@ -647,6 +647,19 @@ JNIEXPORT jstring Java_com_b44t_messenger_DcContext_getInfo(JNIEnv *env, jobject
 	char* temp = dc_get_info(get_dc_context(env, obj));
 		jstring ret = JSTRING_NEW(temp);
 	free(temp);
+	return ret;
+}
+
+
+JNIEXPORT jstring Java_com_b44t_messenger_DcContext_getOauth2Url(JNIEnv *env, jobject obj, jstring addr, jstring redirectUrl)
+{
+    CHAR_REF(addr);
+    CHAR_REF(redirectUrl);
+	char* temp = dc_get_oauth2_url(get_dc_context(env, obj), addrPtr, redirectUrlPtr);
+		jstring ret = JSTRING_NEW(temp);
+	free(temp);
+	CHAR_UNREF(redirectUrl);
+	CHAR_UNREF(addr);
 	return ret;
 }
 
