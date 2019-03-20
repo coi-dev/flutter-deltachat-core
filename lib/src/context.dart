@@ -117,7 +117,7 @@ class Context {
     return await core.invokeMethod(method, arguments);
   }
 
-  Future<dynamic> setConfigValue(String key, value, [ObjectType enforceType]) async {
+  Future<dynamic> setConfigValue(String key, value, ObjectType enforceType) async {
     String type;
     if (enforceType != null) {
       type = describeEnum(enforceType);
