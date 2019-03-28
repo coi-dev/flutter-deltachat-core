@@ -72,6 +72,7 @@ public class ContextCallHandler extends AbstractCallHandler {
     private static final String METHOD_CREATE_CHAT_MESSAGE = "context_createChatMessage";
     private static final String METHOD_CREATE_CHAT_ATTACHMENT_MESSAGE = "context_createChatAttachmentMessage";
     private static final String METHOD_ADD_CONTACT_TO_CHAT = "context_addContactToChat";
+    private static final String METHOD_GET_CHAT_BY_CONTACT_ID = "context_getChatByContactId";
 
     private static final String TYPE_INT = "int";
     private static final String TYPE_STRING = "String";
@@ -146,6 +147,9 @@ public class ContextCallHandler extends AbstractCallHandler {
                 break;
             case METHOD_ADD_CONTACT_TO_CHAT:
                 addContactToChat(methodCall, result);
+                break;
+            case METHOD_GET_CHAT_BY_CONTACT_ID:
+                getChatByContactId(methodCall, result);
                 break;
             default:
                 result.notImplemented();
@@ -474,5 +478,19 @@ public class ContextCallHandler extends AbstractCallHandler {
         }
         int successfullyAdded = dcContext.addContactToChat(chatId, contactId);
         result.success(successfullyAdded);
+    }
+
+    private void getChatByContactId(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_CONTACT_ID)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        Integer contactId = methodCall.argument(ARGUMENT_CONTACT_ID);
+        if (contactId == null) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        int chatId = dcContext.getChatIdByContactId(contactId);
+        result.success(chatId);
     }
 }

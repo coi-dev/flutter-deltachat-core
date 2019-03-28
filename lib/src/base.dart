@@ -97,6 +97,12 @@ abstract class Base {
     }
   }
 
+  set(String key, value) {
+    _storedValues[key] = value;
+    _loadedValues[key] = true;
+    setLastUpdate();
+  }
+
   prepareReloadValue(String key) {
     unloadValue(key);
     setLastUpdate();

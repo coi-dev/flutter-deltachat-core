@@ -66,6 +66,7 @@ class Context {
   static const String methodCreateChatMessage = "context_createChatMessage";
   static const String methodCreateChatAttachmentMessage = "context_createChatAttachmentMessage";
   static const String methodAddContactToChat = "context_addContactToChat";
+  static const String methodGetChatByContactId = "context_getChatByContactId";
 
   static const String configAddress = "addr";
   static const String configMailServer = "mail_server";
@@ -194,5 +195,10 @@ class Context {
   Future<int> addContactToChat(int chatId, int contactId) async {
     var arguments = <String, dynamic>{Base.argumentChatId: chatId, Base.argumentContactId: contactId};
     return await core.invokeMethod(methodAddContactToChat, arguments);
+  }
+
+  Future<int> getChatByContactId(int contactId) async {
+    var arguments = <String, dynamic>{Base.argumentContactId: contactId};
+    return await core.invokeMethod(methodGetChatByContactId, arguments);
   }
 }
