@@ -162,6 +162,7 @@ public class ContextCallHandler extends AbstractCallHandler {
                 break;
             case METHOD_GET_BLOCKED_CONTACTS:
                 getBlockedContacts(methodCall, result);
+                break;
             default:
                 result.notImplemented();
         }
