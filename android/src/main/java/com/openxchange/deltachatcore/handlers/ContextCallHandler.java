@@ -62,11 +62,14 @@ public class ContextCallHandler extends AbstractCallHandler {
     private static final String METHOD_CREATE_CONTACT = "context_createContact";
     private static final String METHOD_DELETE_CONTACT = "context_deleteContact";
     private static final String METHOD_BLOCK_CONTACT = "context_blockContact";
+    private static final String METHOD_UNBLOCK_CONTACT = "context_unblockContact";
+    private static final String METHOD_GET_BLOCKED_CONTACTS = "context_getBlockedContacts";
     private static final String METHOD_CREATE_CHAT_BY_CONTACT_ID = "context_createChatByContactId";
     private static final String METHOD_CREATE_CHAT_BY_MESSAGE_ID = "context_createChatByMessageId";
     private static final String METHOD_CREATE_GROUP_CHAT = "context_createGroupChat";
     private static final String METHOD_GET_CONTACT = "context_getContact";
     private static final String METHOD_GET_CONTACTS = "context_getContacts";
+    private static final String METHOD_GET_CHAT_CONTACTS = "context_getChatContacts";
     private static final String METHOD_GET_CHAT = "context_getChat";
     private static final String METHOD_GET_CHAT_MESSAGES = "context_getChatMessages";
     private static final String METHOD_CREATE_CHAT_MESSAGE = "context_createChatMessage";
@@ -118,6 +121,9 @@ public class ContextCallHandler extends AbstractCallHandler {
             case METHOD_BLOCK_CONTACT:
                 blockContact(methodCall, result);
                 break;
+            case METHOD_UNBLOCK_CONTACT:
+                unblockContact(methodCall, result);
+                break;
             case METHOD_CREATE_CHAT_BY_CONTACT_ID:
                 createChatByContactId(methodCall, result);
                 break;
@@ -132,6 +138,9 @@ public class ContextCallHandler extends AbstractCallHandler {
                 break;
             case METHOD_GET_CONTACTS:
                 getContacts(methodCall, result);
+                break;
+            case METHOD_GET_CHAT_CONTACTS:
+                getChatContacts(methodCall, result);
                 break;
             case METHOD_GET_CHAT:
                 getChat(methodCall, result);
@@ -151,6 +160,8 @@ public class ContextCallHandler extends AbstractCallHandler {
             case METHOD_GET_CHAT_BY_CONTACT_ID:
                 getChatByContactId(methodCall, result);
                 break;
+            case METHOD_GET_BLOCKED_CONTACTS:
+                getBlockedContacts(methodCall, result);
             default:
                 result.notImplemented();
         }
@@ -282,6 +293,19 @@ public class ContextCallHandler extends AbstractCallHandler {
         result.success(null);
     }
 
+    private void unblockContact(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_ID)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        Integer contactId = methodCall.argument(ARGUMENT_ID);
+        if (contactId == null) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        dcContext.blockContact(contactId, 0);
+        result.success(null);
+    }
 
     private void createChatByContactId(MethodCall methodCall, MethodChannel.Result result) {
         if (!hasArgumentKeys(methodCall, ARGUMENT_ID)) {
@@ -369,6 +393,31 @@ public class ContextCallHandler extends AbstractCallHandler {
             loadAndCacheContact(contactId);
         }
         result.success(contactIds);
+    }
+
+    private void getChatContacts(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_CHAT_ID)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        Integer id = methodCall.argument(ARGUMENT_CHAT_ID);
+        if (id == null) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        int[] contactIds = dcContext.getChatContacts(id);
+        for (int contactId : contactIds) {
+            loadAndCacheContact(contactId);
+        }
+        result.success(contactIds);
+    }
+
+    private void getBlockedContacts(MethodCall methodCall, MethodChannel.Result result) {
+        int[] blockedIds = dcContext.getBlockedContacts();
+        for (int blockedContactId : blockedIds) {
+            loadAndCacheContact(blockedContactId);
+        }
+        result.success(blockedIds);
     }
 
     private void getChat(MethodCall methodCall, MethodChannel.Result result) {

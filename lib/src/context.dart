@@ -58,10 +58,13 @@ class Context {
   static const String methodCreateContact = "context_createContact";
   static const String methodDeleteContact = "context_deleteContact";
   static const String methodBlockContact = "context_blockContact";
+  static const String methodUnblockContact = "context_unblockContact";
+  static const String methodGetBlockedContacts = "context_getBlockedContacts";
   static const String methodCreateChatById = "context_createChatByContactId";
   static const String methodCreateChatByMessageId = "context_createChatByMessageId";
   static const String methodCreateGroupChat = "context_createGroupChat";
   static const String methodGetContacts = "context_getContacts";
+  static const String methodGetChatContacts = "context_getChatContacts";
   static const String methodGetChatMessages = "context_getChatMessages";
   static const String methodCreateChatMessage = "context_createChatMessage";
   static const String methodCreateChatAttachmentMessage = "context_createChatAttachmentMessage";
@@ -157,6 +160,11 @@ class Context {
     return await core.invokeMethod(methodBlockContact, arguments);
   }
 
+  Future<bool> unblockContact(int id) async {
+    var arguments = <String, dynamic>{Base.argumentId: id};
+    return await core.invokeMethod(methodUnblockContact, arguments);
+  }
+
   Future<int> createChatByContactId(int id) async {
     var arguments = <String, dynamic>{Base.argumentId: id};
     return await core.invokeMethod(methodCreateChatById, arguments);
@@ -175,6 +183,15 @@ class Context {
   Future<List> getContacts(int flags, String query) async {
     var arguments = <String, dynamic>{Base.argumentFlags: flags, Base.argumentQuery: query};
     return await core.invokeMethod(methodGetContacts, arguments);
+  }
+
+  Future<List> getChatContacts(int chatId) async {
+    var arguments = <String, dynamic>{Base.argumentChatId: chatId};
+    return await core.invokeMethod(methodGetChatContacts, arguments);
+  }
+
+  Future<List> getBlockedContacts() async {
+    return await core.invokeMethod(methodGetBlockedContacts);
   }
 
   Future<List> getChatMessages(int chatId) async {
