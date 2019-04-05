@@ -81,4 +81,9 @@ class Event {
     data1 = eventMap[_INDEX_DATA1];
     data2 = eventMap[_INDEX_DATA2];
   }
+
+  bool hasType(int type) {
+    return eventId == type;
+  }
+
 }

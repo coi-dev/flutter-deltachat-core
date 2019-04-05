@@ -135,7 +135,8 @@ public class ChatListCallHandler extends AbstractCallHandler {
             resultErrorArgumentNoValidInt(result, ARGUMENT_INDEX);
             return;
         }
-        DcChat chat = chatCache.get(index);
+        int chatId = dcChatlist.getChatId(index);
+        DcChat chat = chatCache.get(chatId);
         if (chat == null) {
             chat = dcChatlist.getChat(index);
             chatCache.put(chat.getId(), chat);
