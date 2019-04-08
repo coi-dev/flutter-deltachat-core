@@ -70,6 +70,8 @@ class Context {
   static const String methodCreateChatAttachmentMessage = "context_createChatAttachmentMessage";
   static const String methodAddContactToChat = "context_addContactToChat";
   static const String methodGetChatByContactId = "context_getChatByContactId";
+  static const String methodGetFreshMessageCount = "context_getFreshMessageCount";
+  static const String methodMarkNoticedChat = "context_markNoticedChat";
 
   static const String configAddress = "addr";
   static const String configMailServer = "mail_server";
@@ -217,5 +219,15 @@ class Context {
   Future<int> getChatByContactId(int contactId) async {
     var arguments = <String, dynamic>{Base.argumentContactId: contactId};
     return await core.invokeMethod(methodGetChatByContactId, arguments);
+  }
+
+  Future<int> getFreshMessageCount(int chatId) async {
+    var arguments = <String, dynamic>{Base.argumentChatId: chatId};
+    return await core.invokeMethod(methodGetFreshMessageCount, arguments);
+  }
+
+  Future<int> markNoticedChat(int chatId) async {
+    var arguments = <String, dynamic>{Base.argumentChatId: chatId};
+    return await core.invokeMethod(methodMarkNoticedChat, arguments);
   }
 }

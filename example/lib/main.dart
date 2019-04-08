@@ -143,6 +143,10 @@ class _MyAppState extends State<MyApp> {
         _addListItem(text: "getContacts (context)", assertion: 3, result: contactIds.length);
         var chatContactIds = await context.getChatContacts(chatId);
         _addListItem(text: "getChatContacts", assertion: 1, result: chatContactIds.length);
+        var freshMessageCount = await context.getFreshMessageCount(chatId);
+        _addListItem(text: "getFreshMessageCount", assertion: 0, result: freshMessageCount);
+        await context.markNoticedChat(chatId);
+        _addListItem(text: "markNoticedChat");
       }
     } on PlatformException {
       throw StateError("Test suite failed, forbidden state entered");
