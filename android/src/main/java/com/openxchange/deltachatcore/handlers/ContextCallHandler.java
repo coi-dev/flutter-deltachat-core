@@ -76,6 +76,8 @@ public class ContextCallHandler extends AbstractCallHandler {
     private static final String METHOD_CREATE_CHAT_ATTACHMENT_MESSAGE = "context_createChatAttachmentMessage";
     private static final String METHOD_ADD_CONTACT_TO_CHAT = "context_addContactToChat";
     private static final String METHOD_GET_CHAT_BY_CONTACT_ID = "context_getChatByContactId";
+    private static final String METHOD_GET_FRESH_MESSAGE_COUNT = "context_getFreshMessageCount";
+    private static final String METHOD_MARK_NOTICED_CHAT = "context_markNoticedChat";
 
     private static final String TYPE_INT = "int";
     private static final String TYPE_STRING = "String";
@@ -162,6 +164,12 @@ public class ContextCallHandler extends AbstractCallHandler {
                 break;
             case METHOD_GET_BLOCKED_CONTACTS:
                 getBlockedContacts(methodCall, result);
+                break;
+            case METHOD_GET_FRESH_MESSAGE_COUNT:
+                getFreshMessageCount(methodCall, result);
+                break;
+            case METHOD_MARK_NOTICED_CHAT:
+                markNoticedChat(methodCall, result);
                 break;
             default:
                 result.notImplemented();
@@ -542,5 +550,35 @@ public class ContextCallHandler extends AbstractCallHandler {
         }
         int chatId = dcContext.getChatIdByContactId(contactId);
         result.success(chatId);
+    }
+
+    private void getFreshMessageCount(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_CHAT_ID)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        Integer chatId = methodCall.argument(ARGUMENT_CHAT_ID);
+        if (chatId == null) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+
+        int freshMessageCount = dcContext.getFreshMsgCount(chatId);
+        result.success(freshMessageCount);
+    }
+
+    private void markNoticedChat(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_CHAT_ID)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        Integer chatId = methodCall.argument(ARGUMENT_CHAT_ID);
+        if (chatId == null) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+
+        dcContext.marknoticedChat(chatId);
+        result.success(null);
     }
 }
