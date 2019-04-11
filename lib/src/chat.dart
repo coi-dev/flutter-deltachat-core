@@ -42,6 +42,7 @@
 
 import 'dart:async';
 
+import 'package:delta_chat_core/delta_chat_core.dart';
 import 'package:delta_chat_core/src/base.dart';
 
 class Chat extends Base {
@@ -55,6 +56,8 @@ class Chat extends Base {
   static const String methodChatIsUnpromoted = "chat_isUnpromoted";
   static const String methodChatIsVerified = "chat_isVerified";
   static const String methodChatIsSelfTalk = "chat_isSelfTalk";
+
+  ChatSummary chatSummary;
 
   final int _id;
 
