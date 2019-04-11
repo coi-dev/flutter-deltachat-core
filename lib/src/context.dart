@@ -110,6 +110,8 @@ class Context {
   static const int msgVideo = 50;
   static const int msgFile = 60;
 
+  static const int chatListAddDayMarker = 0x01;
+
   final DeltaChatCore core = DeltaChatCore();
 
   Future<dynamic> getConfigValue(String key, [ObjectType type]) async {
@@ -196,8 +198,8 @@ class Context {
     return await core.invokeMethod(methodGetBlockedContacts);
   }
 
-  Future<List> getChatMessages(int chatId) async {
-    var arguments = <String, dynamic>{Base.argumentId: chatId};
+  Future<List> getChatMessages(int chatId, [int flags = 0]) async {
+    var arguments = <String, dynamic>{Base.argumentId: chatId, Base.argumentFlags: flags};
     return await core.invokeMethod(methodGetChatMessages, arguments);
   }
 

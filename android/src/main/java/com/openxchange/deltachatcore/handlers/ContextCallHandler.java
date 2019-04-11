@@ -462,12 +462,18 @@ public class ContextCallHandler extends AbstractCallHandler {
             resultErrorArgumentMissingValue(result);
             return;
         }
+        Integer flags = methodCall.argument(ARGUMENT_FLAGS);
+        if (flags == null) {
+            flags = 0;
+        }
 
-        int[] messageIds = dcContext.getChatMsgs(id, 0, 0);
+        int[] messageIds = dcContext.getChatMsgs(id, flags, 0);
         for (int messageId : messageIds) {
-            DcMsg message = messageCache.get(messageId);
-            if (message == null) {
-                messageCache.put(messageId, dcContext.getMsg(messageId));
+            if (messageId != DcMsg.DC_MSG_ID_MARKER1 && messageId != DcMsg.DC_MSG_ID_DAYMARKER) {
+                DcMsg message = messageCache.get(messageId);
+                if (message == null) {
+                    messageCache.put(messageId, dcContext.getMsg(messageId));
+                }
             }
         }
         result.success(messageIds);
