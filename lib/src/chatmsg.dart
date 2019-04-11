@@ -84,6 +84,9 @@ class ChatMsg extends Base{
   static const int typeVideo = 50;
   static const int typeFile = 60;
 
+  static const int idMarker = 1;
+  static const int idDayMarker = 9;
+
   final int _id;
 
   ChatMsg._internal(this._id) : super();
