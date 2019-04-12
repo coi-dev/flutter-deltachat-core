@@ -52,6 +52,7 @@ export 'src/chatmsg.dart';
 export 'src/contact.dart';
 export 'src/context.dart';
 export 'src/event.dart';
+export 'src/chatsummary.dart';
 
 class DeltaChatCore {
   static const String channelDeltaChatCore = 'deltaChatCore';
