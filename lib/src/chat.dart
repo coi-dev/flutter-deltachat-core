@@ -57,6 +57,13 @@ class Chat extends Base {
   static const String methodChatIsVerified = "chat_isVerified";
   static const String methodChatIsSelfTalk = "chat_isSelfTalk";
 
+  static const int typeNoChat = 0;
+  static const int typeInvite = 1;
+  static const int typeStarred = 5;
+  static const int typeArchived = 6;
+  static const int typeAllDoneHint = 7;
+  static const int typeLastSpecial = 9;
+
   ChatSummary chatSummary;
 
   final int _id;
