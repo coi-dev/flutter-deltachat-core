@@ -101,15 +101,6 @@ class Context {
   static const int showEmailsAcceptedContacts = 1;
   static const int showEmailsAll = 2;
 
-  static const int msgUndefined = 0;
-  static const int msgText = 10;
-  static const int msgImage = 20;
-  static const int msgGif = 21;
-  static const int msgAudio = 40;
-  static const int msgVoice = 41;
-  static const int msgVideo = 50;
-  static const int msgFile = 60;
-
   static const int chatListAddDayMarker = 0x01;
 
   final DeltaChatCore core = DeltaChatCore();

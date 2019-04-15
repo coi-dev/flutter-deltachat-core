@@ -61,8 +61,6 @@ class ChatList extends Base {
   static const int typeNoSpecials = 0x02;
   static const int typeAddAllDoneHint = 0x04;
 
-  static const int specialInvite = 1;
-
   final DeltaChatCore core = DeltaChatCore();
 
   Future<int> getChatCnt([int chatListType = typeNoSpecials]) async {

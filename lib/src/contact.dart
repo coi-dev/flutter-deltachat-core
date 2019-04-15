@@ -56,6 +56,10 @@ class Contact extends Base {
   static const String methodContactIsBlocked = "contact_isBlocked";
   static const String methodContactIsVerified = "contact_isVerified";
 
+  static const int idSelf = 1;
+  static const int idDevice = 2;
+  static const int idLastSpecial = 9;
+
   final int _id;
 
   Contact._internal(this._id) : super();
@@ -105,5 +109,4 @@ class Contact extends Base {
   static Function getCreator() {
     return (id) => new Contact._internal(id);
   }
-
 }
