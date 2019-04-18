@@ -72,6 +72,8 @@ class Context {
   static const String methodGetChatByContactId = "context_getChatByContactId";
   static const String methodGetFreshMessageCount = "context_getFreshMessageCount";
   static const String methodMarkNoticedChat = "context_markNoticedChat";
+  static const String methodDeleteChat = "context_deleteChat";
+  static const String methodRemoveContactFromChat = "context_removeContactFromChat";
 
   static const String configAddress = "addr";
   static const String configMailServer = "mail_server";
@@ -222,5 +224,15 @@ class Context {
   Future<int> markNoticedChat(int chatId) async {
     var arguments = <String, dynamic>{Base.argumentChatId: chatId};
     return await core.invokeMethod(methodMarkNoticedChat, arguments);
+  }
+
+  Future<int> deleteChat(int chatId) async {
+    var arguments = <String, dynamic>{Base.argumentChatId: chatId};
+    return await core.invokeMethod(methodDeleteChat, arguments);
+  }
+
+  Future<int> removeContactFromChat(int chatId, int contactId) async {
+    var arguments = <String, dynamic>{Base.argumentChatId: chatId, Base.argumentContactId: contactId};
+    return await core.invokeMethod(methodRemoveContactFromChat, arguments);
   }
 }

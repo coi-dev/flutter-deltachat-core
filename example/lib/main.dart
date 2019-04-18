@@ -147,6 +147,9 @@ class _MyAppState extends State<MyApp> {
         _addListItem(text: "getFreshMessageCount", assertion: 0, result: freshMessageCount);
         await context.markNoticedChat(chatId);
         _addListItem(text: "markNoticedChat");
+        await context.deleteChat(chatId);
+        var chatCntAfterDeletingChat = await chatList.getChatCnt(ChatList.typeNoSpecials);
+        _addListItem(text: "deleteChat", assertion: 0, result: chatCntAfterDeletingChat);
       }
     } on PlatformException {
       throw StateError("Test suite failed, forbidden state entered");
