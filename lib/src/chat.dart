@@ -64,8 +64,6 @@ class Chat extends Base {
   static const int typeAllDoneHint = 7;
   static const int typeLastSpecial = 9;
 
-  ChatSummary chatSummary;
-
   final int _id;
 
   Chat._internal(this._id) : super();

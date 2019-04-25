@@ -92,6 +92,9 @@ class Context {
   static const String configQrOverlayLogo = "qr_overlay_logo";
   static const String configShowEmails = "show_emails";
 
+  static const int contactListFlagVerifiedOnly = 1;
+  static const int contactListFlagAddSelf= 2;
+
   static const int serverFlagsImapStartTls = 0x100;
   static const int serverFlagsImapSsl = 0x200;
   static const int serverFlagsImapPlain = 0x400;

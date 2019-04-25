@@ -103,6 +103,10 @@ abstract class Base {
     setLastUpdate();
   }
 
+  get(String key) {
+    return _storedValues[key];
+  }
+
   prepareReloadValue(String key) {
     unloadValue(key);
     setLastUpdate();
