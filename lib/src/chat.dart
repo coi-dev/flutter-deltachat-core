@@ -73,47 +73,47 @@ class Chat extends Base {
   }
 
   Future<int> getChatId() async {
-    return await loadAndGetValue(methodChatGetId, getDefaultParameters());
+    return await loadAndGetValue(methodChatGetId, getDefaultArguments());
   }
 
   Future<bool> isGroup() async {
-    return await loadAndGetValue(methodChatIsGroup, getDefaultParameters());
+    return await loadAndGetValue(methodChatIsGroup, getDefaultArguments());
   }
 
   Future<int> getArchived() async {
-    return await loadAndGetValue(methodChatGetArchived, getDefaultParameters());
+    return await loadAndGetValue(methodChatGetArchived, getDefaultArguments());
   }
 
   Future<int> getColor() async {
-    return await loadAndGetValue(methodChatGetColor, getDefaultParameters());
+    return await loadAndGetValue(methodChatGetColor, getDefaultArguments());
   }
 
   Future<String> getName() async {
-    return await loadAndGetValue(methodChatGetName, getDefaultParameters());
+    return await loadAndGetValue(methodChatGetName, getDefaultArguments());
   }
 
   Future<String> getSubtitle() async {
-    return await loadAndGetValue(methodChatGetSubtitle, getDefaultParameters());
+    return await loadAndGetValue(methodChatGetSubtitle, getDefaultArguments());
   }
 
   Future<String> getProfileImage() async {
-    return await loadAndGetValue(methodChatGetProfileImage, getDefaultParameters());
+    return await loadAndGetValue(methodChatGetProfileImage, getDefaultArguments());
   }
 
   Future<bool> isUnpromoted() async {
-    return await loadAndGetValue(methodChatIsUnpromoted, getDefaultParameters());
+    return await loadAndGetValue(methodChatIsUnpromoted, getDefaultArguments());
   }
 
   Future<bool> isVerified() async {
-    return await loadAndGetValue(methodChatIsVerified, getDefaultParameters());
+    return await loadAndGetValue(methodChatIsVerified, getDefaultArguments());
   }
 
   Future<bool> isSelfTalk() async {
-    return await loadAndGetValue(methodChatIsSelfTalk, getDefaultParameters());
+    return await loadAndGetValue(methodChatIsSelfTalk, getDefaultArguments());
   }
 
   @override
-  Map<String, dynamic> getDefaultParameters() => <String, dynamic>{Base.argumentId: _id};
+  Map<String, dynamic> getDefaultArguments() => <String, dynamic>{Base.argumentId: _id};
 
   static Function getCreator() {
     return (id) => new Chat._internal(id);

@@ -54,6 +54,7 @@ abstract class AbstractCallHandler {
     static final String ARGUMENT_KEY_VALUE = "value";
     static final String ARGUMENT_ADDRESS = "address";
     static final String ARGUMENT_ID = "id";
+    static final String ARGUMENT_CACHE_ID = "cacheId";
     static final String ARGUMENT_VERIFIED = "verified";
     static final String ARGUMENT_NAME = "name";
     static final String ARGUMENT_INDEX = "index";

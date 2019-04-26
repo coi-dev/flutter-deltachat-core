@@ -45,10 +45,18 @@ package com.openxchange.deltachatcore;
 import android.util.SparseArray;
 
 public class Cache<T> {
+    private int generatedId = 0;
+
     private SparseArray<T> items = new SparseArray<>();
 
     public void put(int id, T item) {
         items.put(id, item);
+        generatedId++;
+    }
+
+    public void append(int id, T item) {
+        items.append(id, item);
+        generatedId++;
     }
 
     public T get(int id) {
@@ -61,6 +69,7 @@ public class Cache<T> {
 
     public void clear() {
         items.clear();
+        generatedId = 0;
     }
 
     public int size() {
@@ -69,5 +78,9 @@ public class Cache<T> {
 
     public boolean contains(int id) {
         return items.indexOfKey(id) > 0;
+    }
+
+    public int getGenerateId() {
+        return generatedId;
     }
 }

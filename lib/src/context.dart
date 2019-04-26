@@ -93,7 +93,7 @@ class Context {
   static const String configShowEmails = "show_emails";
 
   static const int contactListFlagVerifiedOnly = 1;
-  static const int contactListFlagAddSelf= 2;
+  static const int contactListFlagAddSelf = 2;
 
   static const int serverFlagsImapStartTls = 0x100;
   static const int serverFlagsImapSsl = 0x200;
@@ -117,8 +117,7 @@ class Context {
     } else if (type == ObjectType.int) {
       method = methodConfigGetInt;
     }
-    var arguments = <String, dynamic>{Base.argumentKey: key};
-    return await core.invokeMethod(method, arguments);
+    return await core.invokeMethod(method, getKeyArguments(key));
   }
 
   Future<dynamic> setConfigValue(String key, value, ObjectType enforceType) async {
@@ -128,8 +127,7 @@ class Context {
     } else {
       type = value != null ? value.runtimeType.toString() : null;
     }
-    var arguments = <String, dynamic>{Base.argumentType: type, Base.argumentKey: key, Base.argumentValue: value};
-    await core.invokeMethod(methodConfigSet, arguments);
+    await core.invokeMethod(methodConfigSet, getConfigArguments(type, key, value));
   }
 
   Future<dynamic> configure() async {
@@ -141,53 +139,43 @@ class Context {
   }
 
   Future<int> addAddressBook(String addressBook) async {
-    var arguments = <String, dynamic>{Base.argumentAddressBook: addressBook};
-    return await core.invokeMethod(methodAddAddressBook, arguments);
+    return await core.invokeMethod(methodAddAddressBook, getAddressBookArguments(addressBook));
   }
 
   Future<int> createContact(String name, String address) async {
-    var arguments = <String, dynamic>{Base.argumentName: name, Base.argumentAddress: address};
-    return await core.invokeMethod(methodCreateContact, arguments);
+    return await core.invokeMethod(methodCreateContact, getContactArguments(name, address));
   }
 
   Future<bool> deleteContact(int id) async {
-    var arguments = <String, dynamic>{Base.argumentId: id};
-    return await core.invokeMethod(methodDeleteContact, arguments);
+    return await core.invokeMethod(methodDeleteContact, getIdArguments(id));
   }
 
   Future<bool> blockContact(int id) async {
-    var arguments = <String, dynamic>{Base.argumentId: id};
-    return await core.invokeMethod(methodBlockContact, arguments);
+    return await core.invokeMethod(methodBlockContact, getIdArguments(id));
   }
 
   Future<bool> unblockContact(int id) async {
-    var arguments = <String, dynamic>{Base.argumentId: id};
-    return await core.invokeMethod(methodUnblockContact, arguments);
+    return await core.invokeMethod(methodUnblockContact, getIdArguments(id));
   }
 
   Future<int> createChatByContactId(int id) async {
-    var arguments = <String, dynamic>{Base.argumentId: id};
-    return await core.invokeMethod(methodCreateChatById, arguments);
+    return await core.invokeMethod(methodCreateChatById, getIdArguments(id));
   }
 
   Future<int> createChatByMessageId(int id) async {
-    var arguments = <String, dynamic>{Base.argumentId: id};
-    return await core.invokeMethod(methodCreateChatByMessageId, arguments);
+    return await core.invokeMethod(methodCreateChatByMessageId, getIdArguments(id));
   }
 
   Future<int> createGroupChat(bool verified, String name) async {
-    var arguments = <String, dynamic>{Base.argumentVerified: verified, Base.argumentName: name};
-    return await core.invokeMethod(methodCreateGroupChat, arguments);
+    return await core.invokeMethod(methodCreateGroupChat, getCreateGroupArguments(verified, name));
   }
 
   Future<List> getContacts(int flags, String query) async {
-    var arguments = <String, dynamic>{Base.argumentFlags: flags, Base.argumentQuery: query};
-    return await core.invokeMethod(methodGetContacts, arguments);
+    return await core.invokeMethod(methodGetContacts, getContactsArguments(flags, query));
   }
 
   Future<List> getChatContacts(int chatId) async {
-    var arguments = <String, dynamic>{Base.argumentChatId: chatId};
-    return await core.invokeMethod(methodGetChatContacts, arguments);
+    return await core.invokeMethod(methodGetChatContacts, getChatIdArguments(chatId));
   }
 
   Future<List> getBlockedContacts() async {
@@ -195,47 +183,68 @@ class Context {
   }
 
   Future<List> getChatMessages(int chatId, [int flags = 0]) async {
-    var arguments = <String, dynamic>{Base.argumentId: chatId, Base.argumentFlags: flags};
-    return await core.invokeMethod(methodGetChatMessages, arguments);
+    return await core.invokeMethod(methodGetChatMessages, getChatMessageArguments(chatId, flags));
   }
 
   Future<int> createChatMessage(int chatId, String text) async {
-    var arguments = <String, dynamic>{Base.argumentId: chatId, Base.argumentValue: text};
-    return await core.invokeMethod(methodCreateChatMessage, arguments);
+    return await core.invokeMethod(methodCreateChatMessage, createChatMessageArguments(chatId, text));
   }
 
   Future<int> createChatAttachmentMessage(int chatId, String path, int msgType, [String text]) async {
-    var arguments = <String, dynamic>{Base.argumentId: chatId, Base.argumentPath: path, Base.argumentType: msgType, Base.argumentText: text};
-    return await core.invokeMethod(methodCreateChatAttachmentMessage, arguments);
+    return await core.invokeMethod(methodCreateChatAttachmentMessage, getCreateAttachmentMessageArguments(chatId, path, msgType, text));
   }
 
   Future<int> addContactToChat(int chatId, int contactId) async {
-    var arguments = <String, dynamic>{Base.argumentChatId: chatId, Base.argumentContactId: contactId};
-    return await core.invokeMethod(methodAddContactToChat, arguments);
+    return await core.invokeMethod(methodAddContactToChat, getChatAndContactIdArguments(chatId, contactId));
   }
 
   Future<int> getChatByContactId(int contactId) async {
-    var arguments = <String, dynamic>{Base.argumentContactId: contactId};
-    return await core.invokeMethod(methodGetChatByContactId, arguments);
+    return await core.invokeMethod(methodGetChatByContactId, getContactIdArguments(contactId));
   }
 
   Future<int> getFreshMessageCount(int chatId) async {
-    var arguments = <String, dynamic>{Base.argumentChatId: chatId};
-    return await core.invokeMethod(methodGetFreshMessageCount, arguments);
+    return await core.invokeMethod(methodGetFreshMessageCount, getChatIdArguments(chatId));
   }
 
   Future<int> markNoticedChat(int chatId) async {
-    var arguments = <String, dynamic>{Base.argumentChatId: chatId};
-    return await core.invokeMethod(methodMarkNoticedChat, arguments);
+    return await core.invokeMethod(methodMarkNoticedChat, getChatIdArguments(chatId));
   }
 
   Future<int> deleteChat(int chatId) async {
-    var arguments = <String, dynamic>{Base.argumentChatId: chatId};
-    return await core.invokeMethod(methodDeleteChat, arguments);
+    return await core.invokeMethod(methodDeleteChat, getChatIdArguments(chatId));
   }
 
   Future<int> removeContactFromChat(int chatId, int contactId) async {
-    var arguments = <String, dynamic>{Base.argumentChatId: chatId, Base.argumentContactId: contactId};
-    return await core.invokeMethod(methodRemoveContactFromChat, arguments);
+    return await core.invokeMethod(methodRemoveContactFromChat, getChatAndContactIdArguments(chatId, contactId));
   }
+
+  Map<String, dynamic> getKeyArguments(String key) => <String, dynamic>{Base.argumentKey: key};
+
+  Map<String, dynamic> getConfigArguments(String type, String key, value) =>
+      <String, dynamic>{Base.argumentType: type, Base.argumentKey: key, Base.argumentValue: value};
+
+  Map<String, dynamic> getAddressBookArguments(String addressBook) => <String, dynamic>{Base.argumentAddressBook: addressBook};
+
+  Map<String, dynamic> getContactArguments(String name, String address) => <String, dynamic>{Base.argumentName: name, Base.argumentAddress: address};
+
+  Map<String, dynamic> getIdArguments(int id) => <String, dynamic>{Base.argumentId: id};
+
+  Map<String, dynamic> getCreateGroupArguments(bool verified, String name) =>
+      <String, dynamic>{Base.argumentVerified: verified, Base.argumentName: name};
+
+  Map<String, dynamic> getContactsArguments(int flags, String query) => <String, dynamic>{Base.argumentFlags: flags, Base.argumentQuery: query};
+
+  Map<String, dynamic> getChatIdArguments(int chatId) => <String, dynamic>{Base.argumentChatId: chatId};
+
+  Map<String, dynamic> getChatMessageArguments(int chatId, int flags) => <String, dynamic>{Base.argumentId: chatId, Base.argumentFlags: flags};
+
+  Map<String, dynamic> createChatMessageArguments(int chatId, String text) => <String, dynamic>{Base.argumentId: chatId, Base.argumentValue: text};
+
+  Map<String, dynamic> getCreateAttachmentMessageArguments(int chatId, String path, int msgType, String text) =>
+      <String, dynamic>{Base.argumentId: chatId, Base.argumentPath: path, Base.argumentType: msgType, Base.argumentText: text};
+
+  Map<String, dynamic> getChatAndContactIdArguments(int chatId, int contactId) =>
+      <String, dynamic>{Base.argumentChatId: chatId, Base.argumentContactId: contactId};
+
+  Map<String, dynamic> getContactIdArguments(int contactId) => <String, dynamic>{Base.argumentContactId: contactId};
 }

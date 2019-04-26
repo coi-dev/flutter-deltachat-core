@@ -46,6 +46,8 @@ import 'package:delta_chat_core/delta_chat_core.dart';
 import 'package:delta_chat_core/src/base.dart';
 
 class ChatList extends Base {
+  static const String methodChatListInternalSetup = "chatList_internal_setup";
+  static const String methodChatListInternalTearDown = "chatList_internal_tearDown";
   static const String methodChatListGetCnt = "chatList_getCnt";
   static const String methodChatListGetId = "chatList_getId";
   static const String methodChatListGetChat = "chatList_getChat";
@@ -63,33 +65,45 @@ class ChatList extends Base {
 
   final DeltaChatCore core = DeltaChatCore();
 
+  int _id;
+
+  Future<void> setup() async {
+    _id = await core.invokeMethod(methodChatListInternalSetup);
+  }
+
+  Future<int> tearDown() async {
+    return await core.invokeMethod(methodChatListInternalTearDown, getDefaultArguments());
+  }
+
   Future<int> getChatCnt([int chatListType = typeNoSpecials]) async {
-    return await core.invokeMethod(methodChatListGetCnt, <String, dynamic>{Base.argumentType: chatListType});
+    return await core.invokeMethod(methodChatListGetCnt, getTypeArguments(chatListType));
   }
 
   Future<int> getChatId(int index, [int chatListType = typeNoSpecials]) async {
-    return await core.invokeMethod(methodChatListGetId, <String, dynamic>{Base.argumentType: chatListType, Base.argumentIndex: index});
+    return await core.invokeMethod(methodChatListGetId, getIndexArguments(chatListType, index));
   }
 
   Future<int> getChatMsgId(int index, [int chatListType = typeNoSpecials]) async {
-    return await core.invokeMethod(methodChatListGetMsgId, <String, dynamic>{Base.argumentType: chatListType, Base.argumentIndex: index});
+    return await core.invokeMethod(methodChatListGetMsgId, getIndexArguments(chatListType, index));
   }
 
   Future<int> getChat(int index, [int chatListType = typeNoSpecials]) async {
-    return await core.invokeMethod(methodChatListGetChat, <String, dynamic>{Base.argumentType: chatListType, Base.argumentIndex: index});
+    return await core.invokeMethod(methodChatListGetChat, getIndexArguments(chatListType, index));
   }
 
   Future<dynamic> getChatMsg(int index, [int chatListType = typeNoSpecials]) async {
-    return await core.invokeMethod(methodChatListGetMsg, <String, dynamic>{Base.argumentType: chatListType, Base.argumentIndex: index});
+    return await core.invokeMethod(methodChatListGetMsg, getIndexArguments(chatListType, index));
   }
 
   Future<dynamic> getChatSummary(int index, [int chatListType = typeNoSpecials]) async {
-    return await core.invokeMethod(methodChatListGetSummary, <String, dynamic>{Base.argumentType: chatListType, Base.argumentIndex: index});
+    return await core.invokeMethod(methodChatListGetSummary, getIndexArguments(chatListType, index));
   }
 
   @override
-  getDefaultParameters() {
-    // TODO: implement getDefaultParameters
-    return null;
-  }
+  getDefaultArguments() => <String, dynamic>{Base.argumentCacheId: _id};
+
+  Map<String, dynamic> getTypeArguments(int chatListType) => <String, dynamic>{Base.argumentCacheId: _id, Base.argumentType: chatListType};
+
+  Map<String, dynamic> getIndexArguments(int chatListType, int index) =>
+      <String, dynamic>{Base.argumentCacheId: _id, Base.argumentType: chatListType, Base.argumentIndex: index};
 }

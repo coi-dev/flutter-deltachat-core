@@ -57,14 +57,16 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
 public class ChatListCallHandler extends AbstractCallHandler {
-    private static final String METHOD_CHAT_GET_CNT = "chatList_getCnt";
-    private static final String METHOD_CHAT_GET_ID = "chatList_getId";
-    private static final String METHOD_CHAT_GET_CHAT = "chatList_getChat";
-    private static final String METHOD_CHAT_GET_MSG_ID = "chatList_getMsgId";
-    private static final String METHOD_CHAT_GET_MSG = "chatList_getMsg";
-    private static final String METHOD_CHAT_GET_SUMMARY = "chatList_getSummary";
+    private static final String METHOD_CHAT_LIST_INTERNAL_SETUP = "chatList_internal_setup";
+    private static final String METHOD_CHAT_LIST_INTERNAL_TEAR_DOWN = "chatList_internal_tearDown";
+    private static final String METHOD_CHAT_LIST_GET_CNT = "chatList_getCnt";
+    private static final String METHOD_CHAT_LIST_GET_ID = "chatList_getId";
+    private static final String METHOD_CHAT_LIST_GET_CHAT = "chatList_getChat";
+    private static final String METHOD_CHAT_LIST_GET_MSG_ID = "chatList_getMsgId";
+    private static final String METHOD_CHAT_LIST_GET_MSG = "chatList_getMsg";
+    private static final String METHOD_CHAT_LIST_GET_SUMMARY = "chatList_getSummary";
 
-    private DcChatlist dcChatlist;
+    private Cache<DcChatlist> chatListCache = new Cache<>();
 
     private Cache<DcChat> chatCache;
 
@@ -82,32 +84,68 @@ public class ChatListCallHandler extends AbstractCallHandler {
         } else {
             chatListFlag = 0;
         }
-        dcChatlist = dcContext.getChatlist(chatListFlag, null, 0);
+        Integer cacheId = methodCall.argument(ARGUMENT_CACHE_ID);
+        DcChatlist dcChatlist = null;
+        if (cacheId != null) {
+            dcChatlist = chatListCache.get(cacheId);
+        }
+        if (dcChatlist == null) {
+            dcChatlist = dcContext.getChatlist(chatListFlag, null, 0);
+        }
         switch (methodCall.method) {
-            case METHOD_CHAT_GET_CNT:
-                getChatCnt(result);
+            case METHOD_CHAT_LIST_INTERNAL_SETUP:
+                setup(dcChatlist, result);
                 break;
-            case METHOD_CHAT_GET_ID:
-                getChatId(methodCall, result);
+            case METHOD_CHAT_LIST_INTERNAL_TEAR_DOWN:
+                tearDown(methodCall, result);
                 break;
-            case METHOD_CHAT_GET_MSG_ID:
-                getChatMsgId(methodCall, result);
+            case METHOD_CHAT_LIST_GET_CNT:
+                getChatCnt(dcChatlist, result);
                 break;
-            case METHOD_CHAT_GET_CHAT:
-                getChat(methodCall, result);
+            case METHOD_CHAT_LIST_GET_ID:
+                getChatId(dcChatlist, methodCall, result);
                 break;
-            case METHOD_CHAT_GET_MSG:
-                getChatMsg(methodCall, result);
+            case METHOD_CHAT_LIST_GET_MSG_ID:
+                getChatMsgId(dcChatlist, methodCall, result);
                 break;
-            case METHOD_CHAT_GET_SUMMARY:
-                getChatSummary(methodCall, result);
+            case METHOD_CHAT_LIST_GET_CHAT:
+                getChat(dcChatlist, methodCall, result);
+                break;
+            case METHOD_CHAT_LIST_GET_MSG:
+                getChatMsg(dcChatlist, methodCall, result);
+                break;
+            case METHOD_CHAT_LIST_GET_SUMMARY:
+                getChatSummary(dcChatlist, methodCall, result);
                 break;
             default:
                 result.notImplemented();
         }
     }
 
-    private void getChatSummary(MethodCall methodCall, MethodChannel.Result result) {
+    private void setup(DcChatlist dcChatlist, MethodChannel.Result result) {
+        int cacheId = chatListCache.getGenerateId();
+        if (dcChatlist != null) {
+            chatListCache.append(cacheId, dcChatlist);
+        }
+        result.success(cacheId);
+    }
+
+    private void tearDown(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_CACHE_ID)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        Integer cacheId = methodCall.argument(ARGUMENT_CACHE_ID);
+        if (!isArgumentIntValueValid(cacheId)) {
+            resultErrorArgumentNoValidInt(result, ARGUMENT_CACHE_ID);
+            return;
+        }
+        //noinspection ConstantConditions
+        chatListCache.delete(cacheId);
+        result.success(null);
+    }
+
+    private void getChatSummary(DcChatlist dcChatlist, MethodCall methodCall, MethodChannel.Result result) {
         Integer index = getArgumentValueAsInt(methodCall, result, ARGUMENT_INDEX);
         if (!isArgumentIntValueValid(index)) {
             resultErrorArgumentNoValidInt(result, ARGUMENT_INDEX);
@@ -119,7 +157,7 @@ public class ChatListCallHandler extends AbstractCallHandler {
         result.success(summaryResult);
     }
 
-    private void getChatMsg(MethodCall methodCall, MethodChannel.Result result) {
+    private void getChatMsg(DcChatlist dcChatlist, MethodCall methodCall, MethodChannel.Result result) {
         Integer index = getArgumentValueAsInt(methodCall, result, ARGUMENT_INDEX);
         if (!isArgumentIntValueValid(index)) {
             resultErrorArgumentNoValidInt(result, ARGUMENT_INDEX);
@@ -130,7 +168,7 @@ public class ChatListCallHandler extends AbstractCallHandler {
         result.success(msgResult);
     }
 
-    private void getChat(MethodCall methodCall, MethodChannel.Result result) {
+    private void getChat(DcChatlist dcChatlist, MethodCall methodCall, MethodChannel.Result result) {
         Integer index = getArgumentValueAsInt(methodCall, result, ARGUMENT_INDEX);
         if (!isArgumentIntValueValid(index)) {
             resultErrorArgumentNoValidInt(result, ARGUMENT_INDEX);
@@ -145,7 +183,7 @@ public class ChatListCallHandler extends AbstractCallHandler {
         result.success(chat.getId());
     }
 
-    private void getChatMsgId(MethodCall methodCall, MethodChannel.Result result) {
+    private void getChatMsgId(DcChatlist dcChatlist, MethodCall methodCall, MethodChannel.Result result) {
         Integer index = getArgumentValueAsInt(methodCall, result, ARGUMENT_INDEX);
         if (!isArgumentIntValueValid(index)) {
             resultErrorArgumentNoValidInt(result, ARGUMENT_INDEX);
@@ -154,7 +192,7 @@ public class ChatListCallHandler extends AbstractCallHandler {
         result.success(dcChatlist.getMsgId(index));
     }
 
-    private void getChatId(MethodCall methodCall, MethodChannel.Result result) {
+    private void getChatId(DcChatlist dcChatlist, MethodCall methodCall, MethodChannel.Result result) {
         Integer index = getArgumentValueAsInt(methodCall, result, ARGUMENT_INDEX);
         if (!isArgumentIntValueValid(index)) {
             resultErrorArgumentNoValidInt(result, ARGUMENT_INDEX);
@@ -163,7 +201,7 @@ public class ChatListCallHandler extends AbstractCallHandler {
         result.success(dcChatlist.getChatId(index));
     }
 
-    private void getChatCnt(MethodChannel.Result result) {
+    private void getChatCnt(DcChatlist dcChatlist, MethodChannel.Result result) {
         result.success(dcChatlist.getCnt());
     }
 }

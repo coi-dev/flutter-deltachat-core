@@ -69,42 +69,42 @@ class Contact extends Base {
   }
 
   Future<String> getName() async {
-    return await loadAndGetValue(methodContactGetName, getDefaultParameters());
+    return await loadAndGetValue(methodContactGetName, getDefaultArguments());
   }
 
   Future<String> getDisplayName() async {
-    return await loadAndGetValue(methodContactGetDisplayName, getDefaultParameters());
+    return await loadAndGetValue(methodContactGetDisplayName, getDefaultArguments());
   }
 
   Future<String> getFirstName() async {
-    return await loadAndGetValue(methodContactGetFirstName, getDefaultParameters());
+    return await loadAndGetValue(methodContactGetFirstName, getDefaultArguments());
   }
 
   Future<String> getAddress() async {
-    return await loadAndGetValue(methodContactGetAddress, getDefaultParameters());
+    return await loadAndGetValue(methodContactGetAddress, getDefaultArguments());
   }
 
   Future<String> getNameAndAddress() async {
-    return await loadAndGetValue(methodContactGetNameAndAddress, getDefaultParameters());
+    return await loadAndGetValue(methodContactGetNameAndAddress, getDefaultArguments());
   }
 
   Future<String> getProfileImage() async {
-    return await loadAndGetValue(methodContactGetProfileImage, getDefaultParameters());
+    return await loadAndGetValue(methodContactGetProfileImage, getDefaultArguments());
   }
 
   Future<int> getColor() async {
-    return await loadAndGetValue(methodContactGetColor, getDefaultParameters());
+    return await loadAndGetValue(methodContactGetColor, getDefaultArguments());
   }
 
   Future<bool> isVerified() async {
-    return await loadAndGetValue(methodContactIsVerified, getDefaultParameters());
+    return await loadAndGetValue(methodContactIsVerified, getDefaultArguments());
   }
 
   Future<bool> isBlocked() async {
-    return await loadAndGetValue(methodContactIsBlocked, getDefaultParameters());
+    return await loadAndGetValue(methodContactIsBlocked, getDefaultArguments());
   }
 
-  Map<String, dynamic> getDefaultParameters() => <String, dynamic>{Base.argumentId: _id};
+  Map<String, dynamic> getDefaultArguments() => <String, dynamic>{Base.argumentId: _id};
 
   static Function getCreator() {
     return (id) => new Contact._internal(id);

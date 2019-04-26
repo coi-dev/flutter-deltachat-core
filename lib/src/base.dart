@@ -50,6 +50,7 @@ abstract class Base {
   static const String argumentValue = "value";
   static const String argumentAddress = "address";
   static const String argumentId = "id";
+  static const String argumentCacheId = "cacheId";
   static const String argumentVerified = "verified";
   static const String argumentName = "name";
   static const String argumentIndex = "index";
@@ -73,26 +74,26 @@ abstract class Base {
     setLastUpdate();
   }
 
-  Future<void> loadValue(String key, var parameters) async {
+  Future<void> loadValue(String key, var arguments) async {
     if (!isValueLoaded(key)) {
-      _storedValues[key] = await core.invokeMethod(key, parameters);
+      _storedValues[key] = await core.invokeMethod(key, arguments);
       _loadedValues[key] = true;
     }
   }
 
-  Future<dynamic> loadAndGetValue(String key, var parameters) async  {
-    await loadValue(key, parameters);
+  Future<dynamic> loadAndGetValue(String key, var arguments) async  {
+    await loadValue(key, arguments);
     return _storedValues[key];
   }
 
-  void loadValues({List<String> keys, Map<String, Map<String, dynamic>> keysAndParameters}) async {
+  void loadValues({List<String> keys, Map<String, Map<String, dynamic>> keysAndArguments}) async {
     if (keys != null && keys.isNotEmpty) {
       Future.forEach(keys, (key) async {
-        await loadValue(key, getDefaultParameters());
+        await loadValue(key, getDefaultArguments());
       });
-    } else if (keysAndParameters != null && keysAndParameters.isNotEmpty) {
-      for (int index = 0; index < keysAndParameters.length; index++) {
-        await loadValue(keysAndParameters.keys.elementAt(index), keysAndParameters.values.elementAt(index));
+    } else if (keysAndArguments != null && keysAndArguments.isNotEmpty) {
+      for (int index = 0; index < keysAndArguments.length; index++) {
+        await loadValue(keysAndArguments.keys.elementAt(index), keysAndArguments.values.elementAt(index));
       }
     }
   }
@@ -132,6 +133,6 @@ abstract class Base {
     _lastUpdate = DateTime.now().millisecondsSinceEpoch;
   }
 
-  getDefaultParameters();
+  getDefaultArguments();
 
 }

@@ -96,55 +96,55 @@ class ChatMsg extends Base{
   }
 
   Future<int> getMessageId() async {
-    return await loadAndGetValue(methodMessageGetId, getDefaultParameters());
+    return await loadAndGetValue(methodMessageGetId, getDefaultArguments());
   }
 
   Future<String> getText() async {
-    return await loadAndGetValue(methodMessageGetText, getDefaultParameters());
+    return await loadAndGetValue(methodMessageGetText, getDefaultArguments());
   }
 
   Future<int> getTimestamp() async {
-    return await loadAndGetValue(methodMessageGetTimestamp, getDefaultParameters());
+    return await loadAndGetValue(methodMessageGetTimestamp, getDefaultArguments());
   }
 
   Future<int> getChatId() async {
-    return await loadAndGetValue(methodMessageGetChatId, getDefaultParameters());
+    return await loadAndGetValue(methodMessageGetChatId, getDefaultArguments());
   }
 
   Future<int> getFromId() async {
-    return await loadAndGetValue(methodMessageGetFromId, getDefaultParameters());
+    return await loadAndGetValue(methodMessageGetFromId, getDefaultArguments());
   }
 
   Future<bool> isOutgoing() async {
-    return await loadAndGetValue(methodMessageIsOutgoing, getDefaultParameters());
+    return await loadAndGetValue(methodMessageIsOutgoing, getDefaultArguments());
   }
 
   Future<bool> hasFile() async {
-    return await loadAndGetValue(methodMessageHasFile, getDefaultParameters());
+    return await loadAndGetValue(methodMessageHasFile, getDefaultArguments());
   }
 
   Future<int> getType() async {
-    return await loadAndGetValue(methodMessageGetType, getDefaultParameters());
+    return await loadAndGetValue(methodMessageGetType, getDefaultArguments());
   }
 
   Future<String> getFile() async {
-    return await loadAndGetValue(methodMessageGetFile, getDefaultParameters());
+    return await loadAndGetValue(methodMessageGetFile, getDefaultArguments());
   }
 
   Future<int> getFileBytes() async {
-    return await loadAndGetValue(methodMessageGetFileBytes, getDefaultParameters());
+    return await loadAndGetValue(methodMessageGetFileBytes, getDefaultArguments());
   }
 
   Future<String> getFileName() async {
-    return await loadAndGetValue(methodMessageGetFilename, getDefaultParameters());
+    return await loadAndGetValue(methodMessageGetFilename, getDefaultArguments());
   }
 
   Future<String> getFileMime() async {
-    return await loadAndGetValue(methodMessageGetFileMime, getDefaultParameters());
+    return await loadAndGetValue(methodMessageGetFileMime, getDefaultArguments());
   }
 
   @override
-  getDefaultParameters() => <String, dynamic>{Base.argumentId: _id};
+  getDefaultArguments() => <String, dynamic>{Base.argumentId: _id};
 
   static Function getCreator() {
     return (id) => new ChatMsg._internal(id);
