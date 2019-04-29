@@ -185,19 +185,19 @@ public class ContextCallHandler extends AbstractCallHandler {
     }
 
     private void setConfig(MethodCall methodCall, MethodChannel.Result result) {
-        if (!hasArgumentKeys(methodCall, ARGUMENT_KEY_TYPE, ARGUMENT_KEY_KEY, ARGUMENT_KEY_VALUE)) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_TYPE, ARGUMENT_KEY, ARGUMENT_VALUE)) {
             resultErrorArgumentMissing(result);
             return;
         }
-        String type = methodCall.argument(ARGUMENT_KEY_TYPE);
+        String type = methodCall.argument(ARGUMENT_TYPE);
         if (type == null) {
             resultErrorArgumentMissingValue(result);
             return;
         }
-        String key = methodCall.argument(ARGUMENT_KEY_KEY);
+        String key = methodCall.argument(ARGUMENT_KEY);
         switch (type) {
             case TYPE_INT: {
-                Integer value = methodCall.argument(ARGUMENT_KEY_VALUE);
+                Integer value = methodCall.argument(ARGUMENT_VALUE);
                 if (value == null) {
                     resultErrorArgumentMissingValue(result);
                     return;
@@ -206,12 +206,12 @@ public class ContextCallHandler extends AbstractCallHandler {
                 break;
             }
             case TYPE_STRING: {
-                String value = methodCall.argument(ARGUMENT_KEY_VALUE);
+                String value = methodCall.argument(ARGUMENT_VALUE);
                 dcContext.setConfig(key, value);
                 break;
             }
             default:
-                resultErrorArgumentTypeMismatch(result, ARGUMENT_KEY_TYPE);
+                resultErrorArgumentTypeMismatch(result, ARGUMENT_TYPE);
                 break;
         }
         result.success(null);
@@ -219,11 +219,11 @@ public class ContextCallHandler extends AbstractCallHandler {
 
 
     private void getConfig(MethodCall methodCall, MethodChannel.Result result, String type) {
-        if (!hasArgumentKeys(methodCall, ARGUMENT_KEY_KEY)) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_KEY)) {
             resultErrorArgumentMissing(result);
             return;
         }
-        String key = methodCall.argument(ARGUMENT_KEY_KEY);
+        String key = methodCall.argument(ARGUMENT_KEY);
         switch (type) {
             case TYPE_INT: {
                 int resultValue = dcContext.getConfigInt(key);
@@ -236,7 +236,7 @@ public class ContextCallHandler extends AbstractCallHandler {
                 break;
             }
             default:
-                resultErrorArgumentTypeMismatch(result, ARGUMENT_KEY_TYPE);
+                resultErrorArgumentTypeMismatch(result, ARGUMENT_TYPE);
                 break;
         }
     }
@@ -497,7 +497,7 @@ public class ContextCallHandler extends AbstractCallHandler {
     }
 
     private void createChatMessage(MethodCall methodCall, MethodChannel.Result result) {
-        if (!hasArgumentKeys(methodCall, ARGUMENT_ID, ARGUMENT_KEY_VALUE)) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_ID, ARGUMENT_VALUE)) {
             resultErrorArgumentMissing(result);
             return;
         }
@@ -507,7 +507,7 @@ public class ContextCallHandler extends AbstractCallHandler {
             return;
         }
 
-        String text = methodCall.argument(ARGUMENT_KEY_VALUE);
+        String text = methodCall.argument(ARGUMENT_VALUE);
 
         DcMsg newMsg = new DcMsg(dcContext, DcMsg.DC_MSG_TEXT);
         newMsg.setText(text);
@@ -516,13 +516,13 @@ public class ContextCallHandler extends AbstractCallHandler {
     }
 
     private void createChatAttachmentMessage(MethodCall methodCall, MethodChannel.Result result) {
-        if (!hasArgumentKeys(methodCall, ARGUMENT_ID, ARGUMENT_KEY_TYPE, ARGUMENT_PATH, ARGUMENT_TEXT)) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_ID, ARGUMENT_TYPE, ARGUMENT_PATH, ARGUMENT_TEXT)) {
             resultErrorArgumentMissing(result);
             return;
         }
         Integer chatId = methodCall.argument(ARGUMENT_ID);
         String path = methodCall.argument(ARGUMENT_PATH);
-        Integer type = methodCall.argument(ARGUMENT_KEY_TYPE);
+        Integer type = methodCall.argument(ARGUMENT_TYPE);
         if (chatId == null || path == null || type == null) {
             resultErrorArgumentMissingValue(result);
             return;

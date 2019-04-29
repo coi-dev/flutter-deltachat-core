@@ -49,9 +49,9 @@ import io.flutter.plugin.common.MethodChannel;
 
 abstract class AbstractCallHandler {
 
-    static final String ARGUMENT_KEY_TYPE = "type";
-    static final String ARGUMENT_KEY_KEY = "key";
-    static final String ARGUMENT_KEY_VALUE = "value";
+    static final String ARGUMENT_TYPE = "type";
+    static final String ARGUMENT_KEY = "key";
+    static final String ARGUMENT_VALUE = "value";
     static final String ARGUMENT_ADDRESS = "address";
     static final String ARGUMENT_ID = "id";
     static final String ARGUMENT_CACHE_ID = "cacheId";

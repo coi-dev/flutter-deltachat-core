@@ -77,24 +77,27 @@ public class ChatListCallHandler extends AbstractCallHandler {
 
     @Override
     public void handleCall(MethodCall methodCall, MethodChannel.Result result) {
-        int chatListFlag;
-        Integer type = methodCall.argument(ARGUMENT_KEY_TYPE);
-        if (type != null) {
-            chatListFlag = type;
-        } else {
-            chatListFlag = 0;
-        }
-        Integer cacheId = methodCall.argument(ARGUMENT_CACHE_ID);
         DcChatlist dcChatlist = null;
-        if (cacheId != null) {
+        if (!methodCall.method.equals(METHOD_CHAT_LIST_INTERNAL_SETUP)) {
+            if (!hasArgumentKeys(methodCall, ARGUMENT_CACHE_ID)) {
+                resultErrorArgumentMissing(result);
+                return;
+            }
+            Integer cacheId = methodCall.argument(ARGUMENT_CACHE_ID);
+            if (!isArgumentIntValueValid(cacheId)) {
+                resultErrorArgumentNoValidInt(result, ARGUMENT_CACHE_ID);
+                return;
+            }
+            //noinspection ConstantConditions
             dcChatlist = chatListCache.get(cacheId);
-        }
-        if (dcChatlist == null) {
-            dcChatlist = dcContext.getChatlist(chatListFlag, null, 0);
+            if (dcChatlist == null) {
+                resultErrorGeneric(methodCall, result);
+                return;
+            }
         }
         switch (methodCall.method) {
             case METHOD_CHAT_LIST_INTERNAL_SETUP:
-                setup(dcChatlist, result);
+                setup(methodCall, result);
                 break;
             case METHOD_CHAT_LIST_INTERNAL_TEAR_DOWN:
                 tearDown(methodCall, result);
@@ -122,24 +125,22 @@ public class ChatListCallHandler extends AbstractCallHandler {
         }
     }
 
-    private void setup(DcChatlist dcChatlist, MethodChannel.Result result) {
-        int cacheId = chatListCache.getGenerateId();
-        if (dcChatlist != null) {
-            chatListCache.append(cacheId, dcChatlist);
+    private void setup(MethodCall methodCall, MethodChannel.Result result) {
+        int chatListFlag;
+        Integer type = methodCall.argument(ARGUMENT_TYPE);
+        if (type != null) {
+            chatListFlag = type;
+        } else {
+            chatListFlag = 0;
         }
+        DcChatlist dcChatlist = dcContext.getChatlist(chatListFlag, null, 0);
+        int cacheId = chatListCache.getGenerateId();
+        chatListCache.append(cacheId, dcChatlist);
         result.success(cacheId);
     }
 
     private void tearDown(MethodCall methodCall, MethodChannel.Result result) {
-        if (!hasArgumentKeys(methodCall, ARGUMENT_CACHE_ID)) {
-            resultErrorArgumentMissing(result);
-            return;
-        }
         Integer cacheId = methodCall.argument(ARGUMENT_CACHE_ID);
-        if (!isArgumentIntValueValid(cacheId)) {
-            resultErrorArgumentNoValidInt(result, ARGUMENT_CACHE_ID);
-            return;
-        }
         //noinspection ConstantConditions
         chatListCache.delete(cacheId);
         result.success(null);
