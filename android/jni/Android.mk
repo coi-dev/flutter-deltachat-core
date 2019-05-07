@@ -7,6 +7,7 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
+LOCAL_CFLAGS += -DOPENSSL_NO_INLINE_ASM
 
 arm_cflags := -DOPENSSL_BN_ASM_MONT -DAES_ASM -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM
 
@@ -413,9 +414,6 @@ local_src_files := \
 	./messenger-backend/libs/openssl/crypto/rc2/rc2_skey.c \
 	./messenger-backend/libs/openssl/crypto/rc2/rc2cfb64.c \
 	./messenger-backend/libs/openssl/crypto/rc2/rc2ofb64.c \
-	./messenger-backend/libs/openssl/crypto/rc4/rc4_enc.c \
-	./messenger-backend/libs/openssl/crypto/rc4/rc4_skey.c \
-	./messenger-backend/libs/openssl/crypto/rc4/rc4_utl.c \
 	./messenger-backend/libs/openssl/crypto/ripemd/rmd_dgst.c \
 	./messenger-backend/libs/openssl/crypto/ripemd/rmd_one.c \
 	./messenger-backend/libs/openssl/crypto/rsa/rsa_ameth.c \
@@ -573,7 +571,7 @@ local_c_flags := -DNO_WINDOWS_BRAINDEATH
 
 LOCAL_SRC_FILES += $(local_src_files)
 LOCAL_CFLAGS += -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -DL_ENDIAN
-LOCAL_CFLAGS += -DOPENSSL_NO_CAPIENG -DOPENSSL_NO_CMS -DOPENSSL_NO_GMP -DOPENSSL_NO_IDEA -DOPENSSL_NO_JPAKE -DOPENSSL_NO_MD2 -DOPENSSL_NO_MDC2 -DOPENSSL_NO_RC5 -DOPENSSL_NO_SHA0 -DOPENSSL_NO_RFC3779 -DOPENSSL_NO_SEED -DOPENSSL_NO_STORE -DOPENSSL_NO_WHIRLPOOL
+LOCAL_CFLAGS += -DOPENSSL_NO_CAPIENG -DOPENSSL_NO_CMS -DOPENSSL_NO_GMP -DOPENSSL_NO_IDEA -DOPENSSL_NO_JPAKE -DOPENSSL_NO_MD2 -DOPENSSL_NO_MDC2 -DOPENSSL_NO_RC4 -DOPENSSL_NO_RC5 -DOPENSSL_NO_SHA0 -DOPENSSL_NO_RFC3779 -DOPENSSL_NO_SEED -DOPENSSL_NO_STORE -DOPENSSL_NO_WHIRLPOOL
 LOCAL_CFLAGS += -DOPENSSL_NO_HW -DOPENSSL_NO_ENGINE -DZLIB
 LOCAL_CFLAGS += $(local_c_flags) -DPURIFY
 LOCAL_C_INCLUDES += $(local_c_includes)
@@ -865,13 +863,13 @@ $(JNI_DIR)/messenger-backend/libs/libetpan/include \
 $(JNI_DIR)/messenger-backend/libs/netpgp/include \
 $(JNI_DIR)/messenger-backend/libs/sqlite
 
-LOCAL_LDLIBS 	:= -ljnigraphics -llog -lz -latomic
+LOCAL_LDLIBS 	:= -ljnigraphics -llog -lz
 LOCAL_STATIC_LIBRARIES :=  etpan sasl2 sqlite crypto libiconv
 # if you get "undefined reference" errors, the reason for this may be the _order_! Eg. libiconv as the first library does not work!
 # "breakpad" was placed after "crypto", NativeLoader.cpp after dc_wrapper.c
 
 LOCAL_CFLAGS 	:= -w -Os -DNULL=0 -DSOCKLEN_T=socklen_t -DLOCALE_NOT_USED -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64
-LOCAL_CFLAGS 	+= -Drestrict='' -D__EMX__ -DOPUS_BUILD -DFIXED_POINT -DUSE_ALLOCA -DHAVE_LRINT -DHAVE_LRINTF -fno-math-errno -std=c99
+LOCAL_CFLAGS 	+= -Drestrict='' -D__EMX__ -DOPUS_BUILD -DFIXED_POINT -DUSE_ALLOCA -DHAVE_LRINT -DHAVE_LRINTF -fno-math-errno
 LOCAL_CFLAGS 	+= -DANDROID_NDK -DDISABLE_IMPORTGL -fno-strict-aliasing -fprefetch-loop-arrays -DAVOID_TABLES -DANDROID_TILE_BASED_DECODE -DANDROID_ARMV6_IDCT -ffast-math -D__STDC_CONSTANT_MACROS
 
 LOCAL_SRC_FILES := \

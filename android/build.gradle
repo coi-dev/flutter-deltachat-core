@@ -1,5 +1,3 @@
-import org.gradle.internal.os.OperatingSystem
-
 group 'com.openxchange.deltachatcore'
 version '1.0-SNAPSHOT'
 
@@ -44,19 +42,14 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    externalNativeBuild {
+        ndkBuild {
+            path 'jni/Android.mk'
+        }
+    }
 }
 
 dependencies {
     implementation 'androidx.annotation:annotation:1.0.2'
 }
-
-task buildDcc << {
-    if (OperatingSystem.current().isLinux()) {
-        exec {
-            commandLine './tools/buildDcc.sh'
-        }
-    } else {
-        println("Couldn't build Delta Core Core automatically (this feature is only supported in Linux environments)")
-    }
-}
-preBuild.dependsOn buildDcc
