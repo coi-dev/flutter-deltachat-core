@@ -124,13 +124,15 @@ class _MyAppState extends State<MyApp> {
         int chatId = await context.createChatByContactId(contactId);
         _addListItem(text: "createChatByContactId", assertion: 10, result: chatId);
         ChatList chatList = ChatList();
+        await chatList.setup();
         int index = 0;
-        int id = await chatList.getChatId(index, ChatList.typeNoSpecials);
+        int id = await chatList.getChatId(index);
         _addListItem(text: "getChatId", assertion: 10, result: id);
-        var chatCnt = await chatList.getChatCnt(ChatList.typeNoSpecials);
+        var chatCnt = await chatList.getChatCnt();
         _addListItem(text: "getChatCnt", assertion: 1, result: chatCnt);
-        int chatIdFromChatList = await chatList.getChat(index, ChatList.typeNoSpecials);
+        int chatIdFromChatList = await chatList.getChat(index);
         _addListItem(text: "getChat", assertion: 10, result: chatIdFromChatList);
+        await chatList.tearDown();
         var groupChatId = await context.createGroupChat(false, "The group");
         _addListItem(text: "createGroupChat", assertion: 11, result: groupChatId);
         var groupAddResult = await context.addContactToChat(groupChatId, contactId);
@@ -148,7 +150,11 @@ class _MyAppState extends State<MyApp> {
         await context.markNoticedChat(chatId);
         _addListItem(text: "markNoticedChat");
         await context.deleteChat(chatId);
-        var chatCntAfterDeletingChat = await chatList.getChatCnt(ChatList.typeNoSpecials);
+        await context.deleteChat(groupChatId);
+        chatList = ChatList();
+        await chatList.setup();
+        var chatCntAfterDeletingChat = await chatList.getChatCnt();
+        await chatList.tearDown();
         _addListItem(text: "deleteChat", assertion: 0, result: chatCntAfterDeletingChat);
       }
     } on PlatformException {
