@@ -74,6 +74,8 @@ class Context {
   static const String methodMarkNoticedChat = "context_markNoticedChat";
   static const String methodDeleteChat = "context_deleteChat";
   static const String methodRemoveContactFromChat = "context_removeContactFromChat";
+  static const String methodImportKeys = "context_importKeys";
+  static const String methodExportKeys = "context_exportKeys";
 
   static const String configAddress = "addr";
   static const String configMailServer = "mail_server";
@@ -218,6 +220,14 @@ class Context {
     return await core.invokeMethod(methodRemoveContactFromChat, getChatAndContactIdArguments(chatId, contactId));
   }
 
+  Future<void> exportKeys(String path) async {
+    return await core.invokeMethod(methodExportKeys, getExportImportArguments(path));
+  }
+
+  Future<void> importKeys(String path) async {
+    return await core.invokeMethod(methodImportKeys, getExportImportArguments(path));
+  }
+
   Map<String, dynamic> getKeyArguments(String key) => <String, dynamic>{Base.argumentKey: key};
 
   Map<String, dynamic> getConfigArguments(String type, String key, value) =>
@@ -247,4 +257,6 @@ class Context {
       <String, dynamic>{Base.argumentChatId: chatId, Base.argumentContactId: contactId};
 
   Map<String, dynamic> getContactIdArguments(int contactId) => <String, dynamic>{Base.argumentContactId: contactId};
+
+  Map<String, dynamic> getExportImportArguments(String path) => <String, dynamic>{Base.argumentPath: path};
 }

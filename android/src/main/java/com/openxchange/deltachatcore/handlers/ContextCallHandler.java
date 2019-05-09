@@ -80,6 +80,8 @@ public class ContextCallHandler extends AbstractCallHandler {
     private static final String METHOD_MARK_NOTICED_CHAT = "context_markNoticedChat";
     private static final String METHOD_DELETE_CHAT = "context_deleteChat";
     private static final String METHOD_REMOVE_CONTACT_FROM_CHAT = "context_removeContactFromChat";
+    private static final String METHOD_IMPORT_KEYS = "context_importKeys";
+    private static final String METHOD_EXPORT_KEYS = "context_exportKeys";
 
     private static final String TYPE_INT = "int";
     private static final String TYPE_STRING = "String";
@@ -178,6 +180,12 @@ public class ContextCallHandler extends AbstractCallHandler {
                 break;
             case METHOD_REMOVE_CONTACT_FROM_CHAT:
                 removeContactFromChat(methodCall, result);
+                break;
+            case METHOD_EXPORT_KEYS:
+                exportImportKeys(methodCall, result, DcContext.DC_IMEX_EXPORT_SELF_KEYS);
+                break;
+            case METHOD_IMPORT_KEYS:
+                exportImportKeys(methodCall, result, DcContext.DC_IMEX_IMPORT_SELF_KEYS);
                 break;
             default:
                 result.notImplemented();
@@ -628,5 +636,20 @@ public class ContextCallHandler extends AbstractCallHandler {
         int deleted = dcContext.removeContactFromChat(chatId, contactId);
 
         result.success(deleted);
+    }
+
+    private void exportImportKeys(MethodCall methodCall, MethodChannel.Result result, int type) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_PATH)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        String path = methodCall.argument(ARGUMENT_PATH);
+        if (path == null || path.isEmpty()) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        dcContext.imex(type, path);
+
+        result.success(null);
     }
 }
