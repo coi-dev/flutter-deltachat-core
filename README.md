@@ -7,7 +7,7 @@ It interacts with the native interfaces provided by the Android and iOS platform
 - **iOS state:** Pending
 
 ## Information
-- [Documentation](https://confluence-public.open-xchange.com/display/COIPublic/OX+Talk+Mobile+App)
+- [Documentation](https://github.com/open-xchange/flutter-deltachat-core/wiki)
 - The IMAP / SMTP interactions are managed by the [delta_chat_core plugin](https://github.com/open-xchange/flutter-deltachat-core)
 
 ## Requirements
