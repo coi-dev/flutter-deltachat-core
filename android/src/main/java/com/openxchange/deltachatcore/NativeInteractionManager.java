@@ -21,11 +21,11 @@ import java.util.Objects;
 public class NativeInteractionManager extends DcContext {
 
     private static final String DATABASE_FILENAME = "messenger.db";
-    private static final String TAG = "ox-talk";
-    private static final String OX_TALK_IMAP_WAKE_LOCK = "ox.talk:imapWakeLock";
-    private static final String OX_TALK_MVBOX_WAKE_LOCK = "ox.talk:mvboxWakeLock";
-    private static final String OX_TALK_SENT_BOX_WAKE_LOCK = "ox.talk:sentBoxWakeLock";
-    private static final String OX_TALK_SMTP_WAKE_LOCK = "ox.talk:smtpWakeLock";
+    private static final String TAG = "coi";
+    private static final String COI_IMAP_WAKE_LOCK = "coi:imapWakeLock";
+    private static final String COI_MVBOX_WAKE_LOCK = "coi:mvboxWakeLock";
+    private static final String COI_SENT_BOX_WAKE_LOCK = "coi:sentBoxWakeLock";
+    private static final String COI_SMTP_WAKE_LOCK = "coi:smtpWakeLock";
     private static final int EVENT_ERROR = 400;
     private final static int INTERRUPT_IDLE = 0x01; // interrupt idle if the thread is already running
 
@@ -75,16 +75,16 @@ public class NativeInteractionManager extends DcContext {
         try {
             PowerManager powerManager = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
 
-            imapWakeLock = Objects.requireNonNull(powerManager).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, OX_TALK_IMAP_WAKE_LOCK);
+            imapWakeLock = Objects.requireNonNull(powerManager).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, COI_IMAP_WAKE_LOCK);
             imapWakeLock.setReferenceCounted(false); // if the idle-thread is killed for any reasons, it is better not to rely on reference counting
 
-            mvboxWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, OX_TALK_MVBOX_WAKE_LOCK);
+            mvboxWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, COI_MVBOX_WAKE_LOCK);
             mvboxWakeLock.setReferenceCounted(false); // if the idle-thread is killed for any reasons, it is better not to rely on reference counting
 
-            sentBoxWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, OX_TALK_SENT_BOX_WAKE_LOCK);
+            sentBoxWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, COI_SENT_BOX_WAKE_LOCK);
             sentBoxWakeLock.setReferenceCounted(false); // if the idle-thread is killed for any reasons, it is better not to rely on reference counting
 
-            smtpWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, OX_TALK_SMTP_WAKE_LOCK);
+            smtpWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, COI_SMTP_WAKE_LOCK);
             smtpWakeLock.setReferenceCounted(false); // if the idle-thread is killed for any reasons, it is better not to rely on reference counting
         } catch (Exception e) {
             Log.e(TAG, "Cannot create wakeLocks");
@@ -97,7 +97,6 @@ public class NativeInteractionManager extends DcContext {
         this.coreStrings = coreStrings;
     }
 
-    @SuppressWarnings("InfiniteLoopStatement")
     private void startThreads(@SuppressWarnings("SameParameterValue") int flags) {
         synchronized (threadsCritical) {
 
@@ -228,36 +227,6 @@ public class NativeInteractionManager extends DcContext {
                 smtpThread.setPriority(Thread.MAX_PRIORITY);
                 smtpThread.start();
             }
-        }
-    }
-
-    public void waitForThreadsRunning() {
-        try {
-            synchronized (imapThreadStartedCond) {
-                while (!imapThreadStartedVal) {
-                    imapThreadStartedCond.wait();
-                }
-            }
-
-            synchronized (mvboxThreadStartedCond) {
-                while (!mvboxThreadStartedVal) {
-                    mvboxThreadStartedCond.wait();
-                }
-            }
-
-            synchronized (sentBoxThreadStartedCond) {
-                while (!sentBoxThreadStartedVal) {
-                    sentBoxThreadStartedCond.wait();
-                }
-            }
-
-            synchronized (smtpThreadStartedCond) {
-                while (!smtpThreadStartedVal) {
-                    smtpThreadStartedCond.wait();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
