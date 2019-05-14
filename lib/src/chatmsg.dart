@@ -143,8 +143,14 @@ class ChatMsg extends Base{
     return await loadAndGetValue(methodMessageGetFileMime, getDefaultArguments());
   }
 
+  Future<String> getSummaryText(int characterCount) async {
+    return await loadAndGetValue(methodMessageGetSummaryText, getSummaryArguments(characterCount));
+  }
+
   @override
   getDefaultArguments() => <String, dynamic>{Base.argumentId: _id};
+
+  getSummaryArguments(int characterCount) => <String, dynamic>{Base.argumentId: _id, Base.argumentCount: characterCount};
 
   static Function getCreator() {
     return (id) => new ChatMsg._internal(id);

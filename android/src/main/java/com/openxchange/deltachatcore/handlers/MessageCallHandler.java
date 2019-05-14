@@ -127,6 +127,9 @@ public class MessageCallHandler extends AbstractCallHandler {
             case METHOD_MESSAGE_GET_FILE_MIME:
                 getFileMime(methodCall, result);
                 break;
+            case METHOD_MESSAGE_GET_SUMMARY_TEXT:
+                getSummaryText(methodCall, result);
+                break;
             default:
                 result.notImplemented();
         }
@@ -238,6 +241,24 @@ public class MessageCallHandler extends AbstractCallHandler {
             return;
         }
         result.success(message.getId());
+    }
+
+    private void getSummaryText(MethodCall methodCall, MethodChannel.Result result) {
+        DcMsg message = getMessage(methodCall, result);
+        if (message == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
+        }
+        if (!hasArgumentKeys(methodCall, ARGUMENT_COUNT)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        Integer characterCount = methodCall.argument(ARGUMENT_COUNT);
+        if (characterCount == null) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        result.success(message.getSummarytext(characterCount));
     }
 
     private DcMsg getMessage(MethodCall methodCall, MethodChannel.Result result) {

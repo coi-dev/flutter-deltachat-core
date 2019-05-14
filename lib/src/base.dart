@@ -61,6 +61,7 @@ abstract class Base {
   static const String argumentChatId = "chatId";
   static const String argumentPath = "path";
   static const String argumentText = "text";
+  static const String argumentCount = "count";
 
   final DeltaChatCore core = DeltaChatCore();
 
@@ -86,7 +87,7 @@ abstract class Base {
     return _storedValues[key];
   }
 
-  void loadValues({List<String> keys, Map<String, Map<String, dynamic>> keysAndArguments}) async {
+  Future<void> loadValues({List<String> keys, Map<String, Map<String, dynamic>> keysAndArguments}) async {
     if (keys != null && keys.isNotEmpty) {
       Future.forEach(keys, (key) async {
         await loadValue(key, getDefaultArguments());

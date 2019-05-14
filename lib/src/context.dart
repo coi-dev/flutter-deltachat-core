@@ -76,6 +76,7 @@ class Context {
   static const String methodRemoveContactFromChat = "context_removeContactFromChat";
   static const String methodImportKeys = "context_importKeys";
   static const String methodExportKeys = "context_exportKeys";
+  static const String methodGetFreshMessages = "context_getFreshMessages";
 
   static const String configAddress = "addr";
   static const String configMailServer = "mail_server";
@@ -226,6 +227,10 @@ class Context {
 
   Future<void> importKeys(String path) async {
     return await core.invokeMethod(methodImportKeys, getExportImportArguments(path));
+  }
+
+  Future<List<int>> getFreshMessages() async {
+    return await core.invokeMethod(methodGetFreshMessages);
   }
 
   Map<String, dynamic> getKeyArguments(String key) => <String, dynamic>{Base.argumentKey: key};
