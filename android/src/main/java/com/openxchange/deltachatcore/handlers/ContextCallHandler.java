@@ -48,6 +48,8 @@ import com.b44t.messenger.DcContext;
 import com.b44t.messenger.DcMsg;
 import com.openxchange.deltachatcore.Cache;
 
+import java.util.ArrayList;
+
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
@@ -83,6 +85,7 @@ public class ContextCallHandler extends AbstractCallHandler {
     private static final String METHOD_IMPORT_KEYS = "context_importKeys";
     private static final String METHOD_EXPORT_KEYS = "context_exportKeys";
     private static final String METHOD_GET_FRESH_MESSAGES = "context_getFreshMessages";
+    private static final String METHOD_FORWARD_MESSAGES = "context_forwardMessages";
 
     private static final String TYPE_INT = "int";
     private static final String TYPE_STRING = "String";
@@ -190,6 +193,9 @@ public class ContextCallHandler extends AbstractCallHandler {
                 break;
             case METHOD_GET_FRESH_MESSAGES:
                 getFreshMessages(result);
+                break;
+            case METHOD_FORWARD_MESSAGES:
+                forwardMessages(methodCall, result);
                 break;
             default:
                 result.notImplemented();
@@ -660,5 +666,25 @@ public class ContextCallHandler extends AbstractCallHandler {
     private void getFreshMessages(MethodChannel.Result result) {
         int[] freshMessages = dcContext.getFreshMsgs();
         result.success(freshMessages);
+    }
+      
+    private void forwardMessages(MethodCall methodCall, MethodChannel.Result result){
+        if (!hasArgumentKeys(methodCall, ARGUMENT_CHAT_ID, ARGUMENT_VALUE)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+
+        Integer chatId = methodCall.argument(ARGUMENT_CHAT_ID);
+        ArrayList<Integer> msgIdArray = methodCall.argument(ARGUMENT_VALUE);
+        if(msgIdArray == null){
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        int[] msgIds = new int[msgIdArray.size()];
+        for (int i = 0; i < msgIds.length; i++) {
+            msgIds[i] = msgIdArray.get(i);
+        }
+
+        dcContext.forwardMsgs(msgIds, chatId);
     }
 }

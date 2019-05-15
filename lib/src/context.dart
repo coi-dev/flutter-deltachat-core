@@ -77,6 +77,7 @@ class Context {
   static const String methodImportKeys = "context_importKeys";
   static const String methodExportKeys = "context_exportKeys";
   static const String methodGetFreshMessages = "context_getFreshMessages";
+  static const String methodForwardMessages = "context_forwardMessages";
 
   static const String configAddress = "addr";
   static const String configMailServer = "mail_server";
@@ -232,6 +233,10 @@ class Context {
   Future<List<int>> getFreshMessages() async {
     return await core.invokeMethod(methodGetFreshMessages);
   }
+  
+  Future<void> forwardMessages(int chatId, List<int> msgIds) async {
+    return await core.invokeMethod(methodForwardMessages, getForwardMessageArguments(chatId, msgIds));
+  }
 
   Map<String, dynamic> getKeyArguments(String key) => <String, dynamic>{Base.argumentKey: key};
 
@@ -264,4 +269,6 @@ class Context {
   Map<String, dynamic> getContactIdArguments(int contactId) => <String, dynamic>{Base.argumentContactId: contactId};
 
   Map<String, dynamic> getExportImportArguments(String path) => <String, dynamic>{Base.argumentPath: path};
+
+  Map<String, dynamic> getForwardMessageArguments(int chatId, List<int> msgIds) => <String, dynamic>{Base.argumentChatId: chatId, Base.argumentValue: msgIds};
 }
