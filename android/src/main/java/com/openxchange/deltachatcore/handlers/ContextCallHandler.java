@@ -84,6 +84,7 @@ public class ContextCallHandler extends AbstractCallHandler {
     private static final String METHOD_REMOVE_CONTACT_FROM_CHAT = "context_removeContactFromChat";
     private static final String METHOD_IMPORT_KEYS = "context_importKeys";
     private static final String METHOD_EXPORT_KEYS = "context_exportKeys";
+    private static final String METHOD_GET_FRESH_MESSAGES = "context_getFreshMessages";
     private static final String METHOD_FORWARD_MESSAGES = "context_forwardMessages";
 
     private static final String TYPE_INT = "int";
@@ -189,6 +190,9 @@ public class ContextCallHandler extends AbstractCallHandler {
                 break;
             case METHOD_IMPORT_KEYS:
                 exportImportKeys(methodCall, result, DcContext.DC_IMEX_IMPORT_SELF_KEYS);
+                break;
+            case METHOD_GET_FRESH_MESSAGES:
+                getFreshMessages(result);
                 break;
             case METHOD_FORWARD_MESSAGES:
                 forwardMessages(methodCall, result);
@@ -659,6 +663,11 @@ public class ContextCallHandler extends AbstractCallHandler {
         result.success(null);
     }
 
+    private void getFreshMessages(MethodChannel.Result result) {
+        int[] freshMessages = dcContext.getFreshMsgs();
+        result.success(freshMessages);
+    }
+      
     private void forwardMessages(MethodCall methodCall, MethodChannel.Result result){
         if (!hasArgumentKeys(methodCall, ARGUMENT_CHAT_ID, ARGUMENT_VALUE)) {
             resultErrorArgumentMissing(result);

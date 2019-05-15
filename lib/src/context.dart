@@ -76,6 +76,7 @@ class Context {
   static const String methodRemoveContactFromChat = "context_removeContactFromChat";
   static const String methodImportKeys = "context_importKeys";
   static const String methodExportKeys = "context_exportKeys";
+  static const String methodGetFreshMessages = "context_getFreshMessages";
   static const String methodForwardMessages = "context_forwardMessages";
 
   static const String configAddress = "addr";
@@ -229,6 +230,10 @@ class Context {
     return await core.invokeMethod(methodImportKeys, getExportImportArguments(path));
   }
 
+  Future<List<int>> getFreshMessages() async {
+    return await core.invokeMethod(methodGetFreshMessages);
+  }
+  
   Future<void> forwardMessages(int chatId, List<int> msgIds) async {
     return await core.invokeMethod(methodForwardMessages, getForwardMessageArguments(chatId, msgIds));
   }
