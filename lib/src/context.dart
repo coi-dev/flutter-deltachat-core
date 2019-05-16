@@ -174,19 +174,19 @@ class Context {
     return await core.invokeMethod(methodCreateGroupChat, getCreateGroupArguments(verified, name));
   }
 
-  Future<List> getContacts(int flags, String query) async {
+  Future<List<int>> getContacts(int flags, String query) async {
     return await core.invokeMethod(methodGetContacts, getContactsArguments(flags, query));
   }
 
-  Future<List> getChatContacts(int chatId) async {
+  Future<List<int>> getChatContacts(int chatId) async {
     return await core.invokeMethod(methodGetChatContacts, getChatIdArguments(chatId));
   }
 
-  Future<List> getBlockedContacts() async {
+  Future<List<int>> getBlockedContacts() async {
     return await core.invokeMethod(methodGetBlockedContacts);
   }
 
-  Future<List> getChatMessages(int chatId, [int flags = 0]) async {
+  Future<List<int>> getChatMessages(int chatId, [int flags = 0]) async {
     return await core.invokeMethod(methodGetChatMessages, getChatMessageArguments(chatId, flags));
   }
 
@@ -256,12 +256,12 @@ class Context {
 
   Map<String, dynamic> getChatIdArguments(int chatId) => <String, dynamic>{Base.argumentChatId: chatId};
 
-  Map<String, dynamic> getChatMessageArguments(int chatId, int flags) => <String, dynamic>{Base.argumentId: chatId, Base.argumentFlags: flags};
+  Map<String, dynamic> getChatMessageArguments(int chatId, int flags) => <String, dynamic>{Base.argumentChatId: chatId, Base.argumentFlags: flags};
 
-  Map<String, dynamic> createChatMessageArguments(int chatId, String text) => <String, dynamic>{Base.argumentId: chatId, Base.argumentValue: text};
+  Map<String, dynamic> createChatMessageArguments(int chatId, String text) => <String, dynamic>{Base.argumentChatId: chatId, Base.argumentText: text};
 
   Map<String, dynamic> getCreateAttachmentMessageArguments(int chatId, String path, int msgType, String text) =>
-      <String, dynamic>{Base.argumentId: chatId, Base.argumentPath: path, Base.argumentType: msgType, Base.argumentText: text};
+      <String, dynamic>{Base.argumentChatId: chatId, Base.argumentPath: path, Base.argumentType: msgType, Base.argumentText: text};
 
   Map<String, dynamic> getChatAndContactIdArguments(int chatId, int contactId) =>
       <String, dynamic>{Base.argumentChatId: chatId, Base.argumentContactId: contactId};
