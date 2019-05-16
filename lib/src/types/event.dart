@@ -39,23 +39,49 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the Mozilla Public License 2.0
  * for more details.
  */
- 
- class ChatSummary{
-   static const _INDEX_SUMMARY_ID = 0;
-   static const _INDEX_TEXT2 = 1;
-   static const _INDEX_TIMESTAMP = 2;
 
-   int summaryId;
-   String preview;
-   int timestamp;
+class Event {
+  static const int info = 100;
+  static const int warning = 300;
+  static const int error = 400;
+  static const int msgsChanged = 2000;
+  static const int incomingMsg = 2005;
+  static const int msgDelivered = 2010;
+  static const int msgFailed = 2012;
+  static const int msgRead = 2015;
+  static const int chatModified = 2020;
+  static const int contactsChanged = 2030;
+  static const int configureProgress = 2041;
+  static const int imexProgress = 2051;
+  static const int imexFileWrite = 2052;
+  static const int secureJoinInviterProgress = 2060;
+  static const int secureJoinJoinerProgress = 2061;
+  static const int isOffline = 2081;
+  static const int getString = 2091;
+  static const int getQuantityString = 2092;
+  static const int httpGet = 2100;
 
-   ChatSummary.fromMethodChannel(dynamic data){
-     if (data is! List) {
-       throw ArgumentError("Given data is no List, can't create Event object");
-     }
-     List eventMap = data as List;
-     summaryId = eventMap[_INDEX_SUMMARY_ID];
-     preview = eventMap[_INDEX_TEXT2];
-     timestamp = eventMap[_INDEX_TIMESTAMP];
-   }
- }
+  static const _INDEX_EVENT_ID = 0;
+  static const _INDEX_DATA1 = 1;
+  static const _INDEX_DATA2 = 2;
+
+  int eventId;
+  var data1;
+  var data2;
+
+  Event(this.eventId, this.data1, this.data2);
+
+  Event.fromStream(dynamic data) {
+    if (data is! List) {
+      throw ArgumentError("Given data is no List, can't create Event object");
+    }
+    List eventMap = data as List;
+    eventId = eventMap[_INDEX_EVENT_ID];
+    data1 = eventMap[_INDEX_DATA1];
+    data2 = eventMap[_INDEX_DATA2];
+  }
+
+  bool hasType(int type) {
+    return eventId == type;
+  }
+}

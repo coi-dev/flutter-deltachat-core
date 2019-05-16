@@ -479,11 +479,11 @@ public class ContextCallHandler extends AbstractCallHandler {
     }
 
     private void getChatMessages(MethodCall methodCall, MethodChannel.Result result) {
-        if (!hasArgumentKeys(methodCall, ARGUMENT_ID)) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_CHAT_ID)) {
             resultErrorArgumentMissing(result);
             return;
         }
-        Integer id = methodCall.argument(ARGUMENT_ID);
+        Integer id = methodCall.argument(ARGUMENT_CHAT_ID);
         if (id == null) {
             resultErrorArgumentMissingValue(result);
             return;
@@ -515,17 +515,17 @@ public class ContextCallHandler extends AbstractCallHandler {
     }
 
     private void createChatMessage(MethodCall methodCall, MethodChannel.Result result) {
-        if (!hasArgumentKeys(methodCall, ARGUMENT_ID, ARGUMENT_VALUE)) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_CHAT_ID, ARGUMENT_TEXT)) {
             resultErrorArgumentMissing(result);
             return;
         }
-        Integer id = methodCall.argument(ARGUMENT_ID);
+        Integer id = methodCall.argument(ARGUMENT_CHAT_ID);
         if (id == null) {
             resultErrorArgumentMissingValue(result);
             return;
         }
 
-        String text = methodCall.argument(ARGUMENT_VALUE);
+        String text = methodCall.argument(ARGUMENT_TEXT);
 
         DcMsg newMsg = new DcMsg(dcContext, DcMsg.DC_MSG_TEXT);
         newMsg.setText(text);
@@ -534,11 +534,11 @@ public class ContextCallHandler extends AbstractCallHandler {
     }
 
     private void createChatAttachmentMessage(MethodCall methodCall, MethodChannel.Result result) {
-        if (!hasArgumentKeys(methodCall, ARGUMENT_ID, ARGUMENT_TYPE, ARGUMENT_PATH, ARGUMENT_TEXT)) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_CHAT_ID, ARGUMENT_TYPE, ARGUMENT_PATH, ARGUMENT_TEXT)) {
             resultErrorArgumentMissing(result);
             return;
         }
-        Integer chatId = methodCall.argument(ARGUMENT_ID);
+        Integer chatId = methodCall.argument(ARGUMENT_CHAT_ID);
         String path = methodCall.argument(ARGUMENT_PATH);
         Integer type = methodCall.argument(ARGUMENT_TYPE);
         if (chatId == null || path == null || type == null) {
@@ -667,8 +667,8 @@ public class ContextCallHandler extends AbstractCallHandler {
         int[] freshMessages = dcContext.getFreshMsgs();
         result.success(freshMessages);
     }
-      
-    private void forwardMessages(MethodCall methodCall, MethodChannel.Result result){
+
+    private void forwardMessages(MethodCall methodCall, MethodChannel.Result result) {
         if (!hasArgumentKeys(methodCall, ARGUMENT_CHAT_ID, ARGUMENT_VALUE)) {
             resultErrorArgumentMissing(result);
             return;
@@ -676,7 +676,7 @@ public class ContextCallHandler extends AbstractCallHandler {
 
         Integer chatId = methodCall.argument(ARGUMENT_CHAT_ID);
         ArrayList<Integer> msgIdArray = methodCall.argument(ARGUMENT_VALUE);
-        if(msgIdArray == null){
+        if (msgIdArray == null) {
             resultErrorArgumentMissingValue(result);
             return;
         }

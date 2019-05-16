@@ -256,12 +256,12 @@ class Context {
 
   Map<String, dynamic> getChatIdArguments(int chatId) => <String, dynamic>{Base.argumentChatId: chatId};
 
-  Map<String, dynamic> getChatMessageArguments(int chatId, int flags) => <String, dynamic>{Base.argumentId: chatId, Base.argumentFlags: flags};
+  Map<String, dynamic> getChatMessageArguments(int chatId, int flags) => <String, dynamic>{Base.argumentChatId: chatId, Base.argumentFlags: flags};
 
-  Map<String, dynamic> createChatMessageArguments(int chatId, String text) => <String, dynamic>{Base.argumentId: chatId, Base.argumentValue: text};
+  Map<String, dynamic> createChatMessageArguments(int chatId, String text) => <String, dynamic>{Base.argumentChatId: chatId, Base.argumentText: text};
 
   Map<String, dynamic> getCreateAttachmentMessageArguments(int chatId, String path, int msgType, String text) =>
-      <String, dynamic>{Base.argumentId: chatId, Base.argumentPath: path, Base.argumentType: msgType, Base.argumentText: text};
+      <String, dynamic>{Base.argumentChatId: chatId, Base.argumentPath: path, Base.argumentType: msgType, Base.argumentText: text};
 
   Map<String, dynamic> getChatAndContactIdArguments(int chatId, int contactId) =>
       <String, dynamic>{Base.argumentChatId: chatId, Base.argumentContactId: contactId};
