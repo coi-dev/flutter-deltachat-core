@@ -1,4 +1,4 @@
-/*
+    /*
  * OPEN-XCHANGE legal information
  *
  * All intellectual property rights in the Software are protected by
@@ -126,6 +126,9 @@ public class MessageCallHandler extends AbstractCallHandler {
                 break;
             case METHOD_MESSAGE_GET_SUMMARY_TEXT:
                 getSummaryText(methodCall, result);
+                break;
+            case METHOD_MESSAGE_GET_STATE:
+                getState(methodCall, result);
                 break;
             default:
                 result.notImplemented();
@@ -256,6 +259,15 @@ public class MessageCallHandler extends AbstractCallHandler {
             return;
         }
         result.success(message.getSummarytext(characterCount));
+    }
+
+    private void getState(MethodCall methodCall, MethodChannel.Result result) {
+        DcMsg message = getMessage(methodCall, result);
+        if (message == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
+        }
+        result.success(message.getState());
     }
 
     private DcMsg getMessage(MethodCall methodCall, MethodChannel.Result result) {

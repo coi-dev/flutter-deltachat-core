@@ -86,6 +86,7 @@ public class ContextCallHandler extends AbstractCallHandler {
     private static final String METHOD_EXPORT_KEYS = "context_exportKeys";
     private static final String METHOD_GET_FRESH_MESSAGES = "context_getFreshMessages";
     private static final String METHOD_FORWARD_MESSAGES = "context_forwardMessages";
+    private static final String METHOD_MARK_SEEN_MESSAGES = "context_markSeenMessages";
 
     private static final String TYPE_INT = "int";
     private static final String TYPE_STRING = "String";
@@ -196,6 +197,9 @@ public class ContextCallHandler extends AbstractCallHandler {
                 break;
             case METHOD_FORWARD_MESSAGES:
                 forwardMessages(methodCall, result);
+                break;
+            case METHOD_MARK_SEEN_MESSAGES:
+                markSeenMessages(methodCall, result);
                 break;
             default:
                 result.notImplemented();
@@ -668,8 +672,8 @@ public class ContextCallHandler extends AbstractCallHandler {
         result.success(freshMessages);
     }
 
-    private void forwardMessages(MethodCall methodCall, MethodChannel.Result result) {
-        if (!hasArgumentKeys(methodCall, ARGUMENT_CHAT_ID, ARGUMENT_VALUE)) {
+    private void forwardMessages(MethodCall methodCall, MethodChannel.Result result){
+        if (!hasArgumentKeys(methodCall, ARGUMENT_CHAT_ID, ARGUMENT_MESSAGE_IDS)) {
             resultErrorArgumentMissing(result);
             return;
         }
@@ -678,8 +682,8 @@ public class ContextCallHandler extends AbstractCallHandler {
             resultErrorArgumentMissingValue(result);
             return;
         }
-        ArrayList<Integer> msgIdArray = methodCall.argument(ARGUMENT_VALUE);
-        if (msgIdArray == null) {
+        ArrayList<Integer> msgIdArray = methodCall.argument(ARGUMENT_MESSAGE_IDS);
+        if(msgIdArray == null){
             resultErrorArgumentMissingValue(result);
             return;
         }
@@ -689,5 +693,24 @@ public class ContextCallHandler extends AbstractCallHandler {
         }
 
         dcContext.forwardMsgs(msgIds, chatId);
+    }
+
+    private void markSeenMessages(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_MESSAGE_IDS)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+
+        ArrayList<Integer> msgIdArray = methodCall.argument(ARGUMENT_MESSAGE_IDS);
+        if(msgIdArray == null){
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        int[] msgIds = new int[msgIdArray.size()];
+        for (int i = 0; i < msgIds.length; i++) {
+            msgIds[i] = msgIdArray.get(i);
+        }
+
+        dcContext.markseenMsgs(msgIds);
     }
 }
