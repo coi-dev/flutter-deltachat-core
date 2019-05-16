@@ -174,19 +174,19 @@ class Context {
     return await core.invokeMethod(methodCreateGroupChat, getCreateGroupArguments(verified, name));
   }
 
-  Future<List> getContacts(int flags, String query) async {
+  Future<List<int>> getContacts(int flags, String query) async {
     return await core.invokeMethod(methodGetContacts, getContactsArguments(flags, query));
   }
 
-  Future<List> getChatContacts(int chatId) async {
+  Future<List<int>> getChatContacts(int chatId) async {
     return await core.invokeMethod(methodGetChatContacts, getChatIdArguments(chatId));
   }
 
-  Future<List> getBlockedContacts() async {
+  Future<List<int>> getBlockedContacts() async {
     return await core.invokeMethod(methodGetBlockedContacts);
   }
 
-  Future<List> getChatMessages(int chatId, [int flags = 0]) async {
+  Future<List<int>> getChatMessages(int chatId, [int flags = 0]) async {
     return await core.invokeMethod(methodGetChatMessages, getChatMessageArguments(chatId, flags));
   }
 
