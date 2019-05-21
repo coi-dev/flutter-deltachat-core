@@ -86,6 +86,8 @@ public class ContextCallHandler extends AbstractCallHandler {
     private static final String METHOD_EXPORT_KEYS = "context_exportKeys";
     private static final String METHOD_GET_FRESH_MESSAGES = "context_getFreshMessages";
     private static final String METHOD_FORWARD_MESSAGES = "context_forwardMessages";
+    private static final String METHOD_INITIATE_KEY_TRANSFER = "context_initiateKeyTransfer";
+    private static final String METHOD_CONTINUE_KEY_TRANSFER = "context_continueKeyTransfer";
     private static final String METHOD_MARK_SEEN_MESSAGES = "context_markSeenMessages";
 
     private static final String TYPE_INT = "int";
@@ -200,6 +202,12 @@ public class ContextCallHandler extends AbstractCallHandler {
                 break;
             case METHOD_MARK_SEEN_MESSAGES:
                 markSeenMessages(methodCall, result);
+                break;
+            case METHOD_INITIATE_KEY_TRANSFER:
+                initiateKeyTransfer(result);
+                break;
+            case METHOD_CONTINUE_KEY_TRANSFER:
+                continueKeyTransfer(methodCall, result);
                 break;
             default:
                 result.notImplemented();
@@ -693,6 +701,29 @@ public class ContextCallHandler extends AbstractCallHandler {
         }
 
         dcContext.forwardMsgs(msgIds, chatId);
+    }
+
+    private void initiateKeyTransfer(MethodChannel.Result result) {
+        new Thread(() -> {
+            String setupKey = dcContext.initiateKeyTransfer();
+            result.success(setupKey);
+        }).start();
+    }
+
+    private void continueKeyTransfer(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_ID, ARGUMENT_SETUP_CODE)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        Integer messageId = methodCall.argument(ARGUMENT_ID);
+        String setupCode = methodCall.argument(ARGUMENT_SETUP_CODE);
+        if (messageId == null || setupCode == null || setupCode.isEmpty()) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        boolean transferResult = dcContext.continueKeyTransfer(messageId, setupCode);
+
+        result.success(transferResult);
     }
 
     private void markSeenMessages(MethodCall methodCall, MethodChannel.Result result) {
