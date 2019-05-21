@@ -130,6 +130,15 @@ public class MessageCallHandler extends AbstractCallHandler {
             case METHOD_MESSAGE_GET_STATE:
                 getState(methodCall, result);
                 break;
+            case METHOD_MESSAGE_IS_SETUP_MESSAGE:
+                isSetupMessage(methodCall, result);
+                break;
+            case METHOD_MESSAGE_IS_INFO:
+                isInfo(methodCall, result);
+                break;
+            case METHOD_MESSAGE_GET_SETUP_CODE_BEGIN:
+                getSetupCodeBegin(methodCall, result);
+                break;
             default:
                 result.notImplemented();
         }
@@ -259,6 +268,33 @@ public class MessageCallHandler extends AbstractCallHandler {
             return;
         }
         result.success(message.getSummarytext(characterCount));
+    }
+
+    private void isSetupMessage(MethodCall methodCall, MethodChannel.Result result) {
+        DcMsg message = getMessage(methodCall, result);
+        if (message == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
+        }
+        result.success(message.isSetupMessage());
+    }
+
+    private void isInfo(MethodCall methodCall, MethodChannel.Result result) {
+        DcMsg message = getMessage(methodCall, result);
+        if (message == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
+        }
+        result.success(message.isInfo());
+    }
+
+    private void getSetupCodeBegin(MethodCall methodCall, MethodChannel.Result result) {
+        DcMsg message = getMessage(methodCall, result);
+        if (message == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
+        }
+        result.success(message.getSetupCodeBegin());
     }
 
     private void getState(MethodCall methodCall, MethodChannel.Result result) {

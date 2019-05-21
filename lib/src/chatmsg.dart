@@ -46,7 +46,6 @@ import 'package:delta_chat_core/src/base.dart';
 
 class ChatMsg extends Base {
   static const String _identifier = "chatMessage";
-
   static const String methodMessageGetId = "msg_getId";
   static const String methodMessageGetText = "msg_getText";
   static const String methodMessageGetTimestamp = "msg_getTimestamp";
@@ -160,6 +159,18 @@ class ChatMsg extends Base {
 
   Future<int> getState() async {
     return await loadAndGetValue(methodMessageGetState);
+  }
+
+  Future<bool> isSetupMessage() async {
+    return await loadAndGetValue(methodMessageIsSetupMessage);
+  }
+
+  Future<bool> isInfo() async {
+    return await loadAndGetValue(methodMessageIsInfo);
+  }
+
+  Future<String> getSetupCodeBegin() async {
+    return await loadAndGetValue(methodMessageGetSetupCodeBegin);
   }
 
   @override
