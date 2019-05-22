@@ -233,7 +233,7 @@ class Context {
   Future<List<int>> getFreshMessages() async {
     return await core.invokeMethod(methodGetFreshMessages);
   }
-  
+
   Future<void> forwardMessages(int chatId, List<int> msgIds) async {
     return await core.invokeMethod(methodForwardMessages, getForwardMessageArguments(chatId, msgIds));
   }
@@ -270,5 +270,6 @@ class Context {
 
   Map<String, dynamic> getExportImportArguments(String path) => <String, dynamic>{Base.argumentPath: path};
 
-  Map<String, dynamic> getForwardMessageArguments(int chatId, List<int> msgIds) => <String, dynamic>{Base.argumentChatId: chatId, Base.argumentValue: msgIds};
+  Map<String, dynamic> getForwardMessageArguments(int chatId, List<int> msgIds) =>
+      <String, dynamic>{Base.argumentChatId: chatId, Base.argumentValue: msgIds};
 }

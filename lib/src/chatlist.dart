@@ -46,6 +46,8 @@ import 'package:delta_chat_core/delta_chat_core.dart';
 import 'package:delta_chat_core/src/base.dart';
 
 class ChatList extends Base {
+  static const String _identifier = "chatList";
+
   static const String methodChatListInternalSetup = "chatList_internal_setup";
   static const String methodChatListInternalTearDown = "chatList_internal_tearDown";
   static const String methodChatListGetCnt = "chatList_getCnt";
@@ -66,6 +68,12 @@ class ChatList extends Base {
   final DeltaChatCore core = DeltaChatCore();
 
   int _id;
+
+  @override
+  int get id => _id;
+
+  @override
+  String get identifier => _identifier;
 
   Future<void> setup([int chatListType = typeNoSpecials]) async {
     _id = await core.invokeMethod(methodChatListInternalSetup, getSetupArguments(chatListType));
@@ -105,4 +113,5 @@ class ChatList extends Base {
   Map<String, dynamic> getSetupArguments(int chatListType) => <String, dynamic>{Base.argumentType: chatListType};
 
   Map<String, dynamic> getIndexArguments(int index) => <String, dynamic>{Base.argumentCacheId: _id, Base.argumentIndex: index};
+
 }

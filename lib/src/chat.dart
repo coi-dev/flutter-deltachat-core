@@ -46,6 +46,8 @@ import 'package:delta_chat_core/delta_chat_core.dart';
 import 'package:delta_chat_core/src/base.dart';
 
 class Chat extends Base {
+  static const String _identifier = "chat";
+
   static const String methodChatGetId = "chat_getId";
   static const String methodChatIsGroup = "chat_isGroup";
   static const String methodChatGetArchived = "chat_getArchived";
@@ -68,48 +70,50 @@ class Chat extends Base {
 
   Chat._internal(this._id) : super();
 
-  int getId() {
-    return _id;
-  }
+  @override
+  int get id => _id;
+
+  @override
+  String get identifier => _identifier;
 
   Future<int> getChatId() async {
-    return await loadAndGetValue(methodChatGetId, getDefaultArguments());
+    return await loadAndGetValue(methodChatGetId);
   }
 
   Future<bool> isGroup() async {
-    return await loadAndGetValue(methodChatIsGroup, getDefaultArguments());
+    return await loadAndGetValue(methodChatIsGroup);
   }
 
   Future<int> getArchived() async {
-    return await loadAndGetValue(methodChatGetArchived, getDefaultArguments());
+    return await loadAndGetValue(methodChatGetArchived);
   }
 
   Future<int> getColor() async {
-    return await loadAndGetValue(methodChatGetColor, getDefaultArguments());
+    return await loadAndGetValue(methodChatGetColor);
   }
 
   Future<String> getName() async {
-    return await loadAndGetValue(methodChatGetName, getDefaultArguments());
+    return await loadAndGetValue(methodChatGetName);
   }
 
   Future<String> getSubtitle() async {
-    return await loadAndGetValue(methodChatGetSubtitle, getDefaultArguments());
+    return await loadAndGetValue(methodChatGetSubtitle);
   }
 
   Future<String> getProfileImage() async {
-    return await loadAndGetValue(methodChatGetProfileImage, getDefaultArguments());
+    return await loadAndGetValue(methodChatGetProfileImage);
   }
 
   Future<bool> isUnpromoted() async {
-    return await loadAndGetValue(methodChatIsUnpromoted, getDefaultArguments());
+    return await loadAndGetValue(methodChatIsUnpromoted);
   }
 
   Future<bool> isVerified() async {
-    return await loadAndGetValue(methodChatIsVerified, getDefaultArguments());
+    return await loadAndGetValue(methodChatIsVerified);
   }
 
   Future<bool> isSelfTalk() async {
-    return await loadAndGetValue(methodChatIsSelfTalk, getDefaultArguments());
+    return await loadAndGetValue(methodChatIsSelfTalk);
   }
 
   @override

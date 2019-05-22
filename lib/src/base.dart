@@ -50,6 +50,7 @@ abstract class Base {
   static const String argumentValue = "value";
   static const String argumentAddress = "address";
   static const String argumentId = "id";
+  static const String argumentRemoveCacheIdentifier = "removeCacheIdentifier";
   static const String argumentCacheId = "cacheId";
   static const String argumentVerified = "verified";
   static const String argumentName = "name";
@@ -75,26 +76,26 @@ abstract class Base {
     setLastUpdate();
   }
 
-  Future<void> loadValue(String key, var arguments) async {
+  Future<void> loadValue(String key, {Map<String, dynamic> arguments}) async {
     if (!isValueLoaded(key)) {
-      _storedValues[key] = await core.invokeMethod(key, arguments);
+      _storedValues[key] = await core.invokeMethod(key, arguments ?? getDefaultArguments());
       _loadedValues[key] = true;
     }
   }
 
-  Future<dynamic> loadAndGetValue(String key, var arguments) async  {
-    await loadValue(key, arguments);
+  Future<dynamic> loadAndGetValue(String key, {Map<String, dynamic> arguments}) async {
+    await loadValue(key, arguments: arguments);
     return _storedValues[key];
   }
 
   Future<void> loadValues({List<String> keys, Map<String, Map<String, dynamic>> keysAndArguments}) async {
     if (keys != null && keys.isNotEmpty) {
       Future.forEach(keys, (key) async {
-        await loadValue(key, getDefaultArguments());
+        await loadValue(key);
       });
     } else if (keysAndArguments != null && keysAndArguments.isNotEmpty) {
       for (int index = 0; index < keysAndArguments.length; index++) {
-        await loadValue(keysAndArguments.keys.elementAt(index), keysAndArguments.values.elementAt(index));
+        await loadValue(keysAndArguments.keys.elementAt(index), arguments: keysAndArguments.values.elementAt(index));
       }
     }
   }
@@ -109,24 +110,41 @@ abstract class Base {
     return _storedValues[key];
   }
 
-  prepareReloadValue(String key) {
-    unloadValue(key);
+  remove(String key) {
+    _storedValues.remove(key);
+    _loadedValues.remove(key);
+  }
+
+  Future<void> reloadValue(String key, {Map<String, dynamic> arguments, bool removeFromJavaCache = true}) async {
+    remove(key);
+    var reloadArguments = arguments ?? getDefaultArguments();
+    if (removeFromJavaCache) {
+      reloadArguments.addAll(_getRemoveCacheIdentifierArguments());
+      if (!reloadArguments.containsKey(argumentId) || !reloadArguments.containsKey(argumentRemoveCacheIdentifier)) {
+        throw ArgumentError("$argumentId or $argumentRemoveCacheIdentifier is missing. Add required parameters to the reloadValue() call");
+      }
+    }
+    await loadValue(key, arguments: reloadArguments);
     setLastUpdate();
   }
 
-  unloadValue(String key) {
-    _storedValues[key] = null;
-    _loadedValues[key] = null;
+  Future<void> reloadValues({List<String> keys, Map<String, Map<String, dynamic>> keysAndArguments}) async {
+    bool removeFromJavaCache = true;
+    if (keys != null && keys.isNotEmpty) {
+      Future.forEach(keys, (key) async {
+        await reloadValue(key, removeFromJavaCache: removeFromJavaCache);
+        removeFromJavaCache = false;
+      });
+    } else if (keysAndArguments != null && keysAndArguments.isNotEmpty) {
+      for (int index = 0; index < keysAndArguments.length; index++) {
+        await reloadValue(keysAndArguments.keys.elementAt(index),
+            arguments: keysAndArguments.values.elementAt(index), removeFromJavaCache: removeFromJavaCache);
+        removeFromJavaCache = false;
+      }
+    }
   }
 
-  bool isValueLoaded(String key) {
-    return _loadedValues[key] != null && _loadedValues[key] != false;
-  }
-
-  resetValues() {
-    _storedValues.clear();
-    _loadedValues.clear();
-  }
+  bool isValueLoaded(String key) => _loadedValues[key] ?? false;
 
   int get lastUpdate => _lastUpdate;
 
@@ -134,6 +152,11 @@ abstract class Base {
     _lastUpdate = DateTime.now().millisecondsSinceEpoch;
   }
 
-  getDefaultArguments();
+  Map<String, String> _getRemoveCacheIdentifierArguments() => {argumentRemoveCacheIdentifier: identifier};
 
+  Map<String, dynamic> getDefaultArguments();
+
+  int get id;
+
+  String get identifier;
 }

@@ -44,7 +44,9 @@ import 'dart:async';
 
 import 'package:delta_chat_core/src/base.dart';
 
-class ChatMsg extends Base{
+class ChatMsg extends Base {
+  static const String _identifier = "chatMessage";
+
   static const String methodMessageGetId = "msg_getId";
   static const String methodMessageGetText = "msg_getText";
   static const String methodMessageGetTimestamp = "msg_getTimestamp";
@@ -91,60 +93,62 @@ class ChatMsg extends Base{
 
   ChatMsg._internal(this._id) : super();
 
-  int getId() {
-    return _id;
-  }
+  @override
+  int get id => _id;
+
+  @override
+  String get identifier => _identifier;
 
   Future<int> getMessageId() async {
-    return await loadAndGetValue(methodMessageGetId, getDefaultArguments());
+    return await loadAndGetValue(methodMessageGetId);
   }
 
   Future<String> getText() async {
-    return await loadAndGetValue(methodMessageGetText, getDefaultArguments());
+    return await loadAndGetValue(methodMessageGetText);
   }
 
   Future<int> getTimestamp() async {
-    return await loadAndGetValue(methodMessageGetTimestamp, getDefaultArguments());
+    return await loadAndGetValue(methodMessageGetTimestamp);
   }
 
   Future<int> getChatId() async {
-    return await loadAndGetValue(methodMessageGetChatId, getDefaultArguments());
+    return await loadAndGetValue(methodMessageGetChatId);
   }
 
   Future<int> getFromId() async {
-    return await loadAndGetValue(methodMessageGetFromId, getDefaultArguments());
+    return await loadAndGetValue(methodMessageGetFromId);
   }
 
   Future<bool> isOutgoing() async {
-    return await loadAndGetValue(methodMessageIsOutgoing, getDefaultArguments());
+    return await loadAndGetValue(methodMessageIsOutgoing);
   }
 
   Future<bool> hasFile() async {
-    return await loadAndGetValue(methodMessageHasFile, getDefaultArguments());
+    return await loadAndGetValue(methodMessageHasFile);
   }
 
   Future<int> getType() async {
-    return await loadAndGetValue(methodMessageGetType, getDefaultArguments());
+    return await loadAndGetValue(methodMessageGetType);
   }
 
   Future<String> getFile() async {
-    return await loadAndGetValue(methodMessageGetFile, getDefaultArguments());
+    return await loadAndGetValue(methodMessageGetFile);
   }
 
   Future<int> getFileBytes() async {
-    return await loadAndGetValue(methodMessageGetFileBytes, getDefaultArguments());
+    return await loadAndGetValue(methodMessageGetFileBytes);
   }
 
   Future<String> getFileName() async {
-    return await loadAndGetValue(methodMessageGetFilename, getDefaultArguments());
+    return await loadAndGetValue(methodMessageGetFilename);
   }
 
   Future<String> getFileMime() async {
-    return await loadAndGetValue(methodMessageGetFileMime, getDefaultArguments());
+    return await loadAndGetValue(methodMessageGetFileMime);
   }
 
   Future<String> getSummaryText(int characterCount) async {
-    return await loadAndGetValue(methodMessageGetSummaryText, getSummaryArguments(characterCount));
+    return await loadAndGetValue(methodMessageGetSummaryText, arguments: getSummaryArguments(characterCount));
   }
 
   @override
@@ -155,5 +159,4 @@ class ChatMsg extends Base{
   static Function getCreator() {
     return (id) => new ChatMsg._internal(id);
   }
-
 }

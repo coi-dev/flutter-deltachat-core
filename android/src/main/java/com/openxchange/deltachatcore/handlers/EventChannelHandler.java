@@ -125,6 +125,7 @@ public class EventChannelHandler implements EventChannel.StreamHandler {
         eventSink = null;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean hasListenersForId(int eventId) {
         return eventId != 0 && listeners.indexOfValue(eventId) >= 0;
     }
