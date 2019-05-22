@@ -42,6 +42,7 @@
 
 package com.openxchange.deltachatcore;
 
+
 import com.b44t.messenger.DcChat;
 import com.b44t.messenger.DcContact;
 import com.b44t.messenger.DcMsg;
@@ -85,7 +86,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
     private static final String ARGUMENT_ADD = "add";
     private static final String ARGUMENT_EVENT_ID = "eventId";
     private static final String ARGUMENT_LISTENER_ID = "listenerId";
-    private static final String ARGUMENT_REMOVE_CACHE_IDENTIFIER = "argumentRemoveCacheIdentifier";
+    private static final String ARGUMENT_REMOVE_CACHE_IDENTIFIER = "removeCacheIdentifier";
 
     private static final String CACHE_IDENTIFIER_CHAT = "chat";
     private static final String CACHE_IDENTIFIER_CHAT_LIST = "chatList";
