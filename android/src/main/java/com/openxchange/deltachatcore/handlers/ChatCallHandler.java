@@ -44,7 +44,6 @@ package com.openxchange.deltachatcore.handlers;
 
 import com.b44t.messenger.DcChat;
 import com.b44t.messenger.DcContext;
-import com.openxchange.deltachatcore.Cache;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -62,12 +61,10 @@ public class ChatCallHandler extends AbstractCallHandler {
     private static final String METHOD_CHAT_IS_SELF_TALK = "chat_isSelfTalk";
     private static final String METHOD_CHAT_IS_VERIFIED = "chat_isVerified";
 
-    private final Cache<DcChat> chatCache;
     private final ContextCallHandler contextCallHandler;
 
-    public ChatCallHandler(DcContext dcContext, Cache<DcChat> chatCache, ContextCallHandler contextCallHandler) {
+    public ChatCallHandler(DcContext dcContext, ContextCallHandler contextCallHandler) {
         super(dcContext);
-        this.chatCache = chatCache;
         this.contextCallHandler = contextCallHandler;
     }
 

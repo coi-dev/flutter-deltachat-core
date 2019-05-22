@@ -45,6 +45,8 @@ import 'dart:async';
 import 'package:delta_chat_core/src/base.dart';
 
 class Contact extends Base {
+  static const String _identifier = "contact";
+
   static const String methodContactGetId = "contact_getId";
   static const String methodContactGetName = "contact_getName";
   static const String methodContactGetDisplayName = "contact_getDisplayName";
@@ -64,44 +66,46 @@ class Contact extends Base {
 
   Contact._internal(this._id) : super();
 
-  int getId() {
-    return _id;
-  }
+  @override
+  int get id => _id;
+
+  @override
+  String get identifier => _identifier;
 
   Future<String> getName() async {
-    return await loadAndGetValue(methodContactGetName, getDefaultArguments());
+    return await loadAndGetValue(methodContactGetName);
   }
 
   Future<String> getDisplayName() async {
-    return await loadAndGetValue(methodContactGetDisplayName, getDefaultArguments());
+    return await loadAndGetValue(methodContactGetDisplayName);
   }
 
   Future<String> getFirstName() async {
-    return await loadAndGetValue(methodContactGetFirstName, getDefaultArguments());
+    return await loadAndGetValue(methodContactGetFirstName);
   }
 
   Future<String> getAddress() async {
-    return await loadAndGetValue(methodContactGetAddress, getDefaultArguments());
+    return await loadAndGetValue(methodContactGetAddress);
   }
 
   Future<String> getNameAndAddress() async {
-    return await loadAndGetValue(methodContactGetNameAndAddress, getDefaultArguments());
+    return await loadAndGetValue(methodContactGetNameAndAddress);
   }
 
   Future<String> getProfileImage() async {
-    return await loadAndGetValue(methodContactGetProfileImage, getDefaultArguments());
+    return await loadAndGetValue(methodContactGetProfileImage);
   }
 
   Future<int> getColor() async {
-    return await loadAndGetValue(methodContactGetColor, getDefaultArguments());
+    return await loadAndGetValue(methodContactGetColor);
   }
 
   Future<bool> isVerified() async {
-    return await loadAndGetValue(methodContactIsVerified, getDefaultArguments());
+    return await loadAndGetValue(methodContactIsVerified);
   }
 
   Future<bool> isBlocked() async {
-    return await loadAndGetValue(methodContactIsBlocked, getDefaultArguments());
+    return await loadAndGetValue(methodContactIsBlocked);
   }
 
   Map<String, dynamic> getDefaultArguments() => <String, dynamic>{Base.argumentId: _id};

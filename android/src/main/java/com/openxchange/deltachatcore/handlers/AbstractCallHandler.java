@@ -47,13 +47,13 @@ import com.b44t.messenger.DcContext;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
-abstract class AbstractCallHandler {
+abstract public class AbstractCallHandler {
 
+    public static final String ARGUMENT_ID = "id";
     static final String ARGUMENT_TYPE = "type";
     static final String ARGUMENT_KEY = "key";
     static final String ARGUMENT_VALUE = "value";
     static final String ARGUMENT_ADDRESS = "address";
-    static final String ARGUMENT_ID = "id";
     static final String ARGUMENT_CACHE_ID = "cacheId";
     static final String ARGUMENT_VERIFIED = "verified";
     static final String ARGUMENT_NAME = "name";

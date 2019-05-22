@@ -171,7 +171,7 @@ public class ContextCallHandler extends AbstractCallHandler {
                 getChatByContactId(methodCall, result);
                 break;
             case METHOD_GET_BLOCKED_CONTACTS:
-                getBlockedContacts(methodCall, result);
+                getBlockedContacts(result);
                 break;
             case METHOD_GET_FRESH_MESSAGE_COUNT:
                 getFreshMessageCount(methodCall, result);
@@ -447,7 +447,7 @@ public class ContextCallHandler extends AbstractCallHandler {
         result.success(contactIds);
     }
 
-    private void getBlockedContacts(MethodCall methodCall, MethodChannel.Result result) {
+    private void getBlockedContacts(MethodChannel.Result result) {
         int[] blockedIds = dcContext.getBlockedContacts();
         for (int blockedContactId : blockedIds) {
             loadAndCacheContact(blockedContactId);
@@ -673,8 +673,11 @@ public class ContextCallHandler extends AbstractCallHandler {
             resultErrorArgumentMissing(result);
             return;
         }
-
         Integer chatId = methodCall.argument(ARGUMENT_CHAT_ID);
+        if (chatId == null) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
         ArrayList<Integer> msgIdArray = methodCall.argument(ARGUMENT_VALUE);
         if (msgIdArray == null) {
             resultErrorArgumentMissingValue(result);

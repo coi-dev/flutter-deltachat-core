@@ -45,6 +45,7 @@ package com.openxchange.deltachatcore;
 import com.b44t.messenger.DcChat;
 import com.b44t.messenger.DcContact;
 import com.b44t.messenger.DcMsg;
+import com.openxchange.deltachatcore.handlers.AbstractCallHandler;
 import com.openxchange.deltachatcore.handlers.ChatCallHandler;
 import com.openxchange.deltachatcore.handlers.ChatListCallHandler;
 import com.openxchange.deltachatcore.handlers.ContactCallHandler;
@@ -53,6 +54,7 @@ import com.openxchange.deltachatcore.handlers.EventChannelHandler;
 import com.openxchange.deltachatcore.handlers.MessageCallHandler;
 
 import java.util.Map;
+import java.util.Objects;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -83,6 +85,13 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
     private static final String ARGUMENT_ADD = "add";
     private static final String ARGUMENT_EVENT_ID = "eventId";
     private static final String ARGUMENT_LISTENER_ID = "listenerId";
+    private static final String ARGUMENT_REMOVE_CACHE_IDENTIFIER = "argumentRemoveCacheIdentifier";
+
+    private static final String CACHE_IDENTIFIER_CHAT = "chat";
+    private static final String CACHE_IDENTIFIER_CHAT_LIST = "chatList";
+    private static final String CACHE_IDENTIFIER_CHAT_MESSAGE = "chatMessage";
+    private static final String CACHE_IDENTIFIER_CONTACT = "contact";
+
 
     private Registrar registrar;
     private com.openxchange.deltachatcore.NativeInteractionManager nativeInteractionManager;
@@ -108,30 +117,33 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
     }
 
     @Override
-    public void onMethodCall(MethodCall call, Result result) {
-        delegateMethodCall(call, result);
+    public void onMethodCall(MethodCall methodCall, Result result) {
+        delegateMethodCall(methodCall, result);
     }
 
-    private void delegateMethodCall(MethodCall call, Result result) {
-        String methodPrefix = extractMethodPrefix(call.method);
+    private void delegateMethodCall(MethodCall methodCall, Result result) {
+        String methodPrefix = extractMethodPrefix(methodCall.method);
+        if (methodCall.hasArgument(ARGUMENT_REMOVE_CACHE_IDENTIFIER)) {
+            removeFromJavaCache(methodCall);
+        }
         switch (methodPrefix) {
             case METHOD_PREFIX_BASE:
-                handleBaseCalls(call, result);
+                handleBaseCalls(methodCall, result);
                 break;
             case METHOD_PREFIX_CHAT_LIST:
-                handleChatListCalls(call, result);
+                handleChatListCalls(methodCall, result);
                 break;
             case METHOD_PREFIX_CHAT:
-                handleChatCalls(call, result);
+                handleChatCalls(methodCall, result);
                 break;
             case METHOD_PREFIX_CONTACT:
-                handleContactCalls(call, result);
+                handleContactCalls(methodCall, result);
                 break;
             case METHOD_PREFIX_CONTEXT:
-                handleContextCalls(call, result);
+                handleContextCalls(methodCall, result);
                 break;
             case METHOD_PREFIX_MSG:
-                handleMessageCalls(call, result);
+                handleMessageCalls(methodCall, result);
                 break;
             default:
                 result.notImplemented();
@@ -142,8 +154,27 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
         return methodCall.split(METHOD_PREFIX_SEPARATOR)[0];
     }
 
-    private void handleBaseCalls(MethodCall call, Result result) {
-        switch (call.method) {
+    private void removeFromJavaCache(MethodCall methodCall) {
+        String identifier = methodCall.argument(ARGUMENT_REMOVE_CACHE_IDENTIFIER);
+        Integer id = methodCall.argument(AbstractCallHandler.ARGUMENT_ID);
+        switch (Objects.requireNonNull(identifier)) {
+            case CACHE_IDENTIFIER_CHAT:
+                chatCache.delete(Objects.requireNonNull(id));
+                break;
+            case CACHE_IDENTIFIER_CHAT_MESSAGE:
+                messageCache.delete(Objects.requireNonNull(id));
+                break;
+            case CACHE_IDENTIFIER_CONTACT:
+                contactCache.delete(Objects.requireNonNull(id));
+                break;
+            case CACHE_IDENTIFIER_CHAT_LIST:
+                // No interaction required
+                break;
+        }
+    }
+
+    private void handleBaseCalls(MethodCall methodCall, Result result) {
+        switch (methodCall.method) {
             case METHOD_BASE_INIT:
                 init(result);
                 break;
@@ -151,10 +182,10 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
                 systemInfo(result);
                 break;
             case METHOD_BASE_CORE_LISTENER:
-                coreListener(call, result);
+                coreListener(methodCall, result);
                 break;
             case METHOD_BASE_SET_CORE_STRINGS:
-                setCoreStrings(call, result);
+                setCoreStrings(methodCall, result);
                 break;
             default:
                 result.notImplemented();
@@ -167,14 +198,14 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
         result.success(null);
         contextCallHandler = new ContextCallHandler(nativeInteractionManager, contactCache, messageCache, chatCache);
         chatListCallHandler = new ChatListCallHandler(nativeInteractionManager, chatCache);
-        messageCallHandler = new MessageCallHandler(nativeInteractionManager, messageCache, contextCallHandler);
-        contactCallHandler = new ContactCallHandler(nativeInteractionManager, contactCache, contextCallHandler);
-        chatCallHandler = new ChatCallHandler(nativeInteractionManager, chatCache, contextCallHandler);
+        messageCallHandler = new MessageCallHandler(nativeInteractionManager, contextCallHandler);
+        contactCallHandler = new ContactCallHandler(nativeInteractionManager, contextCallHandler);
+        chatCallHandler = new ChatCallHandler(nativeInteractionManager, contextCallHandler);
         eventChannelHandler = new EventChannelHandler(nativeInteractionManager, registrar.messenger());
     }
 
-    private void setCoreStrings(MethodCall call, Result result) {
-        Map<Long, String> coreStrings = call.arguments();
+    private void setCoreStrings(MethodCall methodCall, Result result) {
+        Map<Long, String> coreStrings = methodCall.arguments();
         nativeInteractionManager.setCoreStrings(coreStrings);
         result.success(null);
     }
@@ -183,10 +214,10 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
         result.success(android.os.Build.VERSION.RELEASE);
     }
 
-    private void coreListener(MethodCall call, Result result) {
-        Boolean add = call.argument(ARGUMENT_ADD);
-        Integer eventId = call.argument(ARGUMENT_EVENT_ID);
-        Integer listenerId = call.argument(ARGUMENT_LISTENER_ID);
+    private void coreListener(MethodCall methodCall, Result result) {
+        Boolean add = methodCall.argument(ARGUMENT_ADD);
+        Integer eventId = methodCall.argument(ARGUMENT_EVENT_ID);
+        Integer listenerId = methodCall.argument(ARGUMENT_LISTENER_ID);
         if (eventId == null || add == null) {
             return;
         }
@@ -202,24 +233,24 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
         }
     }
 
-    private void handleContextCalls(MethodCall call, Result result) {
-        contextCallHandler.handleCall(call, result);
+    private void handleContextCalls(MethodCall methodCall, Result result) {
+        contextCallHandler.handleCall(methodCall, result);
     }
 
     private void handleChatListCalls(MethodCall call, Result result) {
         chatListCallHandler.handleCall(call, result);
     }
 
-    private void handleChatCalls(MethodCall call, Result result) {
-        chatCallHandler.handleCall(call, result);
+    private void handleChatCalls(MethodCall methodCall, Result result) {
+        chatCallHandler.handleCall(methodCall, result);
     }
 
-    private void handleContactCalls(MethodCall call, Result result) {
-        contactCallHandler.handleCall(call, result);
+    private void handleContactCalls(MethodCall methodCall, Result result) {
+        contactCallHandler.handleCall(methodCall, result);
     }
 
-    private void handleMessageCalls(MethodCall call, Result result) {
-        messageCallHandler.handleCall(call, result);
+    private void handleMessageCalls(MethodCall methodCall, Result result) {
+        messageCallHandler.handleCall(methodCall, result);
     }
 
 }

@@ -44,7 +44,6 @@ package com.openxchange.deltachatcore.handlers;
 
 import com.b44t.messenger.DcContact;
 import com.b44t.messenger.DcContext;
-import com.openxchange.deltachatcore.Cache;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -62,12 +61,10 @@ public class ContactCallHandler extends AbstractCallHandler {
     private static final String METHOD_CONTACT_IS_BLOCKED = "contact_isBlocked";
     private static final String METHOD_CONTACT_IS_VERIFIED = "contact_isVerified";
 
-    private final Cache<DcContact> contactCache;
     private final ContextCallHandler contextCallHandler;
 
-    public ContactCallHandler(DcContext dcContext, Cache<DcContact> contactCache, ContextCallHandler contextCallHandler) {
+    public ContactCallHandler(DcContext dcContext, ContextCallHandler contextCallHandler) {
         super(dcContext);
-        this.contactCache = contactCache;
         this.contextCallHandler = contextCallHandler;
     }
 
