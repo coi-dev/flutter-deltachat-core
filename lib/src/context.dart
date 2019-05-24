@@ -280,7 +280,7 @@ class Context {
   Map<String, dynamic> getExportImportArguments(String path) => <String, dynamic>{Base.argumentPath: path};
 
   Map<String, dynamic> getForwardMessageArguments(int chatId, List<int> msgIds) =>
-      <String, dynamic>{Base.argumentChatId: chatId, Base.argumentValue: msgIds};
+      <String, dynamic>{Base.argumentChatId: chatId, Base.argumentMessageIds: msgIds};
 
   Map<String, dynamic> getMarkSeenMessagesArguments(List<int> msgIds) => <String, dynamic>{Base.argumentMessageIds: msgIds};
 }
