@@ -53,6 +53,7 @@ export 'src/contact.dart';
 export 'src/context.dart';
 export 'package:delta_chat_core/src/types/event.dart';
 export 'package:delta_chat_core/src/types/chatsummary.dart';
+export 'package:delta_chat_core/src/types/qrcoderesult.dart';
 
 class DeltaChatCore {
   static const String channelDeltaChatCore = 'deltaChatCore';

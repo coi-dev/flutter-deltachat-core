@@ -45,10 +45,13 @@ package com.openxchange.deltachatcore.handlers;
 import com.b44t.messenger.DcChat;
 import com.b44t.messenger.DcContact;
 import com.b44t.messenger.DcContext;
+import com.b44t.messenger.DcLot;
 import com.b44t.messenger.DcMsg;
 import com.openxchange.deltachatcore.Cache;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -89,6 +92,10 @@ public class ContextCallHandler extends AbstractCallHandler {
     private static final String METHOD_INITIATE_KEY_TRANSFER = "context_initiateKeyTransfer";
     private static final String METHOD_CONTINUE_KEY_TRANSFER = "context_continueKeyTransfer";
     private static final String METHOD_MARK_SEEN_MESSAGES = "context_markSeenMessages";
+    private static final String METHOD_GET_SECUREJOIN_QR = "context_getSecurejoinQr";
+    private static final String METHOD_JOIN_SECUREJOIN = "context_joinSecurejoin";
+    private static final String METHOD_CHECK_QR = "context_checkQr";
+    private static final String METHOD_STOP_ONGOING_PROCESS = "context_stopOngoingProcess";
 
     private static final String TYPE_INT = "int";
     private static final String TYPE_STRING = "String";
@@ -208,6 +215,17 @@ public class ContextCallHandler extends AbstractCallHandler {
                 break;
             case METHOD_CONTINUE_KEY_TRANSFER:
                 continueKeyTransfer(methodCall, result);
+            case METHOD_GET_SECUREJOIN_QR:
+                getSecurejoinQr(methodCall, result);
+                break;
+            case METHOD_JOIN_SECUREJOIN:
+                joinSecurejoin(methodCall, result);
+                break;
+            case METHOD_CHECK_QR:
+                checkQr(methodCall, result);
+                break;
+            case METHOD_STOP_ONGOING_PROCESS:
+                stopOngoingProcess(result);
                 break;
             default:
                 result.notImplemented();
@@ -744,4 +762,57 @@ public class ContextCallHandler extends AbstractCallHandler {
 
         dcContext.markseenMsgs(msgIds);
     }
+
+    private void getSecurejoinQr(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_CHAT_ID)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        Integer chatId = methodCall.argument(ARGUMENT_CHAT_ID);
+        if (chatId == null) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+
+        String qrCodeText = dcContext.getSecurejoinQr(chatId);
+        result.success(qrCodeText);
+    }
+
+    private void joinSecurejoin(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_QR_TEXT)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        String qrText = methodCall.argument(ARGUMENT_QR_TEXT);
+        if (qrText == null || qrText.isEmpty()) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        new Thread(() -> {
+            int chatId = dcContext.joinSecurejoin(qrText);
+            result.success(chatId);
+        }).start();
+    }
+
+    private void checkQr(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_QR_TEXT)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        String qrText = methodCall.argument(ARGUMENT_QR_TEXT);
+        if (qrText == null || qrText.isEmpty()) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+
+        DcLot qrCode = dcContext.checkQr(qrText);
+        List<Object> summaryResult = Arrays.asList(qrCode.getState(), qrCode.getId(), qrCode.getText1());
+        result.success(summaryResult);
+    }
+
+    private void stopOngoingProcess(MethodChannel.Result result) {
+        dcContext.stopOngoingProcess();
+        result.success(null);
+    }
+
 }

@@ -65,6 +65,7 @@ abstract class Base {
   static const String argumentCount = "count";
   static final String argumentSetupCode = "setupCode";
   static const String argumentMessageIds = "messageIds";
+  static const String argumentQrText = "qrText";
 
   final DeltaChatCore core = DeltaChatCore();
 
