@@ -66,6 +66,7 @@ abstract public class AbstractCallHandler {
     static final String ARGUMENT_PATH = "path";
     static final String ARGUMENT_TEXT = "text";
     static final String ARGUMENT_COUNT = "count";
+    static final String ARGUMENT_MESSAGE_IDS = "messageIds";
     private static final String ERROR_ARGUMENT_MISSING = "1";
     private static final String ERROR_ARGUMENT_TYPE_MISMATCH = "2";
     private static final String ERROR_ARGUMENT_MISSING_VALUE = "3";

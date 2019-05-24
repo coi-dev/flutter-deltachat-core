@@ -78,6 +78,7 @@ class Context {
   static const String methodExportKeys = "context_exportKeys";
   static const String methodGetFreshMessages = "context_getFreshMessages";
   static const String methodForwardMessages = "context_forwardMessages";
+  static const String methodMarkSeenMessages = "context_markSeenMessages";
 
   static const String configAddress = "addr";
   static const String configMailServer = "mail_server";
@@ -238,6 +239,10 @@ class Context {
     return await core.invokeMethod(methodForwardMessages, getForwardMessageArguments(chatId, msgIds));
   }
 
+  Future<void> markSeenMessages(List<int> msgIds) async {
+    return await core.invokeMethod(methodMarkSeenMessages, getMarkSeenMessagesArguments(msgIds));
+  }
+
   Map<String, dynamic> getKeyArguments(String key) => <String, dynamic>{Base.argumentKey: key};
 
   Map<String, dynamic> getConfigArguments(String type, String key, value) =>
@@ -245,20 +250,24 @@ class Context {
 
   Map<String, dynamic> getAddressBookArguments(String addressBook) => <String, dynamic>{Base.argumentAddressBook: addressBook};
 
-  Map<String, dynamic> getContactArguments(String name, String address) => <String, dynamic>{Base.argumentName: name, Base.argumentAddress: address};
+  Map<String, dynamic> getContactArguments(String name, String address) =>
+      <String, dynamic>{Base.argumentName: name, Base.argumentAddress: address};
 
   Map<String, dynamic> getIdArguments(int id) => <String, dynamic>{Base.argumentId: id};
 
   Map<String, dynamic> getCreateGroupArguments(bool verified, String name) =>
       <String, dynamic>{Base.argumentVerified: verified, Base.argumentName: name};
 
-  Map<String, dynamic> getContactsArguments(int flags, String query) => <String, dynamic>{Base.argumentFlags: flags, Base.argumentQuery: query};
+  Map<String, dynamic> getContactsArguments(int flags, String query) =>
+      <String, dynamic>{Base.argumentFlags: flags, Base.argumentQuery: query};
 
   Map<String, dynamic> getChatIdArguments(int chatId) => <String, dynamic>{Base.argumentChatId: chatId};
 
-  Map<String, dynamic> getChatMessageArguments(int chatId, int flags) => <String, dynamic>{Base.argumentChatId: chatId, Base.argumentFlags: flags};
+  Map<String, dynamic> getChatMessageArguments(int chatId, int flags) =>
+      <String, dynamic>{Base.argumentChatId: chatId, Base.argumentFlags: flags};
 
-  Map<String, dynamic> createChatMessageArguments(int chatId, String text) => <String, dynamic>{Base.argumentChatId: chatId, Base.argumentText: text};
+  Map<String, dynamic> createChatMessageArguments(int chatId, String text) =>
+      <String, dynamic>{Base.argumentChatId: chatId, Base.argumentText: text};
 
   Map<String, dynamic> getCreateAttachmentMessageArguments(int chatId, String path, int msgType, String text) =>
       <String, dynamic>{Base.argumentChatId: chatId, Base.argumentPath: path, Base.argumentType: msgType, Base.argumentText: text};
@@ -271,5 +280,7 @@ class Context {
   Map<String, dynamic> getExportImportArguments(String path) => <String, dynamic>{Base.argumentPath: path};
 
   Map<String, dynamic> getForwardMessageArguments(int chatId, List<int> msgIds) =>
-      <String, dynamic>{Base.argumentChatId: chatId, Base.argumentValue: msgIds};
+      <String, dynamic>{Base.argumentChatId: chatId, Base.argumentMessageIds: msgIds};
+
+  Map<String, dynamic> getMarkSeenMessagesArguments(List<int> msgIds) => <String, dynamic>{Base.argumentMessageIds: msgIds};
 }

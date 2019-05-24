@@ -86,6 +86,13 @@ class ChatMsg extends Base {
   static const int typeVideo = 50;
   static const int typeFile = 60;
 
+  static const int messageStatePreparing = 18;
+  static const int messageStateDraft = 19;
+  static const int messageStatePending = 20;
+  static const int messageStateFailed = 24;
+  static const int messageStateDelivered = 26;
+  static const int messageStateReceived = 28;
+
   static const int idMarker = 1;
   static const int idDayMarker = 9;
 
@@ -149,6 +156,10 @@ class ChatMsg extends Base {
 
   Future<String> getSummaryText(int characterCount) async {
     return await loadAndGetValue(methodMessageGetSummaryText, arguments: getSummaryArguments(characterCount));
+  }
+
+  Future<int> getState() async {
+    return await loadAndGetValue(methodMessageGetState);
   }
 
   @override
