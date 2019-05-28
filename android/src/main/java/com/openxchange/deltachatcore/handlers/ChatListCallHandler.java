@@ -133,7 +133,8 @@ public class ChatListCallHandler extends AbstractCallHandler {
         } else {
             chatListFlag = 0;
         }
-        DcChatlist dcChatlist = dcContext.getChatlist(chatListFlag, null, 0);
+        String query = methodCall.argument(ARGUMENT_QUERY);
+        DcChatlist dcChatlist = dcContext.getChatlist(chatListFlag, query, 0);
         int cacheId = chatListCache.getGenerateId();
         chatListCache.append(cacheId, dcChatlist);
         result.success(cacheId);

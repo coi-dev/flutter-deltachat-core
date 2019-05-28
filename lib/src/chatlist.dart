@@ -75,8 +75,8 @@ class ChatList extends Base {
   @override
   String get identifier => _identifier;
 
-  Future<void> setup([int chatListType = typeNoSpecials]) async {
-    _id = await core.invokeMethod(methodChatListInternalSetup, getSetupArguments(chatListType));
+  Future<void> setup([String query, int chatListType = typeNoSpecials]) async {
+    _id = await core.invokeMethod(methodChatListInternalSetup, getSetupArguments(chatListType, query));
   }
 
   Future<int> tearDown() async {
@@ -110,7 +110,7 @@ class ChatList extends Base {
   @override
   getDefaultArguments() => <String, dynamic>{Base.argumentCacheId: _id};
 
-  Map<String, dynamic> getSetupArguments(int chatListType) => <String, dynamic>{Base.argumentType: chatListType};
+  Map<String, dynamic> getSetupArguments(int chatListType, [String query]) => <String, dynamic>{Base.argumentType: chatListType, Base.argumentQuery: query};
 
   Map<String, dynamic> getIndexArguments(int index) => <String, dynamic>{Base.argumentCacheId: _id, Base.argumentIndex: index};
 
