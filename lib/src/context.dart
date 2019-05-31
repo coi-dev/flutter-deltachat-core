@@ -98,6 +98,7 @@ class Context {
   static const String configE2eeEnabled = "e2ee_enabled";
   static const String configQrOverlayLogo = "qr_overlay_logo";
   static const String configShowEmails = "show_emails";
+  static const String configMdnsEnabled = "mdns_enabled";
 
   static const int contactListFlagVerifiedOnly = 1;
   static const int contactListFlagAddSelf = 2;
