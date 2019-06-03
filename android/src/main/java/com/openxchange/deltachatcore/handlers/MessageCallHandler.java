@@ -138,6 +138,8 @@ public class MessageCallHandler extends AbstractCallHandler {
                 break;
             case METHOD_MESSAGE_GET_SETUP_CODE_BEGIN:
                 getSetupCodeBegin(methodCall, result);
+            case METHOD_MESSAGE_SHOW_PADLOCK:
+                showPadlock(methodCall, result);
                 break;
             default:
                 result.notImplemented();
@@ -304,6 +306,16 @@ public class MessageCallHandler extends AbstractCallHandler {
             return;
         }
         result.success(message.getState());
+    }
+
+
+    private void showPadlock(MethodCall methodCall, MethodChannel.Result result) {
+        DcMsg message = getMessage(methodCall, result);
+        if (message == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
+        }
+        result.success(message.showPadlock());
     }
 
     private DcMsg getMessage(MethodCall methodCall, MethodChannel.Result result) {

@@ -173,6 +173,10 @@ class ChatMsg extends Base {
     return await loadAndGetValue(methodMessageGetSetupCodeBegin);
   }
 
+  Future<int> showPadlock() async {
+    return await loadAndGetValue(methodMessageShowPadlock);
+  }
+
   @override
   getDefaultArguments() => <String, dynamic>{Base.argumentId: _id};
 
