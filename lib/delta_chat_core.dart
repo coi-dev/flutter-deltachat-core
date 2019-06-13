@@ -140,7 +140,7 @@ class DeltaChatCore {
 
   removeListener(int eventId, int listenerId) async {
     var eventIdSubscribers = _eventChannelSubscribers[eventId];
-    eventIdSubscribers[listenerId].close();
+    eventIdSubscribers[listenerId]?.close();
     eventIdSubscribers.remove(listenerId);
     await invokeMethod(methodBaseCoreListener, <String, dynamic>{argumentAdd: false, argumentEventId: eventId, argumentListenerId: listenerId});
   }
