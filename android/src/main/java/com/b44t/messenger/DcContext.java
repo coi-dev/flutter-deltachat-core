@@ -148,7 +148,7 @@ public class DcContext {
     public native void         forwardMsgs          (int msg_ids[], int chat_id);
     public native int          sendMsg              (int chat_id, DcMsg msg);
     public native int          sendTextMsg          (int chat_id, String text);
-    public native int          checkQrCPtr          (String qr);
+    public native long          checkQrCPtr          (String qr);
     public @NonNull DcLot      checkQr              (String qr) { return new DcLot(checkQrCPtr(qr)); }
     public native String       getSecurejoinQr      (int chat_id);
     public native int          joinSecurejoin       (String qr);

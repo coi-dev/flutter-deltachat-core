@@ -81,6 +81,10 @@ class Context {
   static const String methodInitiateKeyTransfer = "context_initiateKeyTransfer";
   static const String methodContinueKeyTransfer = "context_continueKeyTransfer";
   static const String methodMarkSeenMessages = "context_markSeenMessages";
+  static const String methodGetSecurejoinQr = "context_getSecurejoinQr";
+  static const String methodJoinSecurejoinQr = "context_joinSecurejoin";
+  static const String methodCheckQr = "context_checkQr";
+  static const String methodStopOngoingProcess = "context_stopOngoingProcess";
   static const String configAddress = "addr";
   static const String configMailServer = "mail_server";
   static const String configMailUser = "mail_user";
@@ -109,6 +113,16 @@ class Context {
   static const int serverFlagsSmtpSsl = 0x20000;
   static const int serverFlagsSmtpPlain = 0x40000;
 
+  static const int qrAskVerifyContact = 200;
+  static const int qrAskVerifyGroup = 202;
+  static const int qrFingerprintOk = 210;
+  static const int qrFingerprintMismatch = 220;
+  static const int qrFingerprintWithoutAddress = 230;
+  static const int qrAddress = 320;
+  static const int qrText = 330;
+  static const int qrUrl = 332;
+  static const int qrError = 400;
+  
   static const int showEmailsOff = 0;
   static const int showEmailsAcceptedContacts = 1;
   static const int showEmailsAll = 2;
@@ -253,6 +267,22 @@ class Context {
     return await core.invokeMethod(methodMarkSeenMessages, getMarkSeenMessagesArguments(msgIds));
   }
 
+  Future<String> getSecureJoinQr(int chatId) async {
+    return await core.invokeMethod(methodGetSecurejoinQr, getSecureJoinQrArguments(chatId));
+  }
+
+  Future<int> joinSecurejoinQr(String qrText) async {
+    return await core.invokeMethod(methodJoinSecurejoinQr, getQrTextArguments(qrText));
+  }
+
+  Future<dynamic> checkQr(String qrText) async {
+    return await core.invokeMethod(methodCheckQr, getQrTextArguments(qrText));
+  }
+
+  Future<dynamic> stopOngoingProcess() async {
+    return await core.invokeMethod(methodStopOngoingProcess);
+  }
+
   Map<String, dynamic> getKeyArguments(String key) => <String, dynamic>{Base.argumentKey: key};
 
   Map<String, dynamic> getConfigArguments(String type, String key, value) =>
@@ -296,4 +326,9 @@ class Context {
     <String, dynamic>{Base.argumentChatId: chatId, Base.argumentMessageIds: msgIds};
 
   Map<String, dynamic> getMarkSeenMessagesArguments(List<int> msgIds) => <String, dynamic>{Base.argumentMessageIds: msgIds};
+
+  Map<String, dynamic> getSecureJoinQrArguments(int chatId) => <String, dynamic>{Base.argumentChatId: chatId};
+
+  Map<String, dynamic> getQrTextArguments(String qrText) => <String, dynamic>{Base.argumentQrText: qrText};
+
 }

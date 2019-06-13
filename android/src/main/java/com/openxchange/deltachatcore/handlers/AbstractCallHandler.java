@@ -68,6 +68,7 @@ abstract public class AbstractCallHandler {
     static final String ARGUMENT_COUNT = "count";
     static final String ARGUMENT_MESSAGE_IDS = "messageIds";
     static final String ARGUMENT_SETUP_CODE = "setupCode";
+    static final String ARGUMENT_QR_TEXT = "qrText";
     private static final String ERROR_ARGUMENT_MISSING = "1";
     private static final String ERROR_ARGUMENT_TYPE_MISMATCH = "2";
     private static final String ERROR_ARGUMENT_MISSING_VALUE = "3";
