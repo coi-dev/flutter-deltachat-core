@@ -272,11 +272,11 @@ class Context {
   }
 
   Future<int> joinSecurejoinQr(String qrText) async {
-    return await core.invokeMethod(methodJoinSecurejoinQr, joinSecurejoinQrArguments(qrText));
+    return await core.invokeMethod(methodJoinSecurejoinQr, getQrTextArguments(qrText));
   }
 
   Future<dynamic> checkQr(String qrText) async {
-    return await core.invokeMethod(methodCheckQr, checkQrArguments(qrText));
+    return await core.invokeMethod(methodCheckQr, getQrTextArguments(qrText));
   }
 
   Future<dynamic> stopOngoingProcess() async {
@@ -329,7 +329,6 @@ class Context {
 
   Map<String, dynamic> getSecureJoinQrArguments(int chatId) => <String, dynamic>{Base.argumentChatId: chatId};
 
-  Map<String, dynamic> joinSecurejoinQrArguments(String qrText) => <String, dynamic>{Base.argumentQrText: qrText};
+  Map<String, dynamic> getQrTextArguments(String qrText) => <String, dynamic>{Base.argumentQrText: qrText};
 
-  Map<String, dynamic> checkQrArguments(String qrText) => <String, dynamic>{Base.argumentQrText: qrText};
 }
