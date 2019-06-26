@@ -78,6 +78,7 @@ public class MessageCallHandler extends AbstractCallHandler {
     private static final String METHOD_MESSAGE_SET_DIMENSION = "msg_setDimension";
     private static final String METHOD_MESSAGE_SET_DURATION = "msg_setDuration";
     private static final String METHOD_MESSAGE_IS_OUTGOING = "msg_isOutgoing";
+    private static final String METHOD_MESSAGE_IS_STARRED = "msg_isStarred";
     private final ContextCallHandler contextCallHandler;
 
     public MessageCallHandler(DcContext dcContext, ContextCallHandler contextCallHandler) {
@@ -140,6 +141,9 @@ public class MessageCallHandler extends AbstractCallHandler {
                 getSetupCodeBegin(methodCall, result);
             case METHOD_MESSAGE_SHOW_PADLOCK:
                 showPadlock(methodCall, result);
+                break;
+            case METHOD_MESSAGE_IS_STARRED:
+                isStarred(methodCall, result);
                 break;
             default:
                 result.notImplemented();
@@ -316,6 +320,15 @@ public class MessageCallHandler extends AbstractCallHandler {
             return;
         }
         result.success(message.showPadlock());
+    }
+
+    private void isStarred(MethodCall methodCall, MethodChannel.Result result) {
+        DcMsg message = getMessage(methodCall, result);
+        if (message == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
+        }
+        result.success(message.isStarred());
     }
 
     private DcMsg getMessage(MethodCall methodCall, MethodChannel.Result result) {

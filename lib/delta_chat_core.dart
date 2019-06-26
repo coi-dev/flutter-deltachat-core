@@ -147,4 +147,9 @@ class DeltaChatCore {
     eventIdSubscribers.remove(listenerId);
     await invokeMethod(methodBaseCoreListener, <String, dynamic>{argumentAdd: false, argumentEventId: eventId, argumentListenerId: listenerId});
   }
+
+  void addStreamEvent(Event event) {
+    delegateEventToSubscribers(event);
+  }
+
 }

@@ -75,6 +75,7 @@ class ChatMsg extends Base {
   static const String methodMessageSetDimension = "msg_setDimension";
   static const String methodMessageSetDuration = "msg_setDuration";
   static const String methodMessageIsOutgoing = "msg_isOutgoing";
+  static const String methodMessageIsStarred = "msg_isStarred";
 
   static const int typeUndefined = 0;
   static const int typeMessage = 10;
@@ -175,6 +176,10 @@ class ChatMsg extends Base {
 
   Future<int> showPadlock() async {
     return await loadAndGetValue(methodMessageShowPadlock);
+  }
+
+  Future<bool> isStarred() async {
+    return await loadAndGetValue(methodMessageIsStarred);
   }
 
   @override
