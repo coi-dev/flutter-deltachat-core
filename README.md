@@ -3,14 +3,14 @@
 The Delta Chat core plugin provides a Flutter / Dart wrapper for the [Delta Chat Core](https://github.com/deltachat/deltachat-core) (DCC). This plugin interacts with the native platform and calls DCC to enable IMAP / SMTP based chats.
 
 - **Android state:** Currently in development
-- **iOS state:** Pending
+- **iOS state:** Currently in development (27.06.19 - just started, no release yet)
 
 ## Information
 - [Documentation](https://github.com/open-xchange/flutter-deltachat-core/wiki)
 
 ## Requirements
 - The latest Flutter stable version is used (if problems occur try the [Flutter Dev Channel](https://github.com/flutter/flutter/wiki/Flutter-build-release-channels))
-- Delta Chat Core v0.41.0 is used
+- The latest Delta Chat Core master branch of this [repository](https://github.com/open-xchange/deltachat-core) is used
 - The used Delta Chat Core is currently only out of the box buildable using Linux (Debian / Ubuntu is recommended)
 - Download the [Android NDK](https://developer.android.com/ndk/downloads/) stable version (r19c)
   - If build errors or problems occur, try [Android NDK Revision 14b (March 2017)](https://developer.android.com/ndk/downloads/older_releases)
