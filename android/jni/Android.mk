@@ -768,7 +768,28 @@ LOCAL_C_INCLUDES = \
 	$(LOCAL_PATH)/messenger-backend/libs/cyrussasl/include \
 	$(LOCAL_PATH)/messenger-backend/libs/cyrussasl/include/sasl
 
+LOCAL_STATIC_LIBRARIES := libcrypto libiconv sasl2
+
 include $(BUILD_STATIC_LIBRARY)
+
+
+#################################################################################
+## libetpan wrapper
+#################################################################################
+#
+#include $(CLEAR_VARS)
+#
+#LOCAL_MODULE := dcmime
+#
+#LOCAL_SRC_FILES := $(LOCAL_PATH)/dc_mime_wrapper.c
+#
+#LOCAL_C_INCLUDES := \
+#    $(LOCAL_PATH)/messenger-backend/src \
+#    $(LOCAL_PATH)/messenger-backend/libs/libetpan/include
+#
+#LOCAL_STATIC_LIBRARIES := etpan
+#
+#include $(BUILD_STATIC_LIBRARY)
 
 
 ################################################################################
@@ -826,6 +847,8 @@ LOCAL_SRC_FILES := \
 	./messenger-backend/libs/cyrussasl/plugins/srp.c \
 	./messenger-backend/libs/cyrussasl/plugins/srp_init.c
 
+LOCAL_STATIC_LIBRARIES := libcrypto
+
 include $(BUILD_STATIC_LIBRARY)
 
 ################################################################################
@@ -865,6 +888,8 @@ $(JNI_DIR)/messenger-backend/libs/sqlite
 
 LOCAL_LDLIBS 	:= -ljnigraphics -llog -lz
 LOCAL_STATIC_LIBRARIES :=  etpan sasl2 sqlite crypto libiconv
+# dcmime
+LOCAL_LDFLAGS += -v
 # if you get "undefined reference" errors, the reason for this may be the _order_! Eg. libiconv as the first library does not work!
 # "breakpad" was placed after "crypto", NativeLoader.cpp after dc_wrapper.c
 
@@ -930,6 +955,8 @@ messenger-backend/src/dc_strbuilder.c \
 messenger-backend/src/dc_strencode.c \
 messenger-backend/src/dc_token.c \
 messenger-backend/src/dc_tools.c \
-dc_wrapper.c
+messenger-backend/src/dc_location.c \
+dc_wrapper.c \
+dc_mime_wrapper.c
 
 include $(BUILD_SHARED_LIBRARY)

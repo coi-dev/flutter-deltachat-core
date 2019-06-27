@@ -24,6 +24,7 @@
 
 
 #include <jni.h>
+#include <stdlib.h>
 #include "messenger-backend/src/deltachat.h"
 
 
@@ -36,7 +37,7 @@ static dc_msg_t* get_dc_msg(JNIEnv *env, jobject obj);
 	if(a) { (*env)->ReleaseStringUTFChars(env, (a), a##Ptr); }
 
 #define JSTRING_NEW(a) jstring_new__(env, (a))
-static jstring jstring_new__(JNIEnv* env, const char* a)
+jstring jstring_new__(JNIEnv* env, const char* a)
 {
 	if (a==NULL || a[0]==0) {
 		return (*env)->NewStringUTF(env, "");
@@ -1488,6 +1489,5 @@ JNIEXPORT jlong Java_com_b44t_messenger_DcContext_stringToData(JNIEnv *env, jcla
     }
     return (jlong)cstring; // the return value of stringToData() will be passed to c-land and free()'d there
 }
-
 
 

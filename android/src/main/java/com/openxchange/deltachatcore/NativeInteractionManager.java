@@ -5,7 +5,8 @@ import android.content.Context;
 import android.os.PowerManager;
 import android.util.Log;
 
-import com.b44t.messenger.DcContext;
+import androidx.annotation.NonNull;
+
 import com.b44t.messenger.DcEventCenter;
 
 import java.io.BufferedInputStream;
@@ -18,7 +19,7 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Objects;
 
-public class NativeInteractionManager extends DcContext {
+public class NativeInteractionManager extends DcMimeContext {
 
     private static final String DATABASE_FILENAME = "messenger.db";
     private static final String TAG = "coi";
@@ -350,6 +351,12 @@ public class NativeInteractionManager extends DcContext {
             break;
         }
         return 0;
+    }
+
+    @Override
+    public void receiveMail(@NonNull Mail mime) {
+        ContentType ct = mime.GetContentType();
+        Log.d("MIME Type", ct == null ? "null" : ct.getType() + "/" + ct.getSubtype());
     }
 }
 
