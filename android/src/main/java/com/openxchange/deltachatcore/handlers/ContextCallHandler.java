@@ -96,6 +96,7 @@ public class ContextCallHandler extends AbstractCallHandler {
     private static final String METHOD_JOIN_SECUREJOIN = "context_joinSecurejoin";
     private static final String METHOD_CHECK_QR = "context_checkQr";
     private static final String METHOD_STOP_ONGOING_PROCESS = "context_stopOngoingProcess";
+    private static final String METHOD_DELETE_MESSAGES = "context_deleteMessages";
 
     private static final String TYPE_INT = "int";
     private static final String TYPE_STRING = "String";
@@ -226,6 +227,9 @@ public class ContextCallHandler extends AbstractCallHandler {
                 break;
             case METHOD_STOP_ONGOING_PROCESS:
                 stopOngoingProcess(result);
+                break;
+            case METHOD_DELETE_MESSAGES:
+                deleteMessages(methodCall, result);
                 break;
             default:
                 result.notImplemented();
@@ -808,6 +812,24 @@ public class ContextCallHandler extends AbstractCallHandler {
         DcLot qrCode = dcContext.checkQr(qrText);
         List<Object> summaryResult = Arrays.asList(qrCode.getState(), qrCode.getId(), qrCode.getText1());
         result.success(summaryResult);
+    }
+
+    private void deleteMessages(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_MESSAGE_IDS)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        ArrayList<Integer> msgIdArray = methodCall.argument(ARGUMENT_MESSAGE_IDS);
+        if(msgIdArray == null){
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        int[] msgIds = new int[msgIdArray.size()];
+        for (int i = 0; i < msgIds.length; i++) {
+            msgIds[i] = msgIdArray.get(i);
+        }
+
+        dcContext.deleteMsgs(msgIds);
     }
 
     private void stopOngoingProcess(MethodChannel.Result result) {

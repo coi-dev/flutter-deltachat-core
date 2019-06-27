@@ -85,6 +85,8 @@ class Context {
   static const String methodJoinSecurejoinQr = "context_joinSecurejoin";
   static const String methodCheckQr = "context_checkQr";
   static const String methodStopOngoingProcess = "context_stopOngoingProcess";
+  static const String methodDeleteMessages = "context_deleteMessages";
+
   static const String configAddress = "addr";
   static const String configMailServer = "mail_server";
   static const String configMailUser = "mail_user";
@@ -264,7 +266,7 @@ class Context {
   }
 
   Future<void> markSeenMessages(List<int> msgIds) async {
-    return await core.invokeMethod(methodMarkSeenMessages, getMarkSeenMessagesArguments(msgIds));
+    return await core.invokeMethod(methodMarkSeenMessages, getMessageIdsArguments(msgIds));
   }
 
   Future<String> getSecureJoinQr(int chatId) async {
@@ -283,6 +285,10 @@ class Context {
     return await core.invokeMethod(methodStopOngoingProcess);
   }
 
+  Future<void> deleteMessages(List<int> msgIds) async {
+    return await core.invokeMethod(methodDeleteMessages, getMessageIdsArguments(msgIds));
+  }
+
   Map<String, dynamic> getKeyArguments(String key) => <String, dynamic>{Base.argumentKey: key};
 
   Map<String, dynamic> getConfigArguments(String type, String key, value) =>
@@ -294,6 +300,8 @@ class Context {
     <String, dynamic>{Base.argumentName: name, Base.argumentAddress: address};
 
   Map<String, dynamic> getIdArguments(int id) => <String, dynamic>{Base.argumentId: id};
+
+  Map<String, dynamic> getMessageIdsArguments(List<int> msgIds) => <String, dynamic>{Base.argumentMessageIds: msgIds};
 
   Map<String, dynamic> getCreateGroupArguments(bool verified, String name) =>
     <String, dynamic>{Base.argumentVerified: verified, Base.argumentName: name};
@@ -324,8 +332,6 @@ class Context {
 
   Map<String, dynamic> getForwardMessageArguments(int chatId, List<int> msgIds) =>
     <String, dynamic>{Base.argumentChatId: chatId, Base.argumentMessageIds: msgIds};
-
-  Map<String, dynamic> getMarkSeenMessagesArguments(List<int> msgIds) => <String, dynamic>{Base.argumentMessageIds: msgIds};
 
   Map<String, dynamic> getSecureJoinQrArguments(int chatId) => <String, dynamic>{Base.argumentChatId: chatId};
 
