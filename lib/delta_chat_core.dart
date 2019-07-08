@@ -139,6 +139,9 @@ class DeltaChatCore {
   delegateErrorToSubscribers(error) {}
 
   removeListener(int eventId, int listenerId) async {
+    if (listenerId == null) {
+      return;
+    }
     var eventIdSubscribers = _eventChannelSubscribers[eventId];
     eventIdSubscribers[listenerId]?.close();
     eventIdSubscribers.remove(listenerId);
