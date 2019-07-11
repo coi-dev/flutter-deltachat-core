@@ -80,7 +80,7 @@ public class EventChannelHandler implements EventChannel.StreamHandler {
 
             @Override
             public boolean runOnMain() {
-                return false;
+                return true;
             }
         };
     }
