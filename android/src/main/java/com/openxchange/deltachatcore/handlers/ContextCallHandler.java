@@ -97,6 +97,7 @@ public class ContextCallHandler extends AbstractCallHandler {
     private static final String METHOD_CHECK_QR = "context_checkQr";
     private static final String METHOD_STOP_ONGOING_PROCESS = "context_stopOngoingProcess";
     private static final String METHOD_DELETE_MESSAGES = "context_deleteMessages";
+    private static final String METHOD_STAR_MESSAGES = "context_starMessages";
 
     private static final String TYPE_INT = "int";
     private static final String TYPE_STRING = "String";
@@ -230,6 +231,8 @@ public class ContextCallHandler extends AbstractCallHandler {
                 break;
             case METHOD_DELETE_MESSAGES:
                 deleteMessages(methodCall, result);
+            case METHOD_STAR_MESSAGES:
+                starMessages(methodCall, result);
                 break;
             default:
                 result.notImplemented();
@@ -837,4 +840,29 @@ public class ContextCallHandler extends AbstractCallHandler {
         result.success(null);
     }
 
+    private void starMessages(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_MESSAGE_IDS, ARGUMENT_VALUE)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+
+        ArrayList<Integer> msgIdArray = methodCall.argument(ARGUMENT_MESSAGE_IDS);
+        if(msgIdArray == null){
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        Integer star = getArgumentValueAsInt(methodCall, result, ARGUMENT_VALUE);
+        if (!isArgumentIntValueValid(star)) {
+            resultErrorArgumentNoValidInt(result, ARGUMENT_VALUE);
+            return;
+        }
+
+        int[] msgIds = new int[msgIdArray.size()];
+        for (int i = 0; i < msgIds.length; i++) {
+            msgIds[i] = msgIdArray.get(i);
+        }
+
+        dcContext.starMsgs(msgIds, star);
+        result.success(null);
+    }
 }

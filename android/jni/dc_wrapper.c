@@ -579,6 +579,15 @@ JNIEXPORT void Java_com_b44t_messenger_DcContext_forwardMsgs(JNIEnv *env, jobjec
 }
 
 
+JNIEXPORT void Java_com_b44t_messenger_DcContext_starMsgs(JNIEnv *env, jobject obj, jintArray msg_ids, jint star)
+{
+    int msg_ids_cnt = 0;
+    const uint32_t* msg_ids_ptr = jintArray2uint32Pointer(env, msg_ids, &msg_ids_cnt);
+    dc_star_msgs(get_dc_context(env, obj), msg_ids_ptr, msg_ids_cnt, star);
+    free(msg_ids_ptr);
+}
+
+
 JNIEXPORT jint Java_com_b44t_messenger_DcContext_sendMsg(JNIEnv *env, jobject obj, jint chat_id, jobject msg)
 {
 	return dc_send_msg(get_dc_context(env, obj), chat_id, get_dc_msg(env, msg));
@@ -1263,6 +1272,11 @@ JNIEXPORT void Java_com_b44t_messenger_DcMsg_setDimension(JNIEnv *env, jobject o
 JNIEXPORT void Java_com_b44t_messenger_DcMsg_setDuration(JNIEnv *env, jobject obj, int duration)
 {
     dc_msg_set_duration(get_dc_msg(env, obj), duration);
+}
+
+JNIEXPORT jboolean Java_com_b44t_messenger_DcMsg_isStarred(JNIEnv *env, jobject obj)
+{
+    return dc_msg_is_starred(get_dc_msg(env, obj))!=0;
 }
 
 

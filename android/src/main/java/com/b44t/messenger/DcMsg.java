@@ -1,10 +1,10 @@
 package com.b44t.messenger;
 
 
+import androidx.annotation.NonNull;
+
 import java.io.File;
 import java.util.Set;
-
-import androidx.annotation.NonNull;
 
 public class DcMsg {
 
@@ -85,6 +85,7 @@ public class DcMsg {
     public native void    setFile            (String file, String filemime);
     public native void    setDimension       (int width, int height);
     public native void    setDuration        (int duration);
+    public native boolean isStarred          ();
 
     public File getFileAsFile() {
         if(getFile()==null)

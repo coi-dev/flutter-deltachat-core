@@ -86,6 +86,7 @@ class Context {
   static const String methodCheckQr = "context_checkQr";
   static const String methodStopOngoingProcess = "context_stopOngoingProcess";
   static const String methodDeleteMessages = "context_deleteMessages";
+  static const String methodStarMessages = "context_starMessages";
 
   static const String configAddress = "addr";
   static const String configMailServer = "mail_server";
@@ -124,12 +125,17 @@ class Context {
   static const int qrText = 330;
   static const int qrUrl = 332;
   static const int qrError = 400;
-  
+
   static const int showEmailsOff = 0;
   static const int showEmailsAcceptedContacts = 1;
   static const int showEmailsAll = 2;
 
   static const int chatListAddDayMarker = 0x01;
+
+  static const int starMessage = 1;
+  static const int unstarMessage = 0;
+
+
 
   final DeltaChatCore core = DeltaChatCore();
 
@@ -289,6 +295,15 @@ class Context {
     return await core.invokeMethod(methodDeleteMessages, getMessageIdsArguments(msgIds));
   }
 
+  Future<void> starMessages(List<int> msgIds, int star) async {
+    await core.invokeMethod(methodStarMessages, getStarMessagesArguments(msgIds, star));
+    // Manually dispatching Event.msgsChanged as the core currently not supports this.
+    // As soon as this is fixed in the core the following part should get removed.
+    msgIds.forEach((msgId) {
+      core.addStreamEvent(Event(Event.msgsChanged, null, msgId));
+    });
+  }
+
   Map<String, dynamic> getKeyArguments(String key) => <String, dynamic>{Base.argumentKey: key};
 
   Map<String, dynamic> getConfigArguments(String type, String key, value) =>
@@ -337,4 +352,5 @@ class Context {
 
   Map<String, dynamic> getQrTextArguments(String qrText) => <String, dynamic>{Base.argumentQrText: qrText};
 
+  Map<String, dynamic> getStarMessagesArguments(List<int> msgIds, int star) => <String, dynamic>{Base.argumentMessageIds: msgIds, Base.argumentValue: star};
 }
