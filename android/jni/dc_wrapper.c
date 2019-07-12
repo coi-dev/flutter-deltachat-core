@@ -25,8 +25,8 @@
 
 #include <jni.h>
 #include <stdlib.h>
+#include <string.h>
 #include "messenger-backend/src/deltachat.h"
-
 
 static dc_msg_t* get_dc_msg(JNIEnv *env, jobject obj);
 

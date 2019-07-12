@@ -8,6 +8,11 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.b44t.messenger.DcEventCenter;
+import com.openxchange.deltachatcore.mime.ParamHeader;
+import com.openxchange.deltachatcore.mime.DcMimeContext;
+import com.openxchange.deltachatcore.mime.Header;
+import com.openxchange.deltachatcore.mime.Message;
+import com.openxchange.deltachatcore.mime.Mailbox;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -16,6 +21,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -354,9 +360,17 @@ public class NativeInteractionManager extends DcMimeContext {
     }
 
     @Override
-    public void receiveMail(@NonNull Mail mime) {
-        ContentType ct = mime.GetContentType();
-        Log.d("MIME Type", ct == null ? "null" : ct.getType() + "/" + ct.getSubtype());
+    public void receiveMail(@NonNull Message mime) {
+        ParamHeader ct = mime.getContentType();
+        Log.d("MIME type", ct == null ? "null" : ct.toString());
+        Header<List<Mailbox>> from = mime.getHeader("From");
+        if (from != null) for (Mailbox mb: from.getValue()) Log.d("MIME from", mb.address);
+        for (Header h: mime.listHeaders()) {
+            Log.d("MIME header", h.getName() + ": " + h.getValue());
+        }
+        Log.d("MIME parts", "start");
+        for (Message part: mime.getParts()) receiveMail(part);
+        Log.d("MIME parts", "end");
     }
 }
 

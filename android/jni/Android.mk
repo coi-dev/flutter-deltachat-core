@@ -955,7 +955,6 @@ messenger-backend/src/dc_strbuilder.c \
 messenger-backend/src/dc_strencode.c \
 messenger-backend/src/dc_token.c \
 messenger-backend/src/dc_tools.c \
-messenger-backend/src/dc_location.c \
 dc_wrapper.c \
 dc_mime_wrapper.c
 

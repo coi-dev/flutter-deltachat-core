@@ -69,7 +69,7 @@ class _MyAppState extends State<MyApp> {
       bool init = await core.init();
       if (init) {
         _addListItem(text: "Init done");
-
+/*
         Context context2 = Context();
         _addListItem(text: "Context2 created");
         bool isConfigured2 = await context2.isConfigured();
@@ -92,7 +92,7 @@ class _MyAppState extends State<MyApp> {
         _addListItem(text: "getConfigValue mail_password", assertion: "secret", result: getConfigMailPasswordValue2);
         await context2.configure();
         _addListItem(text: "configured");
-
+*/
         Context context = Context();
         _addListItem(text: "Context created");
         bool isConfigured = await context.isConfigured();
@@ -122,10 +122,10 @@ class _MyAppState extends State<MyApp> {
         _addListItem(text: "createContact charlie@mailserver.vagrant", assertion: 11, result: contactId2);
         int chatId = await context.createChatByContactId(contactId);
         _addListItem(text: "createChatByContactId", assertion: 10, result: chatId);
-
+/*
         int messageId = await context.createChatMessage(chatId, "Test message");
         _addListItem(text: "createChatMessage", assertion: 10, result: messageId);
-
+*/
         ChatList chatList = ChatList();
         await chatList.setup();
         int index = 0;
