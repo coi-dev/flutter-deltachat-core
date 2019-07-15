@@ -113,6 +113,7 @@ static jobject to_arraylist(JNIEnv *env, clist *list, mapper_t mapper) {
         if (mapped_value == NULL) continue;
 
         (*env)->CallBooleanMethod(env, arraylist, ArrayList_add, mapped_value);
+        (*env)->DeleteLocalRef(env, mapped_value);
     }
     return arraylist;
 }
@@ -241,7 +242,10 @@ static jobject to_contenttype(JNIEnv *env, struct mailmime_content *content_type
     jstring jvalue = to_string(env, value);
     free(value);
 
-    return (*env)->NewObject(env, ParamHeader, new_ParamHeader, jvalue, params);
+    jobject ret = (*env)->NewObject(env, ParamHeader, new_ParamHeader, jvalue, params);
+    (*env)->DeleteLocalRef(env, params);
+    (*env)->DeleteLocalRef(env, jvalue);
+    return ret;
 }
 
 
@@ -262,8 +266,12 @@ Java_com_openxchange_deltachatcore_mime_Message_getContentType__J(JNIEnv *env, j
 }
 
 static jobject to_mailbox(JNIEnv *env, struct mailimf_mailbox *mailbox) {
-    return (*env)->NewObject(env, Mailbox, new_Mailbox, to_string(env, mailbox->mb_display_name),
-                             to_string(env, mailbox->mb_addr_spec));
+    jstring name = to_string(env, mailbox->mb_display_name);
+    jstring addr = to_string(env, mailbox->mb_addr_spec);
+    jobject ret = (*env)->NewObject(env, Mailbox, new_Mailbox, name, addr);
+    (*env)->DeleteLocalRef(env, name);
+    (*env)->DeleteLocalRef(env, addr);
+    return ret;
 }
 
 
@@ -283,6 +291,7 @@ static jobject to_address(JNIEnv *env, struct mailimf_address *address) {
                            to_arraylist(env, group->grp_mb_list->mb_list, MAPPER(to_mailbox));
             value = (*env)->NewObject(env, MailboxGroup, new_MailboxGroup,
                                       to_string(env, group->grp_display_name), list);
+            (*env)->DeleteLocalRef(env, list);
             break;
         }
         default:
@@ -415,9 +424,12 @@ static jobject to_header(JNIEnv *env, struct mailimf_field *field) {
         case MAILIMF_FIELD_OPTIONAL_FIELD: {
             struct mailimf_optional_field *optional_field = field->fld_data.fld_optional_field;
             if (optional_field == NULL) break;
-            return (*env)->NewObject(env, Header, new_Header,
-                                     to_string(env, optional_field->fld_name),
-                                     to_string(env, optional_field->fld_value));
+            jstring jname = to_string(env, optional_field->fld_name);
+            jstring jvalue = to_string(env, optional_field->fld_value);
+            jobject ret =  (*env)->NewObject(env, Header, new_Header, jname, jvalue);
+            (*env)->DeleteLocalRef(env, jname);
+            (*env)->DeleteLocalRef(env, jvalue);
+            return ret;
         }
         default:break;
     }
@@ -431,7 +443,10 @@ static jobject to_header(JNIEnv *env, struct mailimf_field *field) {
     };
 
     jstring name = to_string(env, HEADER_NAMES[field->fld_type]);
-    return (*env)->NewObject(env, Header, new_Header, name, value);
+    jobject ret = (*env)->NewObject(env, Header, new_Header, name, value);
+    (*env)->DeleteLocalRef(env, name);
+    (*env)->DeleteLocalRef(env, value);
+    return ret;
 }
 
 
@@ -502,8 +517,10 @@ static jobject to_disposition(JNIEnv *env, struct mailmime_disposition *disposit
     }
 
     jstring jtype = to_string(env, type);
-
-    return (*env)->NewObject(env, ParamHeader, new_ParamHeader, jtype, params);
+    jobject ret = (*env)->NewObject(env, ParamHeader, new_ParamHeader, jtype, params);
+    (*env)->DeleteLocalRef(env, jtype);
+    (*env)->DeleteLocalRef(env, params);
+    return ret;
 }
 
 
@@ -569,7 +586,10 @@ static jobject to_mime_header(JNIEnv *env, struct mailmime_field *field) {
     };
 
     jstring name = to_string(env, HEADER_NAMES[field->fld_type]);
-    return (*env)->NewObject(env, Header, new_Header, name, value);
+    jobject ret = (*env)->NewObject(env, Header, new_Header, name, value);
+    (*env)->DeleteLocalRef(env, name);
+    (*env)->DeleteLocalRef(env, value);
+    return ret;
 }
 
 
