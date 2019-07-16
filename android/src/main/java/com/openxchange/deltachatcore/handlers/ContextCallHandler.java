@@ -96,6 +96,8 @@ public class ContextCallHandler extends AbstractCallHandler {
     private static final String METHOD_STOP_ONGOING_PROCESS = "context_stopOngoingProcess";
     private static final String METHOD_DELETE_MESSAGES = "context_deleteMessages";
     private static final String METHOD_STAR_MESSAGES = "context_starMessages";
+    private static final String METHOD_SET_CHAT_NAME = "context_setChatName";
+    private static final String METHOD_SET_CHAT_PROFILE_IMAGE = "context_setChatProfileImage";
 
     private static final String TYPE_INT = "int";
     private static final String TYPE_STRING = "String";
@@ -231,6 +233,12 @@ public class ContextCallHandler extends AbstractCallHandler {
                 deleteMessages(methodCall, result);
             case METHOD_STAR_MESSAGES:
                 starMessages(methodCall, result);
+                break;
+            case METHOD_SET_CHAT_NAME:
+                setChatName(methodCall, result);
+                break;
+            case METHOD_SET_CHAT_PROFILE_IMAGE:
+                setChatProfileImage(methodCall, result);
                 break;
             default:
                 result.notImplemented();
@@ -865,5 +873,35 @@ public class ContextCallHandler extends AbstractCallHandler {
 
         dcContext.starMsgs(msgIds, star);
         result.success(null);
+    }
+
+    private void setChatProfileImage(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_CHAT_ID, ARGUMENT_VALUE)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        Integer chatId = methodCall.argument(ARGUMENT_CHAT_ID);
+        if (chatId == null) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        String newName = methodCall.argument(ARGUMENT_VALUE);
+        Integer coreResult = dcContext.setChatProfileImage(chatId, newName);
+        result.success(coreResult);
+    }
+
+    private void setChatName(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_CHAT_ID, ARGUMENT_VALUE)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        Integer chatId = methodCall.argument(ARGUMENT_CHAT_ID);
+        if (chatId == null) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        String newName = methodCall.argument(ARGUMENT_VALUE);
+        Integer coreResult = dcContext.setChatName(chatId, newName);
+        result.success(coreResult);
     }
 }
