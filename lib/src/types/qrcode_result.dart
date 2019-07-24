@@ -40,22 +40,17 @@
  * for more details.
  */
 
-class QrCodeResult {
-  static const _INDEX_STATE = 0;
-  static const _INDEX_CONTACT_ID = 1;
-  static const _INDEX_TEXT1 = 2;
+import 'lot_mapping.dart';
 
+class QrCodeResult {
   int state;
   int contactId;
   String text;
 
   QrCodeResult.fromMethodChannel(dynamic data) {
-    if (data is! List) {
-      throw ArgumentError("Given data is no List, can't create Event object");
-    }
-    List eventMap = data as List;
-    state = eventMap[_INDEX_STATE];
-    contactId = eventMap[_INDEX_CONTACT_ID];
-    text = eventMap[_INDEX_TEXT1];
+    var lotMapping = LotMapping.fromMethodChannel(data);
+    state = lotMapping.state;
+    contactId = lotMapping.id;
+    text = lotMapping.text1;
   }
 }
