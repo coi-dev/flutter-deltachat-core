@@ -40,48 +40,31 @@
  * for more details.
  */
 
-class Event {
-  static const int info = 100;
-  static const int warning = 300;
-  static const int error = 400;
-  static const int msgsChanged = 2000;
-  static const int incomingMsg = 2005;
-  static const int msgDelivered = 2010;
-  static const int msgFailed = 2012;
-  static const int msgRead = 2015;
-  static const int chatModified = 2020;
-  static const int contactsChanged = 2030;
-  static const int configureProgress = 2041;
-  static const int imexProgress = 2051;
-  static const int imexFileWrite = 2052;
-  static const int secureJoinInviterProgress = 2060;
-  static const int secureJoinJoinerProgress = 2061;
-  static const int isOffline = 2081;
-  static const int getString = 2091;
-  static const int getQuantityString = 2092;
-  static const int httpGet = 2100;
+const indexId = 0;
+const indexText1 = 1;
+const indexText1Meaning = 2;
+const indexText2 = 3;
+const indexTimestamp = 4;
+const indexState = 5;
 
-  static const indexEventId = 0;
-  static const indexData1 = 1;
-  static const indexData2 = 2;
+class LotMapping {
+  int id;
+  String text1;
+  int text1Meaning;
+  String text2;
+  int timestamp;
+  int state;
 
-  int eventId;
-  var data1;
-  var data2;
-
-  Event(this.eventId, this.data1, this.data2);
-
-  Event.fromStream(dynamic data) {
+  LotMapping.fromMethodChannel(dynamic data) {
     if (data is! List) {
-      throw ArgumentError("Given data is no List, can't create Event object");
+      throw ArgumentError("Given data is no List, can't create LotMapping object");
     }
-    List eventMap = data as List;
-    eventId = eventMap[indexEventId];
-    data1 = eventMap[indexData1];
-    data2 = eventMap[indexData2];
-  }
-
-  bool hasType(int type) {
-    return eventId == type;
+    List dataMap = data as List;
+    id = dataMap[indexId];
+    text1 = dataMap[indexText1];
+    text1Meaning = dataMap[indexText1Meaning];
+    text2 = dataMap[indexText2];
+    timestamp = dataMap[indexTimestamp];
+    state = dataMap[indexState];
   }
 }

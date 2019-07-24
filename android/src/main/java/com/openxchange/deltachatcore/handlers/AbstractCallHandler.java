@@ -42,7 +42,14 @@
 
 package com.openxchange.deltachatcore.handlers;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import com.b44t.messenger.DcContext;
+import com.b44t.messenger.DcLot;
+
+import java.util.Arrays;
+import java.util.List;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -134,6 +141,14 @@ abstract public class AbstractCallHandler {
 
     boolean isArgumentIntValueValid(Integer value) {
         return value != null;
+    }
+
+    List<Object> mapLotToList(DcLot lot) {
+        return Arrays.asList(lot.getId(), lot.getText1(), lot.getText1Meaning(), lot.getText2(), lot.getTimestamp(), lot.getState());
+    }
+
+    Handler getUiThreadHandler() {
+        return new Handler(Looper.getMainLooper());
     }
 
     abstract void handleCall(MethodCall methodCall, MethodChannel.Result result);

@@ -49,7 +49,6 @@ import com.b44t.messenger.DcLot;
 import com.b44t.messenger.DcMsg;
 import com.openxchange.deltachatcore.Cache;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -155,8 +154,7 @@ public class ChatListCallHandler extends AbstractCallHandler {
         }
         DcChat chat = dcChatlist.getChat(index);
         DcLot summary = dcChatlist.getSummary(index, chat);
-        List<Object> summaryResult = Arrays.asList(summary.getId(), summary.getText2(), summary.getTimestamp());
-        result.success(summaryResult);
+        result.success(mapLotToList(summary));
     }
 
     private void getChatMsg(DcChatlist dcChatlist, MethodCall methodCall, MethodChannel.Result result) {

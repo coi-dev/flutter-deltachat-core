@@ -50,8 +50,6 @@ import com.b44t.messenger.DcMsg;
 import com.openxchange.deltachatcore.Cache;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -731,7 +729,9 @@ public class ContextCallHandler extends AbstractCallHandler {
     private void initiateKeyTransfer(MethodChannel.Result result) {
         new Thread(() -> {
             String setupKey = dcContext.initiateKeyTransfer();
-            result.success(setupKey);
+            getUiThreadHandler().post(() -> {
+                result.success(setupKey);
+            });
         }).start();
     }
 
@@ -797,7 +797,9 @@ public class ContextCallHandler extends AbstractCallHandler {
         }
         new Thread(() -> {
             int chatId = dcContext.joinSecurejoin(qrText);
-            result.success(chatId);
+            getUiThreadHandler().post(() -> {
+                result.success(chatId);
+            });
         }).start();
     }
 
@@ -813,8 +815,7 @@ public class ContextCallHandler extends AbstractCallHandler {
         }
 
         DcLot qrCode = dcContext.checkQr(qrText);
-        List<Object> summaryResult = Arrays.asList(qrCode.getState(), qrCode.getId(), qrCode.getText1());
-        result.success(summaryResult);
+        result.success(mapLotToList(qrCode));
     }
 
     private void deleteMessages(MethodCall methodCall, MethodChannel.Result result) {

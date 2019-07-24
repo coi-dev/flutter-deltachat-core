@@ -40,22 +40,17 @@
  * for more details.
  */
 
-class ChatSummary {
-  static const _INDEX_SUMMARY_ID = 0;
-  static const _INDEX_TEXT2 = 1;
-  static const _INDEX_TIMESTAMP = 2;
+import 'lot_mapping.dart';
 
+class ChatSummary {
   int summaryId;
   String preview;
   int timestamp;
 
   ChatSummary.fromMethodChannel(dynamic data) {
-    if (data is! List) {
-      throw ArgumentError("Given data is no List, can't create Event object");
-    }
-    List eventMap = data as List;
-    summaryId = eventMap[_INDEX_SUMMARY_ID];
-    preview = eventMap[_INDEX_TEXT2];
-    timestamp = eventMap[_INDEX_TIMESTAMP];
+    var lotMapping = LotMapping.fromMethodChannel(data);
+    summaryId = lotMapping.id;
+    preview = lotMapping.text2;
+    timestamp = lotMapping.timestamp;
   }
 }
