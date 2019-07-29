@@ -87,6 +87,8 @@ class Context {
   static const String methodStopOngoingProcess = "context_stopOngoingProcess";
   static const String methodDeleteMessages = "context_deleteMessages";
   static const String methodStarMessages = "context_starMessages";
+  static const String methodSetChatName = "context_setChatName";
+  static const String methodSetChatProfileImage = "context_setChatProfileImage";
 
   static const String configAddress = "addr";
   static const String configMailServer = "mail_server";
@@ -304,6 +306,14 @@ class Context {
     });
   }
 
+  Future<int> setChatName(int chatId, String newName) async {
+    return await core.invokeMethod(methodSetChatName, getSetNameOrImageArguments(chatId, newName));
+  }
+
+  Future<int> setChatProfileImage(int chatId, String newImagePath) async {
+    return await core.invokeMethod(methodSetChatProfileImage, getSetNameOrImageArguments(chatId, newImagePath));
+  }
+
   Map<String, dynamic> getKeyArguments(String key) => <String, dynamic>{Base.argumentKey: key};
 
   Map<String, dynamic> getConfigArguments(String type, String key, value) =>
@@ -353,4 +363,6 @@ class Context {
   Map<String, dynamic> getQrTextArguments(String qrText) => <String, dynamic>{Base.argumentQrText: qrText};
 
   Map<String, dynamic> getStarMessagesArguments(List<int> msgIds, int star) => <String, dynamic>{Base.argumentMessageIds: msgIds, Base.argumentValue: star};
+
+  Map<String, dynamic> getSetNameOrImageArguments(int chatId, String newValue) => <String, dynamic>{Base.argumentChatId: chatId, Base.argumentValue: newValue};
 }
