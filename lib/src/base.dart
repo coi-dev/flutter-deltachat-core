@@ -119,6 +119,7 @@ abstract class Base {
   }
 
   Future<void> reloadValue(String key, {Map<String, dynamic> arguments, bool removeFromJavaCache = true}) async {
+    var value = get(key);
     remove(key);
     var reloadArguments = arguments ?? getDefaultArguments();
     if (removeFromJavaCache) {
@@ -127,8 +128,10 @@ abstract class Base {
         throw ArgumentError("$argumentId or $argumentRemoveCacheIdentifier is missing. Add required parameters to the reloadValue() call");
       }
     }
-    await loadValue(key, arguments: reloadArguments);
-    setLastUpdate();
+    var newValue = await loadAndGetValue(key, arguments: reloadArguments);
+    if (value != newValue) {
+      setLastUpdate();
+    }
   }
 
   Future<void> reloadValues({List<String> keys, Map<String, Map<String, dynamic>> keysAndArguments}) async {
