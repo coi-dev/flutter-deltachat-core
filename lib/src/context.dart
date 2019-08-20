@@ -89,6 +89,8 @@ class Context {
   static const String methodStarMessages = "context_starMessages";
   static const String methodSetChatName = "context_setChatName";
   static const String methodSetChatProfileImage = "context_setChatProfileImage";
+  static const String methodPerformImap = "context_performImap";
+  static const String methodClose = "context_close";
 
   static const String configAddress = "addr";
   static const String configMailServer = "mail_server";
@@ -137,8 +139,6 @@ class Context {
   static const int starMessage = 1;
   static const int unstarMessage = 0;
 
-
-
   final DeltaChatCore core = DeltaChatCore();
 
   Future<dynamic> getConfigValue(String key, [ObjectType type]) async {
@@ -161,7 +161,7 @@ class Context {
     await core.invokeMethod(methodConfigSet, getConfigArguments(type, key, value));
   }
 
-  Future<dynamic> configure() async {
+  Future<void> configure() async {
     await core.invokeMethod(methodConfigure);
   }
 
@@ -285,11 +285,11 @@ class Context {
     return await core.invokeMethod(methodJoinSecurejoinQr, getQrTextArguments(qrText));
   }
 
-  Future<dynamic> checkQr(String qrText) async {
+  Future<List<dynamic>> checkQr(String qrText) async {
     return await core.invokeMethod(methodCheckQr, getQrTextArguments(qrText));
   }
 
-  Future<dynamic> stopOngoingProcess() async {
+  Future<void> stopOngoingProcess() async {
     return await core.invokeMethod(methodStopOngoingProcess);
   }
 
@@ -312,6 +312,14 @@ class Context {
 
   Future<int> setChatProfileImage(int chatId, String newImagePath) async {
     return await core.invokeMethod(methodSetChatProfileImage, getSetNameOrImageArguments(chatId, newImagePath));
+  }
+
+  Future<void> performImap() async {
+    return await core.invokeMethod(methodPerformImap);
+  }
+
+  Future<void> close() async {
+    return await core.invokeMethod(methodClose);
   }
 
   Map<String, dynamic> getKeyArguments(String key) => <String, dynamic>{Base.argumentKey: key};

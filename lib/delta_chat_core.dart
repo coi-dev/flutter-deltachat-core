@@ -45,15 +45,16 @@ import 'dart:async';
 import 'package:delta_chat_core/src/types/event.dart';
 import 'package:flutter/services.dart';
 
+export 'package:delta_chat_core/src/types/chat_summary.dart';
+export 'package:delta_chat_core/src/types/event.dart';
+export 'package:delta_chat_core/src/types/qrcode_result.dart';
+
 export 'src/base.dart';
 export 'src/chat.dart';
 export 'src/chatlist.dart';
 export 'src/chatmsg.dart';
 export 'src/contact.dart';
 export 'src/context.dart';
-export 'package:delta_chat_core/src/types/event.dart';
-export 'package:delta_chat_core/src/types/chat_summary.dart';
-export 'package:delta_chat_core/src/types/qrcode_result.dart';
 
 class DeltaChatCore {
   static const String channelDeltaChatCore = 'deltaChatCore';
@@ -62,16 +63,22 @@ class DeltaChatCore {
   static const String methodBaseInit = 'base_init';
   static const String methodBaseCoreListener = "base_coreListener";
   static const String methodBaseSetCoreStrings = "base_setCoreStrings";
+  static const String methodBaseStart = "base_start";
+  static const String methodBaseStop = "base_stop";
 
   static const String argumentAdd = "add";
   static const String argumentEventId = "eventId";
   static const String argumentListenerId = "listenerId";
+  static const String argumentDBName = "dbName";
 
   static DeltaChatCore _instance;
 
   final MethodChannel _methodChannel;
   final _eventChannel = EventChannel(channelDeltaChatCoreEvents);
   final _eventChannelSubscribers = Map<int, Map<int, StreamController>>();
+  String _dbPath;
+
+  String get dbPath => _dbPath;
 
   StreamSubscription _eventChannelSubscription;
   bool _init = false;
@@ -93,13 +100,21 @@ class DeltaChatCore {
     return _methodChannel.invokeMethod(method, arguments);
   }
 
-  Future<bool> init() async {
+  Future<bool> init(String dbName) async {
     if (!_init) {
-      await _methodChannel.invokeMethod(methodBaseInit);
+      _dbPath = await _methodChannel.invokeMethod(methodBaseInit, <String, dynamic>{argumentDBName: dbName});
       _init = true;
+      _setupEventChannelListener();
     }
-    _setupEventChannelListener();
     return _init;
+  }
+
+  Future<void> start() async {
+    await _methodChannel.invokeMethod(methodBaseStart);
+  }
+
+  Future<void> stop() async {
+    await _methodChannel.invokeMethod(methodBaseStop);
   }
 
   _setupEventChannelListener() {
@@ -148,8 +163,9 @@ class DeltaChatCore {
     await invokeMethod(methodBaseCoreListener, <String, dynamic>{argumentAdd: false, argumentEventId: eventId, argumentListenerId: listenerId});
   }
 
+  // Manually adds events to the core stream. This shouldn't be required normally, as those events should be produced / captured by the
+  // event channel listening to the DCC
   void addStreamEvent(Event event) {
     delegateEventToSubscribers(event);
   }
-
 }

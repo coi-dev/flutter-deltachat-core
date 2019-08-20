@@ -103,7 +103,7 @@ class ChatList extends Base {
     return await core.invokeMethod(methodChatListGetMsg, getIndexArguments(index));
   }
 
-  Future<dynamic> getChatSummary(int index) async {
+  Future<List<dynamic>> getChatSummary(int index) async {
     return await core.invokeMethod(methodChatListGetSummary, getIndexArguments(index));
   }
 

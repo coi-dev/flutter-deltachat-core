@@ -45,10 +45,14 @@ package com.openxchange.deltachatcore;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
+import android.util.Log;
+
+import static com.openxchange.deltachatcore.DeltaChatCorePlugin.TAG;
+
 
 public class ForegroundDetector implements Application.ActivityLifecycleCallbacks {
 
-    private int activityCounter = 0;
+    private int activityCounter = 1;
     private LifeCycleListener lifeCycleListener;
 
     public ForegroundDetector(Activity activity, LifeCycleListener lifeCycleListener) {
@@ -67,17 +71,17 @@ public class ForegroundDetector implements Application.ActivityLifecycleCallback
     @Override
     public void onActivityStarted(Activity activity) {
         activityCounter++;
+        Log.d(TAG, "App is in foreground");
         lifeCycleListener.onForeground();
     }
 
     @Override
     public void onActivityStopped(Activity activity) {
-        if (activityCounter <= 0) {
-            return;
+        if (activityCounter > 0) {
+            activityCounter--;
         }
-
-        activityCounter--;
         if (activityCounter == 0) {
+            Log.d(TAG, "App is in background");
             lifeCycleListener.onBackground();
         }
     }

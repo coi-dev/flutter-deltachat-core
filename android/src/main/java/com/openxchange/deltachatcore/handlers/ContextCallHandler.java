@@ -54,7 +54,7 @@ import java.util.ArrayList;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
-public class ContextCallHandler extends AbstractCallHandler {
+public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.AbstractCallHandler {
 
     private static final String METHOD_CONFIG_SET = "context_configSet";
     private static final String METHOD_CONFIG_GET = "context_configGet";
@@ -98,6 +98,8 @@ public class ContextCallHandler extends AbstractCallHandler {
     private static final String METHOD_STAR_MESSAGES = "context_starMessages";
     private static final String METHOD_SET_CHAT_NAME = "context_setChatName";
     private static final String METHOD_SET_CHAT_PROFILE_IMAGE = "context_setChatProfileImage";
+    private static final String METHOD_PERFORM_IMAP = "context_performImap";
+    private static final String METHOD_CLOSE = "context_close";
 
     private static final String TYPE_INT = "int";
     private static final String TYPE_STRING = "String";
@@ -217,6 +219,7 @@ public class ContextCallHandler extends AbstractCallHandler {
                 break;
             case METHOD_CONTINUE_KEY_TRANSFER:
                 continueKeyTransfer(methodCall, result);
+                break;
             case METHOD_GET_SECUREJOIN_QR:
                 getSecurejoinQr(methodCall, result);
                 break;
@@ -239,6 +242,12 @@ public class ContextCallHandler extends AbstractCallHandler {
                 break;
             case METHOD_SET_CHAT_PROFILE_IMAGE:
                 setChatProfileImage(methodCall, result);
+                break;
+            case METHOD_PERFORM_IMAP:
+                performImap(result);
+                break;
+            case METHOD_CLOSE:
+                close(result);
                 break;
             default:
                 result.notImplemented();
@@ -711,7 +720,7 @@ public class ContextCallHandler extends AbstractCallHandler {
         result.success(freshMessages);
     }
 
-    private void forwardMessages(MethodCall methodCall, MethodChannel.Result result){
+    private void forwardMessages(MethodCall methodCall, MethodChannel.Result result) {
         if (!hasArgumentKeys(methodCall, ARGUMENT_CHAT_ID, ARGUMENT_MESSAGE_IDS)) {
             resultErrorArgumentMissing(result);
             return;
@@ -722,7 +731,7 @@ public class ContextCallHandler extends AbstractCallHandler {
             return;
         }
         ArrayList<Integer> msgIdArray = methodCall.argument(ARGUMENT_MESSAGE_IDS);
-        if(msgIdArray == null){
+        if (msgIdArray == null) {
             resultErrorArgumentMissingValue(result);
             return;
         }
@@ -766,7 +775,7 @@ public class ContextCallHandler extends AbstractCallHandler {
         }
 
         ArrayList<Integer> msgIdArray = methodCall.argument(ARGUMENT_MESSAGE_IDS);
-        if(msgIdArray == null){
+        if (msgIdArray == null) {
             resultErrorArgumentMissingValue(result);
             return;
         }
@@ -832,7 +841,7 @@ public class ContextCallHandler extends AbstractCallHandler {
             return;
         }
         ArrayList<Integer> msgIdArray = methodCall.argument(ARGUMENT_MESSAGE_IDS);
-        if(msgIdArray == null){
+        if (msgIdArray == null) {
             resultErrorArgumentMissingValue(result);
             return;
         }
@@ -856,7 +865,7 @@ public class ContextCallHandler extends AbstractCallHandler {
         }
 
         ArrayList<Integer> msgIdArray = methodCall.argument(ARGUMENT_MESSAGE_IDS);
-        if(msgIdArray == null){
+        if (msgIdArray == null) {
             resultErrorArgumentMissingValue(result);
             return;
         }
@@ -903,5 +912,17 @@ public class ContextCallHandler extends AbstractCallHandler {
         String newName = methodCall.argument(ARGUMENT_VALUE);
         Integer coreResult = dcContext.setChatName(chatId, newName);
         result.success(coreResult);
+    }
+
+    private void performImap(MethodChannel.Result result) {
+        dcContext.performImapJobs();
+        dcContext.performImapFetch();
+        dcContext.performMvboxFetch();
+        result.success(null);
+    }
+
+    private void close(MethodChannel.Result result) {
+        dcContext.close();
+        result.success(null);
     }
 }

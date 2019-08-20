@@ -43,6 +43,8 @@
 package com.openxchange.deltachatcore;
 
 
+import androidx.annotation.NonNull;
+
 import com.b44t.messenger.DcChat;
 import com.b44t.messenger.DcContact;
 import com.b44t.messenger.DcMsg;
@@ -64,8 +66,9 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 public class DeltaChatCorePlugin implements MethodCallHandler {
-    private static final String LIBRARY_NAME = "native-utils";
+    public static final String TAG = "coi";
 
+    private static final String LIBRARY_NAME = "native-utils";
     private static final String CHANNEL_DELTA_CHAT_CORE = "deltaChatCore";
 
     private static final String METHOD_PREFIX_SEPARATOR = "_";
@@ -74,19 +77,20 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
     private static final String METHOD_PREFIX_CHAT_LIST = "chatList";
     private static final String METHOD_PREFIX_CONTACT = "contact";
     private static final String METHOD_PREFIX_CONTEXT = "context";
-    private static final String METHOD_PREFIX_LOT = "lot";
-    private static final String METHOD_PREFIX_MEDIA = "media";
     private static final String METHOD_PREFIX_MSG = "msg";
 
     private static final String METHOD_BASE_INIT = "base_init";
     private static final String METHOD_BASE_SYSTEM_INFO = "base_systemInfo";
     private static final String METHOD_BASE_CORE_LISTENER = "base_coreListener";
     private static final String METHOD_BASE_SET_CORE_STRINGS = "base_setCoreStrings";
+    private static final String METHOD_BASE_START = "base_start";
+    private static final String METHOD_BASE_STOP = "base_stop";
 
     private static final String ARGUMENT_ADD = "add";
     private static final String ARGUMENT_EVENT_ID = "eventId";
     private static final String ARGUMENT_LISTENER_ID = "listenerId";
     private static final String ARGUMENT_REMOVE_CACHE_IDENTIFIER = "removeCacheIdentifier";
+    private static final String ARGUMENT_DB_NAME = "dbName";
 
     private static final String CACHE_IDENTIFIER_CHAT = "chat";
     private static final String CACHE_IDENTIFIER_CHAT_LIST = "chatList";
@@ -95,7 +99,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
 
 
     private Registrar registrar;
-    private com.openxchange.deltachatcore.NativeInteractionManager nativeInteractionManager;
+    private NativeInteractionManager nativeInteractionManager;
 
     private Cache<DcChat> chatCache = new Cache<>();
     private Cache<DcContact> contactCache = new Cache<>();
@@ -118,7 +122,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
     }
 
     @Override
-    public void onMethodCall(MethodCall methodCall, Result result) {
+    public void onMethodCall(@NonNull MethodCall methodCall, @NonNull Result result) {
         delegateMethodCall(methodCall, result);
     }
 
@@ -177,7 +181,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
     private void handleBaseCalls(MethodCall methodCall, Result result) {
         switch (methodCall.method) {
             case METHOD_BASE_INIT:
-                init(result);
+                init(methodCall, result);
                 break;
             case METHOD_BASE_SYSTEM_INFO:
                 systemInfo(result);
@@ -188,21 +192,31 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
             case METHOD_BASE_SET_CORE_STRINGS:
                 setCoreStrings(methodCall, result);
                 break;
+            case METHOD_BASE_START:
+                start(result);
+                break;
+            case METHOD_BASE_STOP:
+                stop(result);
+                break;
             default:
                 result.notImplemented();
         }
     }
 
-    private void init(Result result) {
+    private void init(MethodCall methodCall, Result result) {
+        String dbName = methodCall.argument(ARGUMENT_DB_NAME);
+        if (dbName == null || dbName.isEmpty()) {
+            throw new IllegalArgumentException("No database name given, exiting.");
+        }
         System.loadLibrary(LIBRARY_NAME);
-        nativeInteractionManager = new com.openxchange.deltachatcore.NativeInteractionManager(registrar.activity());
-        result.success(null);
+        nativeInteractionManager = new NativeInteractionManager(registrar.context(), registrar.activity(), dbName);
         contextCallHandler = new ContextCallHandler(nativeInteractionManager, contactCache, messageCache, chatCache);
         chatListCallHandler = new ChatListCallHandler(nativeInteractionManager, chatCache);
         messageCallHandler = new MessageCallHandler(nativeInteractionManager, contextCallHandler);
         contactCallHandler = new ContactCallHandler(nativeInteractionManager, contextCallHandler);
         chatCallHandler = new ChatCallHandler(nativeInteractionManager, contextCallHandler);
         eventChannelHandler = new EventChannelHandler(nativeInteractionManager, registrar.messenger());
+        result.success(nativeInteractionManager.getDbPath());
     }
 
     private void setCoreStrings(MethodCall methodCall, Result result) {
@@ -232,6 +246,16 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
             eventChannelHandler.removeListener(listenerId);
             result.success(null);
         }
+    }
+
+    private void start(Result result) {
+        nativeInteractionManager.start();
+        result.success(null);
+    }
+
+    private void stop(Result result) {
+        nativeInteractionManager.stop();
+        result.success(null);
     }
 
     private void handleContextCalls(MethodCall methodCall, Result result) {
