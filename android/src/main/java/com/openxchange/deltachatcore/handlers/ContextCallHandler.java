@@ -100,6 +100,14 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
     private static final String METHOD_SET_CHAT_PROFILE_IMAGE = "context_setChatProfileImage";
     private static final String METHOD_PERFORM_IMAP = "context_performImap";
     private static final String METHOD_CLOSE = "context_close";
+    private static final String METHOD_IS_COI_SUPPORTED = "context_isCoiSupported";
+    private static final String METHOD_IS_COI_ENABLED = "context_isCoiEnabled";
+    private static final String METHOD_IS_WEB_PUSH_SUPPORTED = "context_isWebPushSupported";
+    private static final String METHOD_GET_WEB_PUSH_VAPID_KEY = "context_getWebPushVapidKey";
+    private static final String METHOD_SUBSCRIBE_WEB_PUSH = "context_subscribeWebPush";
+    private static final String METHOD_GET_WEB_PUSH_SUBSCRIPTION = "context_getWebPushSubscription";
+    private static final String METHOD_SET_COI_ENABLED = "context_setCoiEnabled";
+    private static final String METHOD_SET_COI_MESSAGE_FILTER = "context_setCoiMessageFilter";
 
     private static final String TYPE_INT = "int";
     private static final String TYPE_STRING = "String";
@@ -234,6 +242,7 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
                 break;
             case METHOD_DELETE_MESSAGES:
                 deleteMessages(methodCall, result);
+                break;
             case METHOD_STAR_MESSAGES:
                 starMessages(methodCall, result);
                 break;
@@ -249,9 +258,114 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
             case METHOD_CLOSE:
                 close(result);
                 break;
+            case METHOD_IS_COI_SUPPORTED:
+                isCoiSupported(result);
+                break;
+            case METHOD_IS_COI_ENABLED:
+                isCoiEnabled(result);
+                break;
+            case METHOD_IS_WEB_PUSH_SUPPORTED:
+                isWebPushSupported(result);
+                break;
+            case METHOD_GET_WEB_PUSH_VAPID_KEY:
+                getWebPushVapidKey(result);
+                break;
+            case METHOD_SUBSCRIBE_WEB_PUSH:
+                subscribeWebPush(methodCall, result);
+                break;
+            case METHOD_GET_WEB_PUSH_SUBSCRIPTION:
+                getWebPushSubscription(methodCall, result);
+                break;
+            case METHOD_SET_COI_ENABLED:
+                setCoiEnabled(methodCall, result);
+                break;
+            case METHOD_SET_COI_MESSAGE_FILTER:
+                setCoiMessageFilter(methodCall, result);
+                break;
             default:
                 result.notImplemented();
         }
+    }
+
+    private void setCoiEnabled(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_ENABLE, ARGUMENT_ID)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        Integer enable = methodCall.argument(ARGUMENT_ENABLE);
+        if (enable == null) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        Integer id = methodCall.argument(ARGUMENT_ID);
+        if (id == null) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        dcContext.setCoiEnabled(enable, id);
+        result.success(null);
+    }
+
+    private void setCoiMessageFilter(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_MODE, ARGUMENT_ID)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        Integer mode = methodCall.argument(ARGUMENT_MODE);
+        if (mode == null) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        Integer id = methodCall.argument(ARGUMENT_ID);
+        if (id == null) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        dcContext.setCoiMessageFilter(mode, id);
+        result.success(null);
+    }
+
+    private void subscribeWebPush(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_UID, ARGUMENT_JSON, ARGUMENT_ID)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        String uid = methodCall.argument(ARGUMENT_UID);
+        if (uid == null || uid.isEmpty()) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        String json = methodCall.argument(ARGUMENT_JSON);
+        if (json == null || json.isEmpty()) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        Integer id = methodCall.argument(ARGUMENT_ID);
+        if (id == null) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        dcContext.subscribeWebPush(uid, json, id);
+        result.success(null);
+    }
+
+    private void getWebPushSubscription(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_UID, ARGUMENT_ID)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        String uid = methodCall.argument(ARGUMENT_UID);
+        if (uid == null || uid.isEmpty()) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        Integer id = methodCall.argument(ARGUMENT_ID);
+        if (id == null) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        dcContext.getWebPushSubscription(uid, id);
+        result.success(null);
     }
 
     private void setConfig(MethodCall methodCall, MethodChannel.Result result) {
@@ -924,5 +1038,25 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
     private void close(MethodChannel.Result result) {
         dcContext.close();
         result.success(null);
+    }
+
+    private void isCoiSupported(MethodChannel.Result result) {
+        int coiSupported = dcContext.isCoiSupported();
+        result.success(coiSupported);
+    }
+
+    private void isCoiEnabled(MethodChannel.Result result) {
+        int coiEnabled = dcContext.isCoiEnabled();
+        result.success(coiEnabled);
+    }
+
+    private void isWebPushSupported(MethodChannel.Result result) {
+        int webPushSupported = dcContext.isWebPushSupported();
+        result.success(webPushSupported);
+    }
+
+    private void getWebPushVapidKey(MethodChannel.Result result) {
+        String webPushVapidKey = dcContext.getWebPushVapidKey();
+        result.success(webPushVapidKey);
     }
 }

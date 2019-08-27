@@ -74,3 +74,6 @@ build/
 # Delta chat core
 android/libs/
 android/obj/
+android/jni/arm64-v8a
+android/jni/armeabi-v7a
+android/jni/x86
