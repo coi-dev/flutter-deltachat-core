@@ -56,17 +56,6 @@ public class NativeInteractionManager extends DcContext {
         open(databaseFile.getAbsolutePath());
 
         if (activity != null) {
-            new ForegroundDetector(activity, new ForegroundDetector.LifeCycleListener() {
-                @Override
-                public void onForeground() {
-                    start();
-                }
-
-                @Override
-                public void onBackground() {
-                    stop();
-                }
-            });
             try {
                 PowerManager powerManager = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
 
