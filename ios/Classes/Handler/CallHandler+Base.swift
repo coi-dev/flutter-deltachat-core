@@ -7,8 +7,16 @@
 
 import Foundation
 
-
 extension CallHandler {
+
+    // MARK: - Initializations
+    
+    fileprivate func baseInit(result : FlutterResult) {
+        openDatabase()
+        result(dbFilePath())
+    }
+
+    // MARK: - Method Call Handling
     
     public func handleBaseCalls(methodCall: FlutterMethodCall, result: FlutterResult) {
         switch (methodCall.method) {
@@ -29,13 +37,10 @@ extension CallHandler {
             _ = FlutterMethodNotImplemented
         }
     }
+
+    // MARK: - Private Helper
     
-    private func baseInit(result : FlutterResult) {
-        open()
-        result(dbfile())
-    }
-    
-    func dbfile() -> String {
+    fileprivate func dbFilePath() -> String {
         let paths = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)
         let documentsPath = paths[0]
         
@@ -43,14 +48,14 @@ extension CallHandler {
     }
 
     // TODO : Schauen was hier passiert und methode selbsterklärend benennen
-    func open() {
+    fileprivate func openDatabase() {
         if mailboxPointer == nil {
             mailboxPointer = dc_context_new(nil, nil, "iOS")
             guard mailboxPointer != nil else {
                 fatalError("Error: dc_context_new returned nil")
             }
         }
-        _ = dc_open(mailboxPointer, dbfile(), nil)
+        _ = dc_open(mailboxPointer, dbFilePath(), nil)
     }
     
     private func coreListener(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -73,11 +78,11 @@ extension CallHandler {
         result(nil)
     }
     
-    private func systemInfo(result: FlutterResult) {
+    fileprivate func systemInfo(result: FlutterResult) {
         result("success")
     }
     
-    private func setCoreStrings(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func setCoreStrings(methodCall: FlutterMethodCall, result: FlutterResult) {
         // TODO: Ask Daniel for NativeInteractionManager
 //        guard let coreStrings = methodCall.arguments else {
 //            return
@@ -88,7 +93,5 @@ extension CallHandler {
 //    result.success(null);
         result(nil)
     }
-    
-    
     
 }

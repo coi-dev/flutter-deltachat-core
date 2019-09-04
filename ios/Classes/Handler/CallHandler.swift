@@ -12,7 +12,7 @@ class CallHandler {
     
     var mailboxPointer: OpaquePointer!
     var chatList: OpaquePointer!
-    
+
     func resultErrorArgumentMissing(result: FlutterResult) {
         result(FlutterError(code: Argument.Error.MISSING, message: "Argument is missing", details: nil))
     }
@@ -37,19 +37,19 @@ class CallHandler {
         result(FlutterError(code: methodCall.method, message: nil, details: nil));
     }
     
-    func hasArgumentKeys(methodCall: FlutterMethodCall, arguments: [String]) -> Bool {
-        guard let args = methodCall.arguments else {
-            return false
-        }
-        for argument in arguments {
-            if let myArgs = args as? [String: Any] {
-                if !(myArgs[argument] != nil) {
-                    return false
-                }
-            }
-        }
-        return true;
-    }
+//    func hasArgumentKeys(methodCall: FlutterMethodCall, arguments: [String]) -> Bool {
+//        guard let args = methodCall.arguments else {
+//            return false
+//        }
+//        for argument in arguments {
+//            if let myArgs = args as? [String: Any] {
+//                if !(myArgs[argument] != nil) {
+//                    return false
+//                }
+//            }
+//        }
+//        return true;
+//    }
     
     func getArgumentValueAsInt(methodCall: FlutterMethodCall, result: FlutterResult, argument: String) -> Int {
         var id: Int?
@@ -57,7 +57,7 @@ class CallHandler {
             fatalError()
         }
         
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [argument])) {
+        if (!methodCall.contains(keys: [argument])) {
             resultErrorArgumentMissing(result: result)
         }
         

@@ -3,7 +3,7 @@ import UIKit
 
 public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
     
-    let callHandler = CallHandler()
+    fileprivate let callHandler = CallHandler()
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "deltaChatCore", binaryMessenger: registrar.messenger())
@@ -12,42 +12,40 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
     }
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        delegateMethodCall(methodCall: call, result: result)
-    }
-    
-    private func delegateMethodCall(methodCall: FlutterMethodCall, result: FlutterResult) {
-        print("MethodCall: \(methodCall.method)")
-        let methodPrefix = extractMethodPrefix(methodCall.method)
+
+        NSLog("MethodCall: \(call.method)")
+        let methodPrefix = prefix(for: call.method)
+
         switch (methodPrefix) {
         case Method.Prefix.BASE:
-            callHandler.handleBaseCalls(methodCall: methodCall, result: result);
+            callHandler.handleBaseCalls(methodCall: call, result: result);
             break;
         case Method.Prefix.CONTEXT:
-            callHandler.handleContextCalls(methodCall: methodCall, result: result)
+            callHandler.handleContextCalls(methodCall: call, result: result)
             break
         case Method.Prefix.CHAT_LIST:
-            callHandler.handleChatListCalls(methodCall: methodCall, result: result)
+            callHandler.handleChatListCalls(methodCall: call, result: result)
             break
         case Method.Prefix.CHAT:
-            callHandler.handleChatCalls(methodCall: methodCall, result: result)
+            callHandler.handleChatCalls(methodCall: call, result: result)
             break
         case Method.Prefix.CONTACT:
-            callHandler.handleContactCalls(methodCall: methodCall, result: result)
+            callHandler.handleContactCalls(methodCall: call, result: result)
             break
         case Method.Prefix.MSG:
-            callHandler.handleMessageCalls(methodCall: methodCall, result: result);
+            callHandler.handleMessageCalls(methodCall: call, result: result);
             break;
         default:
-            print("Failing for \(methodCall.method)")
+            NSLog("Failing for \(call.method)")
             _ = FlutterMethodNotImplemented
         }
+
     }
     
-    private func extractMethodPrefix(_ methodCall: String) -> String {
+    // MARK: - Private Helper
+    
+    fileprivate func prefix(for methodCall: String) -> String {
         return String(methodCall.split(separator: Method.Prefix.SEPERATOR)[0])
     }
     
 }
-
-
-

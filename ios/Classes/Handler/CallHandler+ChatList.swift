@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 extension CallHandler {
     
     func handleChatListCalls(methodCall: FlutterMethodCall, result: FlutterResult) {
