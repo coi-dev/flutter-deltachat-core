@@ -143,3 +143,31 @@ struct Method {
         static let SET_CHAT_PROFILE_IMAGE = "context_setChatProfileImage"
     }
 }
+
+extension Method {
+ 
+    static func errorMissingArgument(result: FlutterResult) {
+        result(FlutterError(code: Argument.Error.MISSING, message: "Argument is missing", details: nil))
+    }
+    
+    static func errorTypeMismatch(for argument: String, result: FlutterResult) {
+        result(FlutterError(code: Argument.Error.TYPE_MISMATCH, message: "Wrong type for argument " + argument, details: nil))
+    }
+    
+    static func errorArgumentMissingValue(result: FlutterResult) {
+        result(FlutterError(code: Argument.Error.MISSING_VALUE, message: "Argument value is missing or null", details: nil))
+    }
+    
+    static func errorNoInt(for argument: String, result: FlutterResult) {
+        result(FlutterError(code: Argument.Error.NO_INT, message: "Argument is no integer: " + argument, details: nil))
+    }
+    
+    static func errorArgumentNoValidInt(result: FlutterResult, argument: String) {
+        result(FlutterError(code: Argument.Error.NO_INT, message: "Argument has no valid int value: " + argument, details: nil))
+    }
+    
+    static func resultErrorGeneric(methodCall: FlutterMethodCall, result: FlutterResult) {
+        result(FlutterError(code: methodCall.method, message: nil, details: nil));
+    }
+
+}

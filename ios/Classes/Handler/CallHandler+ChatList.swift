@@ -31,7 +31,7 @@ extension CallHandler {
             break
         case Method.ChatList.GET_SUMMARY:
             getChatSummary(dcChatlist: chatList, methodCall: methodCall, result: result);
-            break;
+            break
         case Method.ChatList.INTERNAL_TEAR_DOWN:
             tearDown(methodCall: methodCall, result: result)
             break
@@ -42,7 +42,7 @@ extension CallHandler {
         }
     }
     
-    private func setup(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func setup(methodCall: FlutterMethodCall, result: FlutterResult) {
         var chatListFlag: Int
         guard let args = methodCall.arguments else {
             return
@@ -56,20 +56,16 @@ extension CallHandler {
             chatList = dc_get_chatlist(mailboxPointer, Int32(chatListFlag), nil, 0)
             result(1)
         } else {
-            resultErrorArgumentMissing(result: result)
+            Method.errorMissingArgument(result: result)
         }
         
         
     }
     
     private func getChatId(methodCall: FlutterMethodCall, result: FlutterResult) {
-        let index = getArgumentValueAsInt(methodCall: methodCall, result: result, argument: Argument.INDEX);
-        
-        if (!isArgumentIntValueValid(value: index)) {
-            resultErrorArgumentNoInt(result: result, argument: Argument.INDEX)
-            return;
-        }
+        let index = methodCall.intValue(for: Argument.INDEX, result: result)
         let id = dc_chatlist_get_chat_id(chatList, index)
+
         result(id)
     }
     
@@ -78,22 +74,15 @@ extension CallHandler {
     }
     
     private func getChat(methodCall: FlutterMethodCall, result: FlutterResult) {
-        let index = getArgumentValueAsInt(methodCall: methodCall, result: result, argument: Argument.INDEX);
-        if (!isArgumentIntValueValid(value: index)) {
-            resultErrorArgumentNoInt(result: result, argument: Argument.INDEX)
-            return;
-        }
+        let index = methodCall.intValue(for: Argument.INDEX, result: result)
         let chatId = dc_chatlist_get_chat_id(chatList, index)
+
         result(chatId)
     }
     
     private func getChatMsgId(dcChatlist: OpaquePointer, methodCall: FlutterMethodCall, result: FlutterResult) {
-        let index = getArgumentValueAsInt(methodCall: methodCall, result: result, argument: Argument.INDEX)
-        
-        if (!isArgumentIntValueValid(value: index)) {
-            resultErrorArgumentNoValidInt(result: result, argument: Argument.INDEX)
-            return
-        }
+        let index = methodCall.intValue(for: Argument.INDEX, result: result)
+
         result(dc_chatlist_get_msg_id(dcChatlist, index))
     }
     
@@ -113,14 +102,10 @@ extension CallHandler {
     }
     
     private func getChatSummary(dcChatlist: OpaquePointer, methodCall: FlutterMethodCall, result: FlutterResult) {
-        let index = getArgumentValueAsInt(methodCall: methodCall, result: result, argument: Argument.INDEX)
-        
-        if (!isArgumentIntValueValid(value: index)) {
-            resultErrorArgumentNoValidInt(result: result, argument: Argument.INDEX)
-            return
-        }
+        let index = methodCall.intValue(for: Argument.INDEX, result: result)
         let chat = dc_get_chat(dcChatlist, UInt32(index))
         let summary = dc_chatlist_get_summary(dcChatlist, index, chat)
+
         result(summary)
     }
     

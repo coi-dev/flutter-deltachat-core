@@ -22,16 +22,16 @@ extension CallHandler {
         switch (methodCall.method) {
         case Method.Base.INIT:
             baseInit(result: result);
-            break;
+            break
         case Method.Base.SYSTEM_INFO:
             systemInfo(result: result);
-            break;
+            break
         case Method.Base.CORE_LISTENER:
             coreListener(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Base.SET_CORE_STRINGS:
             setCoreStrings(methodCall: methodCall, result: result);
-            break;
+            break
         default:
             print("Base: Failing for \(methodCall.method)")
             _ = FlutterMethodNotImplemented

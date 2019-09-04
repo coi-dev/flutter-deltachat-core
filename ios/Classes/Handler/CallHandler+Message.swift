@@ -13,60 +13,60 @@ extension CallHandler {
         switch (methodCall.method) {
         case Method.Message.GET_ID:
             getId(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Message.GET_TEXT:
             getText(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Message.GET_TIMESTAMP:
             getTimestamp(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Message.GET_CHAT_ID:
             getChatId(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Message.GET_FROM_ID:
             getFromId(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Message.IS_OUTGOING:
             isOutgoing(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Message.HAS_FILE:
             hasFile(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Message.GET_TYPE:
             getType(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Message.GET_FILE:
             getFile(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Message.GET_FILE_BYTES:
             getFileBytes(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Message.GET_FILENAME:
             getFileName(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Message.GET_FILE_MIME:
             getFileMime(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Message.GET_SUMMARY_TEXT:
             getSummaryText(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Message.GET_STATE:
             getState(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Message.IS_SETUP_MESSAGE:
             isSetupMessage(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Message.IS_INFO:
             isInfo(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Message.GET_SETUP_CODE_BEGIN:
             getSetupCodeBegin(methodCall: methodCall, result: result);
         case Method.Message.SHOW_PADLOCK:
             showPadlock(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Message.IS_STARRED:
             isStarred(methodCall: methodCall, result: result);
-            break;
+            break
         default:
             print("Context: Failing for \(methodCall.method)")
             _ = FlutterMethodNotImplemented
@@ -175,7 +175,7 @@ extension CallHandler {
     }
     
     private func getMessage(methodCall: FlutterMethodCall, result: FlutterResult) -> OpaquePointer? {
-        let id = getArgumentValueAsInt(methodCall: methodCall, result: result, argument: Argument.ID);
+        let id = methodCall.intValue(for: Argument.ID, result: result)
         guard let message = dc_get_contact(mailboxPointer, UInt32(id)) else { return nil }
         return message;
     }

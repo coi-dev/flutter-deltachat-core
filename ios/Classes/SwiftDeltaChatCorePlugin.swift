@@ -19,7 +19,7 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         switch (methodPrefix) {
         case Method.Prefix.BASE:
             callHandler.handleBaseCalls(methodCall: call, result: result);
-            break;
+            break
         case Method.Prefix.CONTEXT:
             callHandler.handleContextCalls(methodCall: call, result: result)
             break
@@ -34,7 +34,7 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
             break
         case Method.Prefix.MSG:
             callHandler.handleMessageCalls(methodCall: call, result: result);
-            break;
+            break
         default:
             NSLog("Failing for \(call.method)")
             _ = FlutterMethodNotImplemented

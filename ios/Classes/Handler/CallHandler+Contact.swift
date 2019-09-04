@@ -13,34 +13,34 @@ extension CallHandler {
         switch (methodCall.method) {
         case Method.Contact.GET_ID:
             getId(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Contact.GET_NAME:
             getName(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Contact.GET_DISPLAY_NAME:
             getDisplayName(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Contact.GET_FIRST_NAME:
             getFirstName(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Contact.GET_ADDRESS:
             getAddress(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Contact.GET_NAME_AND_ADDRESS:
             getNameAndAddress(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Contact.GET_PROFILE_IMAGE:
             getProfileImage(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Contact.GET_COLOR:
             getColor(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Contact.IS_BLOCKED:
             isBlocked(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Contact.IS_VERIFIED:
             isVerified(methodCall: methodCall, result: result);
-            break;
+            break
         default:
             print("Context: Failing for \(methodCall.method)")
             _ = FlutterMethodNotImplemented
@@ -91,7 +91,7 @@ extension CallHandler {
     }
     
     private func getContact(methodCall: FlutterMethodCall, result: FlutterResult) -> OpaquePointer {
-        let id = getArgumentValueAsInt(methodCall: methodCall, result: result, argument: Argument.ID);
+        let id = methodCall.intValue(for: Argument.ID, result: result)
     
         return dc_get_contact(mailboxPointer, UInt32(id))
     }

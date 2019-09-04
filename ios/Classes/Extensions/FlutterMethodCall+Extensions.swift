@@ -1,6 +1,6 @@
 //
 //  FlutterMethodCall+Extensions.swift
-//  background_fetch
+//  delta_chat_core
 //
 //  Created by Frank Gregor on 04.09.19.
 //
@@ -22,6 +22,24 @@ extension FlutterMethodCall {
         }
         
         return true
+    }
+    
+    func intValue(for key: String, result: FlutterResult) -> Int {
+        guard let arguments: [String: Any] = arguments as? [String: Any] else {
+            fatalError("No arguments found for method: \(method)")
+        }
+        
+        if !contains(keys: [key]) {
+            Method.errorMissingArgument(result: result)
+            fatalError()
+        }
+        
+        guard let value: Int = arguments[key] as? Int else {
+            Method.errorNoInt(for: key, result: result)
+            fatalError()
+        }
+        
+        return value
     }
     
 }

@@ -13,34 +13,34 @@ extension CallHandler {
         switch (methodCall.method) {
         case Method.Chat.GET_ID:
             getChatId(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Chat.IS_GROUP:
             isGroup(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Chat.GET_ARCHIVED:
             getArchived(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Chat.GET_COLOR:
             getColor(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Chat.GET_NAME:
             getName(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Chat.GET_SUBTITLE:
             getSubtitle(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Chat.GET_PROFILE_IMAGE:
             getProfileImage(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Chat.IS_UNPROMOTED:
             isUnpromoted(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Chat.IS_SELF_TALK:
             isSelfTalk(methodCall: methodCall, result: result);
-            break;
+            break
         case Method.Chat.IS_VERIFIED:
             isVerified(methodCall: methodCall, result: result);
-            break;
+            break
         default:
             print("Context: Failing for \(methodCall.method)")
             _ = FlutterMethodNotImplemented
@@ -103,7 +103,7 @@ extension CallHandler {
     }
     
     private func getChat(methodCall: FlutterMethodCall, result: FlutterResult) -> OpaquePointer {
-        let id = getArgumentValueAsInt(methodCall: methodCall, result: result, argument: Argument.ID);
+        let id = methodCall.intValue(for: Argument.ID, result: result)
         let chat: OpaquePointer = dc_get_chat(mailboxPointer, UInt32(id))
         return chat;
     }
