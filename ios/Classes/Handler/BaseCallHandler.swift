@@ -31,7 +31,8 @@ extension CallHandler {
     }
     
     private func baseInit(result : FlutterResult) {
-        result(open())
+        open()
+        result(dbfile())
     }
     
     func dbfile() -> String {
@@ -40,16 +41,16 @@ extension CallHandler {
         
         return documentsPath + "/messenger.db"
     }
+
     // TODO : Schauen was hier passiert und methode selbsterklärend benennen
-    func open() -> Int32 {
+    func open() {
         if mailboxPointer == nil {
             mailboxPointer = dc_context_new(nil, nil, "iOS")
             guard mailboxPointer != nil else {
                 fatalError("Error: dc_context_new returned nil")
             }
         }
-        let open = dc_open(mailboxPointer, dbfile(), nil)
-        return open
+        _ = dc_open(mailboxPointer, dbfile(), nil)
     }
     
     private func coreListener(methodCall: FlutterMethodCall, result: FlutterResult) {
