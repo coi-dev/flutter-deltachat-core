@@ -57,7 +57,7 @@ class CallHandler {
             fatalError()
         }
         
-        if (!methodCall.contains(keys: [argument])) {
+        if !methodCall.contains(keys: [argument]) {
             resultErrorArgumentMissing(result: result)
         }
         

@@ -25,19 +25,3 @@ extension FlutterMethodCall {
     }
     
 }
-
-/*
-func hasArgumentKeys(methodCall: FlutterMethodCall, arguments: [String]) -> Bool {
-    guard let args = methodCall.arguments else {
-        return false
-    }
-    for argument in arguments {
-        if let myArgs = args as? [String: Any] {
-            if !(myArgs[argument] != nil) {
-                return false
-            }
-        }
-    }
-    return true;
-}
-*/

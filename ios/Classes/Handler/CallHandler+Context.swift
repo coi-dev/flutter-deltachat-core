@@ -147,10 +147,15 @@ extension CallHandler {
         guard let args = methodCall.arguments else {
             return
         }
-        if let myArgs = args as? [String: Any], let someInfo1 = myArgs["key"] as? String, let someInfo2 = myArgs["value"] as? String {
+        
+        if let myArgs = args as? [String: Any],
+            let someInfo1 = myArgs["key"] as? String,
+            let someInfo2 = myArgs["value"] as? String {
+            
             dc_set_config(mailboxPointer, someInfo1, someInfo2)
             result("nil")
-        } else {
+        }
+        else {
             result("iOS could not extract flutter arguments in method: (sendParams)")
         }
     }
@@ -159,7 +164,9 @@ extension CallHandler {
         guard let args = methodCall.arguments else {
             return
         }
-        if let myArgs = args as? [String: Any], let key = myArgs["key"] as? String {
+        if let myArgs = args as? [String: Any],
+            let key = myArgs["key"] as? String {
+            
             switch (type) {
                 case ArgumentType.STRING:
                     let value = dc_get_config(mailboxPointer, key)
@@ -171,6 +178,7 @@ extension CallHandler {
                         result(c)
                     }
                     break;
+                
                 case ArgumentType.INT:
                     let value = dc_get_config(mailboxPointer, key)
                     if let pSafe = value {
@@ -179,7 +187,8 @@ extension CallHandler {
                         result(c)
                     }
                     break;
-            default: break
+                
+                default: break
             }
             
         } else {
@@ -192,17 +201,22 @@ extension CallHandler {
     }
     
     private func addAddressBook(methodCall: FlutterMethodCall, result: FlutterResult) {
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.ADDRESS_BOOK])) {
+        if !methodCall.contains(keys: [Argument.ADDRESS_BOOK]) {
             resultErrorArgumentMissing(result: result);
             return;
         }
+
         guard let args = methodCall.arguments else {
             return
         }
-        if let myArgs = args as? [String: Any], let addressBook = myArgs[Argument.ADDRESS_BOOK] as? String {
+
+        if let myArgs = args as? [String: Any],
+            let addressBook = myArgs[Argument.ADDRESS_BOOK] as? String {
+            
             let changedCount = dc_add_address_book(mailboxPointer, addressBook)
             result(changedCount)
-        } else {
+        }
+        else {
             resultErrorArgumentMissingValue(result: result)
             return;
         }
@@ -213,27 +227,35 @@ extension CallHandler {
         guard let args = methodCall.arguments else {
             return
         }
-        if let myArgs = args as? [String: Any], let address = myArgs["address"] as? String {
+        if let myArgs = args as? [String: Any],
+            let address = myArgs["address"] as? String {
+            
             let name = myArgs["name"] as? String
             let contactId = dc_create_contact(mailboxPointer, name, address)
             result(Int(contactId))
-        } else {
+        }
+        else {
             result(resultErrorArgumentMissingValue(result: result))
         }
     }
     
     private func deleteContact(methodCall: FlutterMethodCall, result: FlutterResult) {
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.ID])) {
+        if !methodCall.contains(keys: [Argument.ID]) {
             resultErrorArgumentMissing(result: result);
             return;
         }
+
         guard let args = methodCall.arguments else {
             return
         }
-        if let myArgs = args as? [String: Any], let contactId = myArgs[Argument.ID] as? UInt32 {
+
+        if let myArgs = args as? [String: Any],
+            let contactId = myArgs[Argument.ID] as? UInt32 {
+            
             let deleted = dc_delete_contact(mailboxPointer, contactId)
             result(deleted)
-        } else {
+        }
+        else {
             resultErrorArgumentMissingValue(result: result)
             return;
         }
@@ -241,17 +263,22 @@ extension CallHandler {
     }
     
     private func blockContact(methodCall: FlutterMethodCall, result: FlutterResult) {
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.ID])) {
+        if !methodCall.contains(keys: [Argument.ID]) {
             resultErrorArgumentMissing(result: result);
             return;
         }
+
         guard let args = methodCall.arguments else {
             return
         }
-        if let myArgs = args as? [String: Any], let contactId = myArgs[Argument.ID] as? UInt32 {
+
+        if let myArgs = args as? [String: Any],
+            let contactId = myArgs[Argument.ID] as? UInt32 {
+            
             dc_block_contact(mailboxPointer, contactId, 1)
             result(nil)
-        } else {
+        }
+        else {
             resultErrorArgumentMissingValue(result: result)
             return;
         }
@@ -265,17 +292,20 @@ extension CallHandler {
     }
     
     private func unblockContact(methodCall: FlutterMethodCall, result: FlutterResult) {
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.ID])) {
+        if !methodCall.contains(keys: [Argument.ID]) {
             resultErrorArgumentMissing(result: result);
             return;
         }
+
         guard let args = methodCall.arguments else {
             return
         }
+        
         if let myArgs = args as? [String: Any], let contactId = myArgs[Argument.ID] as? UInt32 {
             dc_block_contact(mailboxPointer, contactId, 0)
             result(nil)
-        } else {
+        }
+        else {
             resultErrorArgumentMissingValue(result: result)
             return;
         }
@@ -283,18 +313,19 @@ extension CallHandler {
     }
     
     private func createChatByContactId(methodCall: FlutterMethodCall, result: FlutterResult) {
-        
         guard let args = methodCall.arguments else {
             return
         }
         
-        if let myArgs = args as? [String: Any], let contactId = myArgs[Argument.ID] as? UInt32 {
+        if let myArgs = args as? [String: Any],
+            let contactId = myArgs[Argument.ID] as? UInt32 {
+            
             let chatId = dc_create_chat_by_contact_id(mailboxPointer, contactId)
             result(Int(chatId))
-        } else {
+        }
+        else {
             result(resultErrorArgumentMissing(result: result))
         }
-        
     }
     
     private func createChatByMessageId(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -302,10 +333,13 @@ extension CallHandler {
             return
         }
         
-        if let myArgs = args as? [String: Any], let messageId = myArgs[Argument.ID] as? UInt32 {
+        if let myArgs = args as? [String: Any],
+            let messageId = myArgs[Argument.ID] as? UInt32 {
+            
             let chatId = dc_create_chat_by_msg_id(mailboxPointer, messageId)
             result(Int(chatId))
-        } else {
+        }
+        else {
             result(resultErrorArgumentMissing(result: result))
         }
     
@@ -315,18 +349,22 @@ extension CallHandler {
         guard let args = methodCall.arguments else {
             fatalError()
         }
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.VERIFIED, Argument.NAME])) {
+        
+        if !methodCall.contains(keys: [Argument.VERIFIED, Argument.NAME]) {
             result(resultErrorArgumentMissing(result: result))
             return;
         }
+
         if let myArgs = args as? [String: Any] {
             let verified = myArgs[Argument.VERIFIED] as? Bool
             if (verified == nil) {
                 result(resultErrorArgumentMissing(result: result))
                 return;
             }
+            
             let name = myArgs[Argument.NAME] as? String
             let chatId = dc_create_group_chat(mailboxPointer, Int32(truncating: verified! as NSNumber), name)
+            
             result(chatId)
         }
     }
@@ -335,18 +373,23 @@ extension CallHandler {
         guard let args = methodCall.arguments else {
             fatalError()
         }
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.CHAT_ID, Argument.CONTACT_ID])) {
+        
+        if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.CONTACT_ID]) {
             result(resultErrorArgumentMissing(result: result))
             return;
         }
+
         if let myArgs = args as? [String: Any] {
             let chatId = myArgs[Argument.CHAT_ID] as? UInt32
             let contactId = myArgs[Argument.CONTACT_ID] as? UInt32
+            
             if (chatId == nil || contactId == nil) {
                 result(resultErrorArgumentMissing(result: result))
                 return;
             }
+            
             let successfullyAdded = dc_add_contact_to_chat(mailboxPointer, chatId!, contactId!)
+            
             result(successfullyAdded)
         }
         
@@ -356,14 +399,18 @@ extension CallHandler {
         guard let args = methodCall.arguments else {
             fatalError()
         }
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.CONTACT_ID])) {
+        
+        if !methodCall.contains(keys: [Argument.CONTACT_ID]) {
             resultErrorArgumentMissing(result: result);
             return;
         }
-        if let myArgs = args as? [String: Any], let contactId = myArgs[Argument.CONTACT_ID] as? UInt32 {
+
+        if let myArgs = args as? [String: Any],
+            let contactId = myArgs[Argument.CONTACT_ID] as? UInt32 {
             let chatId = dc_get_chat_id_by_contact_id(mailboxPointer, contactId)
             result(chatId)
-        } else {
+        }
+        else {
             resultErrorArgumentMissingValue(result: result);
             return;
         }
@@ -385,18 +432,23 @@ extension CallHandler {
         guard let args = methodCall.arguments else {
             fatalError()
         }
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.FLAGS, Argument.QUERY])) {
+        
+        if !methodCall.contains(keys: [Argument.FLAGS, Argument.QUERY]) {
             result(resultErrorArgumentMissing(result: result))
             return;
         }
+
         if let myArgs = args as? [String: Any] {
             let flags = myArgs[Argument.FLAGS] as? UInt32
             let query = myArgs[Argument.QUERY]  as? String
+            
             if (flags == nil) {
                 result(resultErrorArgumentMissing(result: result))
                 return;
             }
+            
             var contactIds = dc_get_contacts(mailboxPointer, flags!, query)
+            
             result(FlutterStandardTypedData(int32: Data(bytes: &contactIds, count: MemoryLayout.size(ofValue: contactIds))))
         }
         
@@ -406,17 +458,22 @@ extension CallHandler {
         guard let args = methodCall.arguments else {
             fatalError()
         }
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.CHAT_ID])) {
+        
+        if !methodCall.contains(keys: [Argument.CHAT_ID]) {
             result(resultErrorArgumentMissing(result: result))
             return;
         }
+
         if let myArgs = args as? [String: Any] {
             let id = myArgs[Argument.CHAT_ID] as? UInt32
+            
             if id == nil {
                 result(resultErrorArgumentMissing(result: result))
                 return
             }
+            
             var contactIds = dc_get_chat_contacts(mailboxPointer, id!)
+            
             result(FlutterStandardTypedData(int32: Data(bytes: &contactIds, count: MemoryLayout.size(ofValue: contactIds))))
         }
         
@@ -428,13 +485,17 @@ extension CallHandler {
             return
         }
         
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.ID])) {
+        if !methodCall.contains(keys: [Argument.ID]) {
             resultErrorArgumentMissing(result: result);
             return
         }
-        if let myArgs = args as? [String: Any], let id = myArgs[Argument.ID] as? UInt32 {
+
+        if let myArgs = args as? [String: Any],
+            let id = myArgs[Argument.ID] as? UInt32 {
+            
             result(dc_get_chat(mailboxPointer, id))
-        } else {
+        }
+        else {
             resultErrorArgumentMissing(result: result);
         }
     }
@@ -444,13 +505,18 @@ extension CallHandler {
             resultErrorArgumentMissing(result: result)
             return
         }
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.CHAT_ID])) {
+        
+        if !methodCall.contains(keys: [Argument.CHAT_ID]) {
             resultErrorArgumentMissing(result: result);
             return
         }
-        if let myArgs = args as? [String: Any], let chatId = myArgs[Argument.CHAT_ID] as? UInt32, let flags = myArgs[Argument.FLAGS] {
+
+        if let myArgs = args as? [String: Any],
+            let chatId = myArgs[Argument.CHAT_ID] as? UInt32,
+            let flags = myArgs[Argument.FLAGS] {
             //result(dc_get_chat(mailboxPointer, chatId))
-        } else {
+        }
+        else {
             resultErrorArgumentMissing(result: result);
         }
 //        Integer id = methodCall.argument(ARGUMENT_CHAT_ID);
@@ -480,15 +546,19 @@ extension CallHandler {
             resultErrorArgumentMissing(result: result)
             return
         }
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.CHAT_ID, Argument.TEXT])) {
+        
+        if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.TEXT]) {
             resultErrorArgumentMissing(result: result);
             return
         }
         
-        if let myArgs = args as? [String: Any], let chatId = myArgs[Argument.CHAT_ID] as? UInt32, let flags = myArgs[Argument.TEXT] {
+        if let myArgs = args as? [String: Any],
+            let chatId = myArgs[Argument.CHAT_ID] as? UInt32,
+            let flags = myArgs[Argument.TEXT] {
             //result(dc_get_chat(mailboxPointer, chatId))
             
-        } else {
+        }
+        else {
             resultErrorArgumentMissing(result: result);
         }
         
@@ -511,14 +581,21 @@ extension CallHandler {
             resultErrorArgumentMissing(result: result)
             return
         }
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.CHAT_ID, Argument.TYPE, Argument.PATH, Argument.TEXT])) {
+        
+        if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.TYPE, Argument.PATH, Argument.TEXT]) {
             resultErrorArgumentMissing(result: result);
             return;
         }
-        if let myArgs = args as? [String: Any], let chatId = myArgs[Argument.CHAT_ID] as? UInt32, let path = myArgs[Argument.PATH], let type = myArgs[Argument.TYPE] {
+
+        if let myArgs = args as? [String: Any],
+            let chatId = myArgs[Argument.CHAT_ID] as? UInt32,
+            let path = myArgs[Argument.PATH],
+            let type = myArgs[Argument.TYPE] {
+            
             let text = myArgs[Argument.TEXT]
             
-        } else {
+        }
+        else {
             resultErrorArgumentMissing(result: result);
         }
         
@@ -543,17 +620,22 @@ extension CallHandler {
         guard let args = methodCall.arguments else {
             fatalError()
         }
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.CHAT_ID])) {
+        
+        if !methodCall.contains(keys: [Argument.CHAT_ID]) {
             result(resultErrorArgumentMissing(result: result))
             return;
         }
+
         if let myArgs = args as? [String: Any] {
             let chatId = myArgs[Argument.CHAT_ID] as? UInt32
+
             if chatId == nil {
                 result(resultErrorArgumentMissing(result: result))
                 return
             }
+
             let freshMessageCount = dc_get_fresh_msg_cnt(mailboxPointer, chatId!)
+
             result(freshMessageCount)
         }
         
@@ -563,16 +645,20 @@ extension CallHandler {
         guard let args = methodCall.arguments else {
             fatalError()
         }
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.CHAT_ID])) {
+        
+        if !methodCall.contains(keys: [Argument.CHAT_ID]) {
             result(resultErrorArgumentMissing(result: result))
             return;
         }
+
         if let myArgs = args as? [String: Any] {
             let chatId = myArgs[Argument.CHAT_ID] as? UInt32
+
             if chatId == nil {
                 result(resultErrorArgumentMissing(result: result))
                 return
             }
+
             dc_marknoticed_chat(mailboxPointer, chatId!)
             result(nil)
         }
@@ -583,16 +669,20 @@ extension CallHandler {
         guard let args = methodCall.arguments else {
             fatalError()
         }
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.CHAT_ID])) {
+        
+        if !methodCall.contains(keys: [Argument.CHAT_ID]) {
             result(resultErrorArgumentMissing(result: result))
             return;
         }
+
         if let myArgs = args as? [String: Any] {
             let chatId = myArgs[Argument.CHAT_ID] as? UInt32
+
             if chatId == nil {
                 result(resultErrorArgumentMissing(result: result))
                 return
             }
+
             dc_delete_chat(mailboxPointer, chatId!)
             result(nil)
         }
@@ -604,13 +694,16 @@ extension CallHandler {
             resultErrorArgumentMissing(result: result);
             return
         }
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.CHAT_ID, Argument.CONTACT_ID])) {
+        
+        if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.CONTACT_ID]) {
             resultErrorArgumentMissing(result: result);
             return;
         }
+
         if let myArgs = args as? [String: Any], let chatId = myArgs[Argument.CHAT_ID], let contactId = myArgs[Argument.CONTACT_ID] {
             result(dc_remove_contact_from_chat(mailboxPointer, chatId as! UInt32, contactId as! UInt32))
-        } else {
+        }
+        else {
             resultErrorArgumentMissing(result: result);
         }
     
@@ -626,14 +719,17 @@ extension CallHandler {
             resultErrorArgumentMissing(result: result);
             return
         }
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.CHAT_ID, Argument.MESSAGE_IDS])) {
+        
+        if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.MESSAGE_IDS]) {
             resultErrorArgumentMissing(result: result);
             return;
         }
+
         if let myArgs = args as? [String: Any], let chatId = myArgs[Argument.CHAT_ID], let msgIdArray = myArgs[Argument.MESSAGE_IDS] {
             
             result(dc_forward_msgs(mailboxPointer, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count), chatId as! UInt32))
-        } else {
+        }
+        else {
             resultErrorArgumentMissing(result: result);
         }
 
@@ -644,13 +740,16 @@ extension CallHandler {
             resultErrorArgumentMissing(result: result);
             return
         }
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.MESSAGE_IDS])) {
+        
+        if !methodCall.contains(keys: [Argument.MESSAGE_IDS]) {
             resultErrorArgumentMissing(result: result);
             return;
         }
+
         if let myArgs = args as? [String: Any], let msgIdArray = myArgs[Argument.MESSAGE_IDS] {
             result(dc_markseen_msgs(mailboxPointer, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count)))
-        } else {
+        }
+        else {
             resultErrorArgumentMissing(result: result);
         }
     
@@ -670,13 +769,19 @@ extension CallHandler {
             resultErrorArgumentMissing(result: result);
             return
         }
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.ID, Argument.SETUP_CODE])) {
+        
+        if !methodCall.contains(keys: [Argument.ID, Argument.SETUP_CODE]) {
             resultErrorArgumentMissing(result: result);
             return;
         }
-        if let myArgs = args as? [String: Any], let messageId = myArgs[Argument.ID], let setupCode = myArgs[Argument.SETUP_CODE] {
+
+        if let myArgs = args as? [String: Any],
+            let messageId = myArgs[Argument.ID],
+            let setupCode = myArgs[Argument.SETUP_CODE] {
+            
             result(dc_continue_key_transfer(mailboxPointer, messageId as! UInt32, setupCode as? UnsafePointer<Int8>))
-        } else {
+        }
+        else {
             resultErrorArgumentMissing(result: result);
         }
         
@@ -687,13 +792,17 @@ extension CallHandler {
             resultErrorArgumentMissing(result: result);
             return
         }
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.CHAT_ID])) {
+        
+        if !methodCall.contains(keys: [Argument.CHAT_ID]) {
             resultErrorArgumentMissing(result: result);
             return;
         }
-        if let myArgs = args as? [String: Any], let chatId = myArgs[Argument.CHAT_ID] {
+
+        if let myArgs = args as? [String: Any],
+            let chatId = myArgs[Argument.CHAT_ID] {
             result(dc_get_securejoin_qr(mailboxPointer, chatId as! UInt32))
-        } else {
+        }
+        else {
             resultErrorArgumentMissing(result: result);
         }
     
@@ -704,18 +813,22 @@ extension CallHandler {
             resultErrorArgumentMissing(result: result);
             return
         }
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.QR_TEXT])) {
+        
+        if !methodCall.contains(keys: [Argument.QR_TEXT]) {
             resultErrorArgumentMissing(result: result);
             return;
         }
-        if let myArgs = args as? [String: Any], let qrText = myArgs[Argument.QR_TEXT] {
+
+        if let myArgs = args as? [String: Any],
+            let qrText = myArgs[Argument.QR_TEXT] {
 //            new Thread(() -> {
 //                int chatId = dcContext.joinSecurejoin(qrText);
 //                getUiThreadHandler().post(() -> {
 //                    result.success(chatId);
 //                    });
 //                }).start();
-        } else {
+        }
+        else {
             resultErrorArgumentMissing(result: result);
         }
     
@@ -726,14 +839,18 @@ extension CallHandler {
             resultErrorArgumentMissing(result: result);
             return
         }
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.QR_TEXT])) {
+        
+        if !methodCall.contains(keys: [Argument.QR_TEXT]) {
             resultErrorArgumentMissing(result: result);
             return;
         }
-        if let myArgs = args as? [String: Any], let qrText = myArgs[Argument.QR_TEXT] {
+
+        if let myArgs = args as? [String: Any],
+            let qrText = myArgs[Argument.QR_TEXT] {
 //            DcLot qrCode = dcContext.checkQr(qrText);
 //            result.success(mapLotToList(qrCode));
-        } else {
+        }
+        else {
             resultErrorArgumentMissing(result: result);
         }
     
@@ -744,13 +861,17 @@ extension CallHandler {
             resultErrorArgumentMissing(result: result);
             return
         }
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.MESSAGE_IDS])) {
+        
+        if !methodCall.contains(keys: [Argument.MESSAGE_IDS]) {
             resultErrorArgumentMissing(result: result);
             return;
         }
-        if let myArgs = args as? [String: Any], let msgIdArray = myArgs[Argument.MESSAGE_IDS] {
+
+        if let myArgs = args as? [String: Any],
+            let msgIdArray = myArgs[Argument.MESSAGE_IDS] {
             result(dc_delete_msgs(mailboxPointer, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count)))
-        } else {
+        }
+        else {
             resultErrorArgumentMissing(result: result);
         }
     
@@ -761,19 +882,27 @@ extension CallHandler {
             resultErrorArgumentMissing(result: result);
             return
         }
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.MESSAGE_IDS, Argument.VALUE])) {
+        
+        if !methodCall.contains(keys: [Argument.MESSAGE_IDS, Argument.VALUE]) {
             resultErrorArgumentMissing(result: result);
             return;
         }
-        if let myArgs = args as? [String: Any], let msgIdArray = myArgs[Argument.MESSAGE_IDS], let value = myArgs[Argument.VALUE] {
+
+        if let myArgs = args as? [String: Any],
+            let msgIdArray = myArgs[Argument.MESSAGE_IDS],
+            let value = myArgs[Argument.VALUE] {
+            
             let star = getArgumentValueAsInt(methodCall: methodCall, result: result, argument: Argument.VALUE)
+
             if (!isArgumentIntValueValid(value: star)) {
                 resultErrorArgumentNoValidInt(result: result, argument: Argument.VALUE)
                 return
             }
+
             dc_star_msgs(mailboxPointer, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count), Int32(star))
             result(nil)
-        } else {
+        }
+        else {
             resultErrorArgumentMissing(result: result);
         }
     
@@ -784,14 +913,20 @@ extension CallHandler {
             resultErrorArgumentMissing(result: result);
             return
         }
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.CHAT_ID, Argument.VALUE])) {
+        
+        if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.VALUE]) {
             resultErrorArgumentMissing(result: result);
             return;
         }
-        if let myArgs = args as? [String: Any], let chatId = myArgs[Argument.CHAT_ID], let value = myArgs[Argument.VALUE] {
+
+        if let myArgs = args as? [String: Any],
+            let chatId = myArgs[Argument.CHAT_ID],
+            let value = myArgs[Argument.VALUE] {
+            
             dc_set_chat_profile_image(mailboxPointer, chatId as! UInt32, value as? UnsafePointer<Int8>)
             result(nil)
-        } else {
+        }
+        else {
             resultErrorArgumentMissing(result: result)
             return
         }
@@ -803,14 +938,20 @@ extension CallHandler {
             resultErrorArgumentMissing(result: result);
             return
         }
-        if (!hasArgumentKeys(methodCall: methodCall, arguments: [Argument.CHAT_ID, Argument.VALUE])) {
+        
+        if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.VALUE]) {
             resultErrorArgumentMissing(result: result);
             return;
         }
-        if let myArgs = args as? [String: Any], let chatId = myArgs[Argument.CHAT_ID], let value = myArgs[Argument.VALUE] {
+
+        if let myArgs = args as? [String: Any],
+            let chatId = myArgs[Argument.CHAT_ID],
+            let value = myArgs[Argument.VALUE] {
+            
             dc_set_chat_name(mailboxPointer, chatId as! UInt32, value as? UnsafePointer<Int8>)
             result(nil)
-        } else {
+        }
+        else {
             resultErrorArgumentMissing(result: result)
             return
         }
