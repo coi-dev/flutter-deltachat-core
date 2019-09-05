@@ -14,12 +14,11 @@ Pod::Spec.new do |s|
   s.dependency 'Flutter'
   
   s.xcconfig = {
-    'HEADER_SEARCH_PATHS' => '"$(SRCROOT)/../.symlinks/plugins/delta_chat_core/ios/Classes" "$(SRCROOT)/../.symlinks/plugins/delta_chat_core/ios/Libraries"',
-    'LIBRARY_SEARCH_PATHS' => '"$(SRCROOT)/../.symlinks/plugins/delta_chat_core/ios/Libraries/"',
+    'HEADER_SEARCH_PATHS': '"$(SRCROOT)/../.symlinks/plugins/delta_chat_core/ios/Classes" "$(SRCROOT)/../.symlinks/plugins/delta_chat_core/ios/Libraries"',
+    'LIBRARY_SEARCH_PATHS': '"$(SRCROOT)/../.symlinks/plugins/delta_chat_core/ios/Libraries/"',
   }
   
   s.description = <<-DESC
 A Flutter plugin for COI (Chat Over IMAP) via the DeltaChat Core library.
 DESC
 end
-
