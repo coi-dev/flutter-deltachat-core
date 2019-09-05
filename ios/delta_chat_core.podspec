@@ -9,13 +9,13 @@ Pod::Spec.new do |s|
   s.license               = { :file => '../LICENSE' }
   s.author                = { 'Open-Xchange GmbH' => 'info@open-xchange.com' }
   s.source                = { :path => '.' }
-  s.source_files          = '*.a', 'Classes/**/*.{h,m,swift}', 'Libraries/**/*.{c,h,m}'
+  s.source_files          = 'Libraries/*.a', 'Classes/**/*.{h,m,swift}', 'Libraries/**/*.h'
   s.public_header_files   = 'Classes/**/*.h', 'Libraries/**/*.h'
   s.dependency 'Flutter'
   
   s.xcconfig = {
     'HEADER_SEARCH_PATHS' => '"$(SRCROOT)/../.symlinks/plugins/delta_chat_core/ios/Classes" "$(SRCROOT)/../.symlinks/plugins/delta_chat_core/ios/Libraries"',
-    'LIBRARY_SEARCH_PATHS' => '"$(SRCROOT)/../.symlinks/plugins/delta_chat_core/ios/Classes" "$(SRCROOT)/../.symlinks/plugins/delta_chat_core/ios/Libraries"',
+    'LIBRARY_SEARCH_PATHS' => '"$(SRCROOT)/../.symlinks/plugins/delta_chat_core/ios/Libraries/"',
   }
   
   s.description = <<-DESC
