@@ -1,6 +1,6 @@
 [submodule "android/jni/messenger-backend"]
 	path = android/jni/messenger-backend
 	url = https://github.com/open-xchange/deltachat-core
-[submodule "ios/Classes/libraries/deltachat-core-rust"]
-	path = ios/Classes/libraries/deltachat-core-rust
+[submodule "ios/Libraries/delta_chat_core"]
+	path = ios/Libraries/delta_chat_core
 	url = https://github.com/deltachat/deltachat-core-rust.git
