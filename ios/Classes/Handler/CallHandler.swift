@@ -5,7 +5,6 @@
 //  Created by Cihan Oezkan on 12.08.19.
 //
 
-import Flutter
 import UIKit
 
 class CallHandler {
