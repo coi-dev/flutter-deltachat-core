@@ -145,11 +145,11 @@ struct Method {
 }
 
 extension Method {
- 
+    
     static func errorMissingArgument(result: FlutterResult) {
         result(FlutterError(code: Argument.Error.MISSING, message: "Argument is missing", details: nil))
     }
-    
+
     static func errorTypeMismatch(for argument: String, result: FlutterResult) {
         result(FlutterError(code: Argument.Error.TYPE_MISMATCH, message: "Wrong type for argument " + argument, details: nil))
     }

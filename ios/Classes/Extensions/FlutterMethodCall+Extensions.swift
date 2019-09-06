@@ -8,7 +8,7 @@
 import Foundation
 import Flutter
 
-typealias MethodCallParameters = [String: Any]
+typealias MethodCallParameters = [String: Any?]
 
 extension MethodCallParameters {
 }
@@ -21,23 +21,17 @@ extension FlutterMethodCall {
         guard let arguments: MethodCallParameters = arguments as? MethodCallParameters else {
             return [:]
         }
-        
         return arguments
     }
     
     // MARK: - Helper
 
     func contains(keys: [String]) -> Bool {
-        guard let arguments: MethodCallParameters = arguments as? MethodCallParameters else {
-            return false
-        }
-        
         for key in keys {
-            if (nil == arguments[key]) {
+            if (!parameters.keys.contains(key)) {
                 return false
             }
         }
-        
         return true
     }
     
