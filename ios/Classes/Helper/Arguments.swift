@@ -9,27 +9,31 @@ import Foundation
 
 
 struct Argument {
-    
+
     static let ID                = "id"
-    static let TYPE              = "type";
-    static let KEY               = "key";
-    static let VALUE             = "value";
-    static let ADDRESS           = "address";
-    static let CACHE_ID          = "cacheId";
-    static let VERIFIED          = "verified";
-    static let NAME              = "name";
-    static let INDEX             = "index";
-    static let FLAGS             = "flags";
-    static let QUERY             = "query";
-    static let ADDRESS_BOOK      = "addressBook";
-    static let CONTACT_ID        = "contactId";
-    static let CHAT_ID           = "chatId";
-    static let PATH              = "path";
-    static let TEXT              = "text";
-    static let COUNT             = "count";
-    static let MESSAGE_IDS       = "messageIds";
-    static let SETUP_CODE        = "setupCode";
-    static let QR_TEXT           = "qrText";
+    static let TYPE              = "type"
+    static let KEY               = "key"
+    static let VALUE             = "value"
+    static let ADDRESS           = "address"
+    static let CACHE_ID          = "cacheId"
+    static let VERIFIED          = "verified"
+    static let NAME              = "name"
+    static let INDEX             = "index"
+    static let FLAGS             = "flags"
+    static let QUERY             = "query"
+    static let ADDRESS_BOOK      = "addressBook"
+    static let CONTACT_ID        = "contactId"
+    static let CHAT_ID           = "chatId"
+    static let PATH              = "path"
+    static let TEXT              = "text"
+    static let COUNT             = "count"
+    static let MESSAGE_IDS       = "messageIds"
+    static let SETUP_CODE        = "setupCode"
+    static let QR_TEXT           = "qrText"
+
+    static let ADD               = "add"
+    static let EVENT_ID          = "eventId"
+    static let LISTENER_ID       = "listenerId"
     
     struct Error {
         static let MISSING       = "1"
@@ -42,5 +46,5 @@ struct Argument {
 
 struct ArgumentType {
     static let INT    = "int"
-    static let STRING = "string"
+    static let STRING = "String"
 }

@@ -144,16 +144,13 @@ extension CallHandler {
     }
     
     private func setConfig(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            return
-        }
-        
-        if let myArgs = args as? [String: Any],
-            let someInfo1 = myArgs["key"] as? String,
-            let someInfo2 = myArgs["value"] as? String {
+        let parameters = methodCall.parameters
+
+        if let key = parameters["key"] as? String,
+            let value = parameters["value"] as? String {
             
-            dc_set_config(mailboxPointer, someInfo1, someInfo2)
-            result("nil")
+            let dc_result = dcConfig.set(value: value, for: key)
+            result(NSNumber(value: dc_result))
         }
         else {
             result("iOS could not extract flutter arguments in method: (sendParams)")
@@ -161,11 +158,9 @@ extension CallHandler {
     }
     
     private func getConfig(methodCall: FlutterMethodCall, result: FlutterResult, type: String) {
-        guard let args = methodCall.arguments else {
-            return
-        }
-        if let myArgs = args as? [String: Any],
-            let key = myArgs["key"] as? String {
+        let parameters = methodCall.parameters
+        
+        if let key = parameters["key"] as? String {
             
             switch (type) {
                 case ArgumentType.STRING:
@@ -206,15 +201,12 @@ extension CallHandler {
             return
         }
 
-        guard let args = methodCall.arguments else {
-            return
-        }
-
-        if let myArgs = args as? [String: Any],
-            let addressBook = myArgs[Argument.ADDRESS_BOOK] as? String {
+        let parameters = methodCall.parameters
+        
+        if let addressBook = parameters[Argument.ADDRESS_BOOK] as? String {
             
-            let changedCount = dc_add_address_book(mailboxPointer, addressBook)
-            result(changedCount)
+            let dc_result = dc_add_address_book(mailboxPointer, addressBook)
+            result(dc_result)
         }
         else {
             Method.errorArgumentMissingValue(result: result)

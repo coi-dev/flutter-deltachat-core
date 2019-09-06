@@ -8,10 +8,27 @@
 import Foundation
 import Flutter
 
+typealias MethodCallParameters = [String: Any]
+
+extension MethodCallParameters {
+}
+
 extension FlutterMethodCall {
     
+    // MARK: - Computed Properties
+    
+    var parameters: MethodCallParameters {
+        guard let arguments: MethodCallParameters = arguments as? MethodCallParameters else {
+            return [:]
+        }
+        
+        return arguments
+    }
+    
+    // MARK: - Helper
+
     func contains(keys: [String]) -> Bool {
-        guard let arguments: [String: Any] = arguments as? [String: Any] else {
+        guard let arguments: MethodCallParameters = arguments as? MethodCallParameters else {
             return false
         }
         
@@ -24,8 +41,10 @@ extension FlutterMethodCall {
         return true
     }
     
+    // MARK: - Parameter Values
+    
     func intValue(for key: String, result: FlutterResult) -> Int {
-        guard let arguments: [String: Any] = arguments as? [String: Any] else {
+        guard let arguments: MethodCallParameters = arguments as? MethodCallParameters else {
             fatalError("No arguments found for method: \(method)")
         }
         
@@ -40,6 +59,15 @@ extension FlutterMethodCall {
         }
         
         return value
+    }
+    
+    func value(for key: String, result: FlutterResult) -> Any? {
+        if contains(keys: [key]) {
+            return parameters[key] as? String
+        }
+
+        Method.errorMissingArgument(result: result);
+        return nil
     }
     
 }

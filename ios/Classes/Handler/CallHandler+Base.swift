@@ -9,11 +9,18 @@ import Foundation
 
 extension CallHandler {
 
+    // MARK: - Computed Properties
+    
+    fileprivate var dbFilePath: String {
+        let paths = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)
+        return "\(paths[0])/messenger.db"
+    }
+
     // MARK: - Initializations
     
     fileprivate func baseInit(result : FlutterResult) {
         openDatabase()
-        result(dbFilePath())
+        result(dbFilePath)
     }
 
     // MARK: - Method Call Handling
@@ -39,13 +46,6 @@ extension CallHandler {
     }
 
     // MARK: - Private Helper
-    
-    fileprivate func dbFilePath() -> String {
-        let paths = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)
-        let documentsPath = paths[0]
-        
-        return documentsPath + "/messenger.db"
-    }
 
     // TODO : Schauen was hier passiert und methode selbsterklärend benennen
     fileprivate func openDatabase() {
@@ -55,10 +55,29 @@ extension CallHandler {
                 fatalError("Error: dc_context_new returned nil")
             }
         }
-        _ = dc_open(mailboxPointer, dbFilePath(), nil)
+        _ = dc_open(mailboxPointer, dbFilePath, nil)
     }
     
     private func coreListener(methodCall: FlutterMethodCall, result: FlutterResult) {
+        guard let add: Bool = methodCall.value(for: Argument.ADD, result: result) as? Bool,
+            let eventId: Int = methodCall.value(for: Argument.EVENT_ID, result: result) as? Int else {
+                result(nil)
+                return
+        }
+        
+        // Add a new Listener
+        if true == add {
+            let listenerId = Int(1 /* TODO: Add new Listener here */)
+            result(listenerId)
+        }
+        
+        // Remove a given Listener
+        if let listenerId: Int = methodCall.value(for: Argument.LISTENER_ID, result: result) as? Int {
+            // TODO: Add logic to remove the listener with listenerId
+        }
+        
+        result(nil)
+
         //        Boolean add = methodCall.argument(ARGUMENT_ADD);
         //        Integer eventId = methodCall.argument(ARGUMENT_EVENT_ID);
         //        Integer listenerId = methodCall.argument(ARGUMENT_LISTENER_ID);
@@ -75,7 +94,6 @@ extension CallHandler {
         //        eventChannelHandler.removeListener(listenerId);
         //        result.success(null);
         //        }
-        result(nil)
     }
     
     fileprivate func systemInfo(result: FlutterResult) {

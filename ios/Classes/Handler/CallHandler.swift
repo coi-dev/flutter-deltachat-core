@@ -11,5 +11,7 @@ class CallHandler {
     
     var mailboxPointer: OpaquePointer!
     var chatList: OpaquePointer!
-    
+
+    var dcConfig: DCConfig = DCConfig()
+
 }
