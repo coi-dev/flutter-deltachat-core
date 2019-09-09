@@ -13,7 +13,7 @@ disabled_rules:
   - xctfail_message
   - line_length
 excluded:
-  - Pods/SwiftyBeaver
+  - SwiftyBeaver
 opt_in_rules:
   - array_init
   - attributes
