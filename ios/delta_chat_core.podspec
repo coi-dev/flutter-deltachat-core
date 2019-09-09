@@ -21,20 +21,6 @@ Pod::Spec.new do |s|
   # We need to use SwiftyBeaver for logging
   s.dependency 'SwiftyBeaver', '~> 1.7'
   
-  # Add a script build phase to execute Swiftlint before compile
-  s.script_phase = {
-    :name => 'SwiftLint',
-    :script => '
-if which swiftlint >/dev/null; then
-  pwd
-  swiftlint
-else
-  echo "warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint" or install it via "brew install swiftlint"
-fi
-',
-    :execution_position => :before_compile
-  }
-  
   s.description = <<-DESC
 A Flutter plugin for COI (Chat Over IMAP) via the DeltaChat Core library.
 DESC
