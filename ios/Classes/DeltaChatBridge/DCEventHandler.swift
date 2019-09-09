@@ -43,28 +43,43 @@
 import Foundation
 
 struct DCEventHandler {
+
+    @_silgen_name("handleDeltaChatEvent")
+    public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsignedLong, data1String: UnsafePointer<Int8>, data2String: UnsafePointer<Int8>) -> UnsafePointer<Int8>? {
+        log.debug("Received event: \(event)")
+
+        switch event {
+        case DC_EVENT_INCOMING_MSG:
+            log.debug("Message ID: \(Int(data2))")
+            
+        default:
+            log.error("Unknown event: \(event)")
+        }
+        
+        return nil
+    }
     
-    public let DC_EVENT_INFO                        = 100;
-    public let DC_EVENT_WARNING                     = 300;
-    public let DC_EVENT_ERROR                       = 400;
-    public let DC_EVENT_ERROR_NETWORK               = 401;
-    public let DC_EVENT_ERROR_SELF_NOT_IN_GROUP     = 410;
-    public let DC_EVENT_MSGS_CHANGED                = 2000;
-    public let DC_EVENT_INCOMING_MSG                = 2005;
-    public let DC_EVENT_MSG_DELIVERED               = 2010;
-    public let DC_EVENT_MSG_FAILED                  = 2012;
-    public let DC_EVENT_MSG_READ                    = 2015;
-    public let DC_EVENT_CHAT_MODIFIED               = 2020;
-    public let DC_EVENT_CONTACTS_CHANGED            = 2030;
-    public let DC_EVENT_CONFIGURE_PROGRESS          = 2041;
-    public let DC_EVENT_IMEX_PROGRESS               = 2051;
-    public let DC_EVENT_IMEX_FILE_WRITTEN           = 2052;
-    public let DC_EVENT_SECUREJOIN_INVITER_PROGRESS = 2060;
-    public let DC_EVENT_SECUREJOIN_JOINER_PROGRESS  = 2061;
-    public let DC_EVENT_IS_OFFLINE                  = 2081;
-    public let DC_EVENT_GET_STRING                  = 2091;
-    public let DC_EVENT_GET_QUANTITIY_STRING        = 2092;
-    public let DC_EVENT_HTTP_GET                    = 2100;
-    public let DC_EVENT_HTTP_POST                   = 2110;
+    public let DC_EVENT_INFO: CInt                        = 100
+    public let DC_EVENT_WARNING: CInt                     = 300
+    public let DC_EVENT_ERROR: CInt                       = 400
+    public let DC_EVENT_ERROR_NETWORK: CInt               = 401
+    public let DC_EVENT_ERROR_SELF_NOT_IN_GROUP: CInt     = 410
+    public let DC_EVENT_MSGS_CHANGED: CInt                = 2000
+    public let DC_EVENT_INCOMING_MSG: CInt                = 2005
+    public let DC_EVENT_MSG_DELIVERED: CInt               = 2010
+    public let DC_EVENT_MSG_FAILED: CInt                  = 2012
+    public let DC_EVENT_MSG_READ: CInt                    = 2015
+    public let DC_EVENT_CHAT_MODIFIED: CInt               = 2020
+    public let DC_EVENT_CONTACTS_CHANGED: CInt            = 2030
+    public let DC_EVENT_CONFIGURE_PROGRESS: CInt          = 2041
+    public let DC_EVENT_IMEX_PROGRESS: CInt               = 2051
+    public let DC_EVENT_IMEX_FILE_WRITTEN: CInt           = 2052
+    public let DC_EVENT_SECUREJOIN_INVITER_PROGRESS: CInt = 2060
+    public let DC_EVENT_SECUREJOIN_JOINER_PROGRESS: CInt  = 2061
+    public let DC_EVENT_IS_OFFLINE: CInt                  = 2081
+    public let DC_EVENT_GET_STRING: CInt                  = 2091
+    public let DC_EVENT_GET_QUANTITIY_STRING: CInt        = 2092
+    public let DC_EVENT_HTTP_GET: CInt                    = 2100
+    public let DC_EVENT_HTTP_POST: CInt                   = 2110
 
 }
