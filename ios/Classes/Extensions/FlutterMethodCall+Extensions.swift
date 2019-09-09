@@ -57,7 +57,7 @@ extension FlutterMethodCall {
     
     func value(for key: String, result: FlutterResult) -> Any? {
         if contains(keys: [key]) {
-            return parameters[key] as? String
+            return parameters[key]
         }
 
         Method.errorMissingArgument(result: result);

@@ -42,57 +42,29 @@
 
 import Foundation
 
-struct DCConfig {
-
-    fileprivate var mailboxPointer: OpaquePointer!
+struct DCEventHandler {
     
-    // MARK: - Public API
-    
-    func set(value: String, for key: String) -> Int32 {
-        return setString(value: value, for: key)
-    }
-    
-    // MARK: - Private Helper
-
-    fileprivate func stringValue(for key: String) -> String? {
-        guard let cString = dc_get_config(mailboxPointer, key) else { return nil }
-        let value = String(cString: cString)
-        free(cString)
-
-        if value.isEmpty {
-            return nil
-        }
-
-        return value
-    }
-
-    fileprivate func setString(value: String?, for key: String) -> Int32 {
-        guard let value = value else {
-            return dc_set_config(mailboxPointer, key, nil)
-        }
-
-        return dc_set_config(mailboxPointer, key, value)
-    }
-    
-    fileprivate func boolValue(for key: String) -> Bool {
-        return String.bool(for: stringValue(for: key))
-    }
-    
-    fileprivate func setBool(value: Bool, for key: String) -> Int32 {
-        return setString(value: value ? "1" : "0" , for: key)
-    }
-    
-    fileprivate func intValue(for key: String) -> Int {
-        guard let intString = stringValue(for: key),
-            let intValue = Int(intString) else {
-            return 0
-        }
-
-        return intValue
-    }
-    
-    fileprivate func setIntValue(value: Int, for key: String) -> Int32 {
-        return setString(value: String(value), for: key)
-    }
+    public let DC_EVENT_INFO                        = 100;
+    public let DC_EVENT_WARNING                     = 300;
+    public let DC_EVENT_ERROR                       = 400;
+    public let DC_EVENT_ERROR_NETWORK               = 401;
+    public let DC_EVENT_ERROR_SELF_NOT_IN_GROUP     = 410;
+    public let DC_EVENT_MSGS_CHANGED                = 2000;
+    public let DC_EVENT_INCOMING_MSG                = 2005;
+    public let DC_EVENT_MSG_DELIVERED               = 2010;
+    public let DC_EVENT_MSG_FAILED                  = 2012;
+    public let DC_EVENT_MSG_READ                    = 2015;
+    public let DC_EVENT_CHAT_MODIFIED               = 2020;
+    public let DC_EVENT_CONTACTS_CHANGED            = 2030;
+    public let DC_EVENT_CONFIGURE_PROGRESS          = 2041;
+    public let DC_EVENT_IMEX_PROGRESS               = 2051;
+    public let DC_EVENT_IMEX_FILE_WRITTEN           = 2052;
+    public let DC_EVENT_SECUREJOIN_INVITER_PROGRESS = 2060;
+    public let DC_EVENT_SECUREJOIN_JOINER_PROGRESS  = 2061;
+    public let DC_EVENT_IS_OFFLINE                  = 2081;
+    public let DC_EVENT_GET_STRING                  = 2091;
+    public let DC_EVENT_GET_QUANTITIY_STRING        = 2092;
+    public let DC_EVENT_HTTP_GET                    = 2100;
+    public let DC_EVENT_HTTP_POST                   = 2110;
 
 }

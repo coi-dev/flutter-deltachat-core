@@ -18,6 +18,12 @@ Pod::Spec.new do |s|
     'LIBRARY_SEARCH_PATHS': '"$(SRCROOT)/../.symlinks/plugins/delta_chat_core/ios/Libraries"',
   }
   
+  s.script_phase = {
+    :name => 'Swiftlint',
+    :script => 'swiftlint',
+    :execution_position => :before_compile
+  }
+  
   s.description = <<-DESC
 A Flutter plugin for COI (Chat Over IMAP) via the DeltaChat Core library.
 DESC
