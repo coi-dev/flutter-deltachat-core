@@ -42,6 +42,15 @@
 
 import Foundation
 
-struct DCContext {
-
+class DCContext {
+    
+    let context: OpaquePointer?
+    
+    init() {
+        context = dc_context_new(callback_ios, nil, "iOS")
+    }
+    
+    deinit {
+        dc_context_unref(context)
+    }
 }

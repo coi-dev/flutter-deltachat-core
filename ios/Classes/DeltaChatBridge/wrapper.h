@@ -40,57 +40,21 @@
  * for more details.
  */
 
-import Flutter
-import SwiftyBeaver
-import UIKit
+#ifndef wrapper_h
+#define wrapper_h
 
-let log = SwiftyBeaver.self
+#include <stdio.h>
+#include "deltachat.h"
 
-public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
-    
-    fileprivate let callHandler = CallHandler()
-    
-    public static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "deltaChatCore", binaryMessenger: registrar.messenger())
-        let instance = SwiftDeltaChatCorePlugin()
-        registrar.addMethodCallDelegate(instance, channel: channel)
-    }
+// redeclare, so swift understands they are opaque types
+typedef dc_context_t dc_context_t;
+typedef dc_contact_t dc_contact_t;
+typedef dc_chat_t dc_chat_t;
+typedef dc_msg_t dc_msg_t;
+typedef dc_lot_t dc_lot_t;
+typedef dc_array_t dc_array_t;
+typedef dc_chatlist_t dc_chatlist_t;
 
-    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+uintptr_t callback_ios(dc_context_t* mailbox, int event, uintptr_t data1, uintptr_t data2);
 
-        log.debug("MethodCall: \(call.method)")
-        let methodPrefix = prefix(for: call.method)
-
-        switch (methodPrefix) {
-        case Method.Prefix.BASE:
-            callHandler.handleBaseCalls(methodCall: call, result: result);
-            break
-        case Method.Prefix.CONTEXT:
-            callHandler.handleContextCalls(methodCall: call, result: result)
-            break
-        case Method.Prefix.CHAT_LIST:
-            callHandler.handleChatListCalls(methodCall: call, result: result)
-            break
-        case Method.Prefix.CHAT:
-            callHandler.handleChatCalls(methodCall: call, result: result)
-            break
-        case Method.Prefix.CONTACT:
-            callHandler.handleContactCalls(methodCall: call, result: result)
-            break
-        case Method.Prefix.MSG:
-            callHandler.handleMessageCalls(methodCall: call, result: result);
-            break
-        default:
-            log.debug("Failing for \(call.method)")
-            _ = FlutterMethodNotImplemented
-        }
-
-    }
-    
-    // MARK: - Private Helper
-    
-    fileprivate func prefix(for methodCall: String) -> String {
-        return String(methodCall.split(separator: Method.Prefix.SEPERATOR)[0])
-    }
-    
-}
+#endif /* wrapper_h */
