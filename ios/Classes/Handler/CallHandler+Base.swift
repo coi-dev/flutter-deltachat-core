@@ -40,7 +40,7 @@ extension CallHandler {
             setCoreStrings(methodCall: methodCall, result: result);
             break
         default:
-            print("Base: Failing for \(methodCall.method)")
+            log.error("Base: Failing for \(methodCall.method)")
             _ = FlutterMethodNotImplemented
         }
     }

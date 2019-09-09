@@ -24,8 +24,7 @@ extension CallHandler {
                 configure(result: result)
                 break
             case Method.Context.IS_CONFIGURED:
-                let isConfigured: Bool = dc_is_configured(mailboxPointer) == 1
-                result(isConfigured)
+                result(dcConfig.isConfigured)
                 break
             case Method.Context.ADD_ADDRESS_BOOK:
                 addAddressBook(methodCall: methodCall, result: result)
@@ -138,7 +137,7 @@ extension CallHandler {
                 setChatProfileImage(methodCall: methodCall, result: result)
                 break
             default:
-                print("Context: Failing for \(methodCall.method)")
+                log.error("Context: Failing for \(methodCall.method)")
                 _ = FlutterMethodNotImplemented
         }
     }
@@ -204,7 +203,6 @@ extension CallHandler {
         let parameters = methodCall.parameters
         
         if let addressBook = parameters[Argument.ADDRESS_BOOK] as? String {
-            
             let dc_result = dc_add_address_book(mailboxPointer, addressBook)
             result(dc_result)
         }

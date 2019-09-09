@@ -48,6 +48,10 @@ struct DCConfig {
     
     // MARK: - Public API
     
+    var isConfigured: Bool {
+        return 1 == dc_is_configured(mailboxPointer)
+    }
+
     func set(value: String, for key: String) -> Int32 {
         return setString(value: value, for: key)
     }

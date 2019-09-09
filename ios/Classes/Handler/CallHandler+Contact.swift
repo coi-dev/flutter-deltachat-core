@@ -42,7 +42,7 @@ extension CallHandler {
             isVerified(methodCall: methodCall, result: result);
             break
         default:
-            print("Context: Failing for \(methodCall.method)")
+            log.error("Context: Failing for \(methodCall.method)")
             _ = FlutterMethodNotImplemented
         }
     }

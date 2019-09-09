@@ -1,5 +1,8 @@
 import Flutter
+import SwiftyBeaver
 import UIKit
+
+let log = SwiftyBeaver.self
 
 public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
     
@@ -13,7 +16,7 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
 
-        NSLog("MethodCall: \(call.method)")
+        log.debug("MethodCall: \(call.method)")
         let methodPrefix = prefix(for: call.method)
 
         switch (methodPrefix) {
@@ -36,7 +39,7 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
             callHandler.handleMessageCalls(methodCall: call, result: result);
             break
         default:
-            NSLog("Failing for \(call.method)")
+            log.debug("Failing for \(call.method)")
             _ = FlutterMethodNotImplemented
         }
 

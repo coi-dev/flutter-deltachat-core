@@ -36,7 +36,7 @@ extension CallHandler {
             tearDown(methodCall: methodCall, result: result)
             break
         default:
-            print("ChatList: Failing for \(methodCall.method)")
+            log.error("ChatList: Failing for \(methodCall.method)")
             _ = FlutterMethodNotImplemented
             
         }
