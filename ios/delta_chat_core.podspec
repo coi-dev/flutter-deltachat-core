@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.license               = { :file => '../LICENSE' }
   s.author                = { 'Open-Xchange GmbH' => 'info@open-xchange.com' }
   s.source                = { :path => '.' }
-  s.source_files          = 'Libraries/*.a', 'Classes/**/*.{h,m,swift}', 'Libraries/**/*.h', '.swiftlint.yml'
+  s.source_files          = 'Libraries/*.a', 'Classes/**/*.{c,h,m,swift}', 'Libraries/**/*.h', '.swiftlint.yml'
   s.public_header_files   = 'Classes/**/*.h', 'Libraries/**/*.h'
   s.dependency 'Flutter'
   
