@@ -11,9 +11,9 @@ disabled_rules:
   - override_in_extension
   - todo # next to enable again
   - xctfail_message
+  - line_length
 excluded:
-  - Carthage
-  - CookIslands
+  - Pods/SwiftyBeaver
 opt_in_rules:
   - array_init
   - attributes

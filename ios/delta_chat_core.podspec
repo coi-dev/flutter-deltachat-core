@@ -3,13 +3,13 @@
 #
 Pod::Spec.new do |s|
   s.name                  = 'delta_chat_core'
-  s.version               = '0.1.0'
+  s.version               = '0.2.0'
   s.summary               = 'Flutter DeltaChat Core Plugin'
   s.homepage              = 'https://open-xchange.com'
   s.license               = { :file => '../LICENSE' }
   s.author                = { 'Open-Xchange GmbH' => 'info@open-xchange.com' }
   s.source                = { :path => '.' }
-  s.source_files          = 'Libraries/*.a', 'Classes/**/*.{h,m,swift}', 'Libraries/**/*.h'
+  s.source_files          = 'Libraries/*.a', 'Classes/**/*.{h,m,swift}', 'Libraries/**/*.h', '.swiftlint.yml'
   s.public_header_files   = 'Classes/**/*.h', 'Libraries/**/*.h'
   s.dependency 'Flutter'
   
@@ -18,9 +18,20 @@ Pod::Spec.new do |s|
     'LIBRARY_SEARCH_PATHS': '"$(SRCROOT)/../.symlinks/plugins/delta_chat_core/ios/Libraries"',
   }
   
+  # We need to use SwiftyBeaver for logging
+  s.dependency 'SwiftyBeaver', '~> 1.7'
+  
+  # Add a script build phase to execute Swiftlint before compile
   s.script_phase = {
-    :name => 'Swiftlint',
-    :script => 'swiftlint',
+    :name => 'SwiftLint',
+    :script => '
+if which swiftlint >/dev/null; then
+  pwd
+  swiftlint
+else
+  echo "warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint" or install it via "brew install swiftlint"
+fi
+',
     :execution_position => :before_compile
   }
   
