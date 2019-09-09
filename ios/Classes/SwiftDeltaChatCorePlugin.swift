@@ -48,52 +48,176 @@ let log = SwiftyBeaver.self
 
 public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
     
-    fileprivate let callHandler = CallHandler()
     fileprivate let registrar: FlutterPluginRegistrar!
-    
+    fileprivate let dcContext: DCContext!
+
+    fileprivate let chatCallHandler: ChatCallHandler!
+    fileprivate let chatListCallHandler: ChatListCallHandler!
+    fileprivate let contactCallHandler: ContactCallHandler!
+    fileprivate let contextCallHandler: ContextCallHandler!
+    fileprivate let messageCallHandler: MessageCallHandler!
     fileprivate let eventChannelHandler: EventChannelHandler!
     
+
+    // MARK: - Initialization
+
     init(registrar: FlutterPluginRegistrar) {
         self.registrar = registrar
-        
+        self.dcContext = DCContext("OX Coi iOS")
+
+        self.chatCallHandler = ChatCallHandler(context: dcContext)
+        self.chatListCallHandler = ChatListCallHandler(context: dcContext)
+        self.contactCallHandler = ContactCallHandler(context: dcContext)
+        self.contextCallHandler = ContextCallHandler(context: dcContext)
+        self.messageCallHandler = MessageCallHandler(context: dcContext)
         self.eventChannelHandler = EventChannelHandler(messanger: registrar.messenger())
     }
     
     // MARK: - Pubic API
     
+    // This is out entry point
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "deltaChatCore", binaryMessenger: registrar.messenger())
-        let instance = SwiftDeltaChatCorePlugin(registrar: registrar)
-        registrar.addMethodCallDelegate(instance, channel: channel)
+        let delegate = SwiftDeltaChatCorePlugin(registrar: registrar)
+        registrar.addMethodCallDelegate(delegate, channel: channel)
     }
+    
+    // MARK: - FlutterPlugin
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         log.debug("MethodCall: \(call.method)")
 
         switch (call.methodPrefix) {
         case Method.Prefix.BASE:
-            callHandler.handleBaseCalls(methodCall: call, result: result);
-            break
-        case Method.Prefix.CONTEXT:
-            callHandler.handleContextCalls(methodCall: call, result: result)
-            break
-        case Method.Prefix.CHAT_LIST:
-            callHandler.handleChatListCalls(methodCall: call, result: result)
+            handle(baseCall: call, result: result)
             break
         case Method.Prefix.CHAT:
-            callHandler.handleChatCalls(methodCall: call, result: result)
+            handle(chatCall: call, result: result)
+            break
+        case Method.Prefix.CHAT_LIST:
+            handle(chatListCall: call, result: result)
             break
         case Method.Prefix.CONTACT:
-            callHandler.handleContactCalls(methodCall: call, result: result)
+            handle(contactCall: call, result: result)
+            break
+        case Method.Prefix.CONTEXT:
+            handle(contextCall: call, result: result)
             break
         case Method.Prefix.MSG:
-            callHandler.handleMessageCalls(methodCall: call, result: result);
+            handle(messageCall: call, result: result)
             break
         default:
             log.debug("Failing for \(call.method)")
-            _ = FlutterMethodNotImplemented
+            result(FlutterMethodNotImplemented)
         }
 
     }
     
+    // MARK: - MethodChannel Calls
+    
+    fileprivate func handle(baseCall call: FlutterMethodCall, result: FlutterResult) {
+        switch (call.method) {
+        case Method.Base.INIT:
+            baseInit(result: result)
+            break
+        case Method.Base.SYSTEM_INFO:
+            systemInfo(result: result)
+            break
+        case Method.Base.CORE_LISTENER:
+            coreListener(methodCall: call, result: result);
+            break
+        case Method.Base.SET_CORE_STRINGS:
+            setCoreStrings(methodCall: call, result: result);
+            break
+        default:
+            log.error("Failing for \(call.method)")
+            result(FlutterMethodNotImplemented)
+        }
+    }
+    
+    fileprivate func handle(chatCall call: FlutterMethodCall, result: FlutterResult) {
+        chatCallHandler.handle(call, result: result);
+    }
+    
+    fileprivate func handle(chatListCall call: FlutterMethodCall, result: FlutterResult) {
+        chatListCallHandler.handle(call, result: result);
+    }
+    
+    fileprivate func handle(contactCall call: FlutterMethodCall, result: FlutterResult) {
+        contactCallHandler.handle(call, result: result);
+    }
+    
+    fileprivate func handle(contextCall call: FlutterMethodCall, result: FlutterResult) {
+        contextCallHandler.handle(call, result: result);
+    }
+    
+    fileprivate func handle(messageCall call: FlutterMethodCall, result: FlutterResult) {
+        messageCallHandler.handle(call, result: result);
+    }
+    
+    // MARK: - Private Helper
+
+    fileprivate func baseInit(result: FlutterResult) {
+        if dcContext.openUserDataBase() {
+            result(dcContext.userDatabasePath)
+            return
+        }
+        log.error("Couldn't open user database at path: \(dcContext.userDatabasePath)")
+        result(DCPluginError.couldNotOpenDataBase())
+    }
+    
+    fileprivate func systemInfo(result: FlutterResult) {
+        result(UIApplication.version)
+    }
+
+    fileprivate func coreListener(methodCall: FlutterMethodCall, result: FlutterResult) {
+        guard let add: Bool = methodCall.value(for: Argument.ADD, result: result) as? Bool,
+            let eventId: Int = methodCall.value(for: Argument.EVENT_ID, result: result) as? Int else {
+                result(nil)
+                return
+        }
+        
+        // Add a new Listener
+        if true == add {
+            let listenerId = Int(1 /* TODO: Add new Listener here */)
+            result(listenerId)
+        }
+        
+        // Remove a given Listener
+        if let listenerId: Int = methodCall.value(for: Argument.LISTENER_ID, result: result) as? Int {
+            // TODO: Add logic to remove the listener with listenerId
+        }
+        
+        result(nil)
+        
+        //        Boolean add = methodCall.argument(ARGUMENT_ADD);
+        //        Integer eventId = methodCall.argument(ARGUMENT_EVENT_ID);
+        //        Integer listenerId = methodCall.argument(ARGUMENT_LISTENER_ID);
+        //        if (eventId == null || add == null) {
+        //        return;
+        //        }
+        //        if (add) {
+        //        int newListenerId = eventChannelHandler.addListener(eventId);
+        //        result.success(newListenerId);
+        //        } else {
+        //        if (listenerId == null) {
+        //        return;
+        //        }
+        //        eventChannelHandler.removeListener(listenerId);
+        //        result.success(null);
+        //        }
+    }
+    
+    fileprivate func setCoreStrings(methodCall: FlutterMethodCall, result: FlutterResult) {
+        // TODO: Ask Daniel for NativeInteractionManager
+        //        guard let coreStrings = methodCall.arguments else {
+        //            return
+        //        }
+        //
+        //    Map<Long, String> coreStrings = methodCall.arguments();
+        //    nativeInteractionManager.setCoreStrings(coreStrings);
+        //    result.success(null);
+        result(nil)
+    }
+
 }

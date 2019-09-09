@@ -40,33 +40,18 @@
  * for more details.
  */
 
-import Foundation
+import UIKit
 
-class DCContext {
+extension UIApplication {
     
-    var context: OpaquePointer?
-
-    // MARK: - Computed Properties
+    // MARK: - UIApplication
     
-    var userDatabasePath: String {
-        let paths = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)
-        return "\(paths[0])/messenger.db"
-    }
-
-    // MARK: - Initialization
-
-    init(_ osName: String) {
-        context = dc_context_new(dcc_event_callback, nil, osName)
+    public static var name: String {
+        return Bundle.displayName
     }
     
-    deinit {
-        dc_context_unref(context)
+    public static var version: String {
+        return Bundle.versionBuildString
     }
     
-    // MARK: - Public API
-
-    func openUserDataBase() -> Bool {
-        let result = NSNumber(value: dc_open(context, userDatabasePath, nil))
-        return Bool(truncating: result)
-    }
 }

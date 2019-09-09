@@ -40,33 +40,19 @@
  * for more details.
  */
 
-import Foundation
+protocol MethodCallHandling {
+    func handle(_ methodCall: FlutterMethodCall, result: FlutterResult)
+}
 
-class DCContext {
+class BaseCallHandler {
     
-    var context: OpaquePointer?
-
-    // MARK: - Computed Properties
-    
-    var userDatabasePath: String {
-        let paths = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)
-        return "\(paths[0])/messenger.db"
-    }
+    var dcConfig = DCConfig()
+    let dcContext: DCContext!
 
     // MARK: - Initialization
-
-    init(_ osName: String) {
-        context = dc_context_new(dcc_event_callback, nil, osName)
-    }
     
-    deinit {
-        dc_context_unref(context)
+    init(context: DCContext) {
+        self.dcContext = context
     }
-    
-    // MARK: - Public API
 
-    func openUserDataBase() -> Bool {
-        let result = NSNumber(value: dc_open(context, userDatabasePath, nil))
-        return Bool(truncating: result)
-    }
 }
