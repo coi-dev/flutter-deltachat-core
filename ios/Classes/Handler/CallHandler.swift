@@ -11,7 +11,13 @@ class CallHandler {
     
     var mailboxPointer: OpaquePointer!
     var chatList: OpaquePointer!
-
     var dcConfig: DCConfig = DCConfig()
 
+    let dcContext: DCContext!
+
+    // MARK: - Initialization
+
+    init() {
+        dcContext = DCContext("OX Coi iOS")
+    }
 }

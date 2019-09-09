@@ -46,8 +46,8 @@ class DCContext {
     
     let context: OpaquePointer?
     
-    init() {
-        context = dc_context_new(dcc_event_callback, nil, "OX Coi iOS")
+    init(_ osName: String) {
+        context = dc_context_new(dcc_event_callback, nil, osName)
     }
     
     deinit {

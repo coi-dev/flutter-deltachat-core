@@ -40,60 +40,23 @@
  * for more details.
  */
 
-import Flutter
-import SwiftyBeaver
-import UIKit
+import Foundation
 
-let log = SwiftyBeaver.self
-
-public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
+class EventChannelHandler: FlutterStreamHandler {
     
-    fileprivate let callHandler = CallHandler()
-    fileprivate let registrar: FlutterPluginRegistrar!
+    fileprivate let messanger: FlutterBinaryMessenger!
     
-    fileprivate let eventChannelHandler: EventChannelHandler!
-    
-    init(registrar: FlutterPluginRegistrar) {
-        self.registrar = registrar
-        
-        self.eventChannelHandler = EventChannelHandler(messanger: registrar.messenger())
+    init(messanger: FlutterBinaryMessenger) {
+        self.messanger = messanger
     }
     
-    // MARK: - Pubic API
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        return nil
+    }
     
-    public static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "deltaChatCore", binaryMessenger: registrar.messenger())
-        let instance = SwiftDeltaChatCorePlugin(registrar: registrar)
-        registrar.addMethodCallDelegate(instance, channel: channel)
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        return nil
     }
-
-    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        log.debug("MethodCall: \(call.method)")
-
-        switch (call.methodPrefix) {
-        case Method.Prefix.BASE:
-            callHandler.handleBaseCalls(methodCall: call, result: result);
-            break
-        case Method.Prefix.CONTEXT:
-            callHandler.handleContextCalls(methodCall: call, result: result)
-            break
-        case Method.Prefix.CHAT_LIST:
-            callHandler.handleChatListCalls(methodCall: call, result: result)
-            break
-        case Method.Prefix.CHAT:
-            callHandler.handleChatCalls(methodCall: call, result: result)
-            break
-        case Method.Prefix.CONTACT:
-            callHandler.handleContactCalls(methodCall: call, result: result)
-            break
-        case Method.Prefix.MSG:
-            callHandler.handleMessageCalls(methodCall: call, result: result);
-            break
-        default:
-            log.debug("Failing for \(call.method)")
-            _ = FlutterMethodNotImplemented
-        }
-
-    }
+    
     
 }
