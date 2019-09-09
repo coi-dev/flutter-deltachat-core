@@ -50,6 +50,8 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
     
     fileprivate let callHandler = CallHandler()
     
+    // MARK: - Pubic API
+    
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "deltaChatCore", binaryMessenger: registrar.messenger())
         let instance = SwiftDeltaChatCorePlugin()
@@ -57,11 +59,9 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
     }
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-
         log.debug("MethodCall: \(call.method)")
-        let methodPrefix = prefix(for: call.method)
 
-        switch (methodPrefix) {
+        switch (call.methodPrefix) {
         case Method.Prefix.BASE:
             callHandler.handleBaseCalls(methodCall: call, result: result);
             break
@@ -85,12 +85,6 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
             _ = FlutterMethodNotImplemented
         }
 
-    }
-    
-    // MARK: - Private Helper
-    
-    fileprivate func prefix(for methodCall: String) -> String {
-        return String(methodCall.split(separator: Method.Prefix.SEPERATOR)[0])
     }
     
 }

@@ -24,6 +24,10 @@ extension FlutterMethodCall {
         return arguments
     }
     
+    var methodPrefix: String {
+        return String(method.split(separator: Method.Prefix.SEPERATOR)[0])
+    }
+
     // MARK: - Helper
 
     func contains(keys: [String]) -> Bool {
@@ -34,7 +38,7 @@ extension FlutterMethodCall {
         }
         return true
     }
-    
+
     // MARK: - Parameter Values
     
     func intValue(for key: String, result: FlutterResult) -> Int {
