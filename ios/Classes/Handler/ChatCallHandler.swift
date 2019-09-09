@@ -43,8 +43,6 @@
 import Foundation
 
 class ChatCallHandler: BaseCallHandler, MethodCallHandling {
-    
-    fileprivate var mailboxPointer: OpaquePointer!
 
     // MARK: - Protocol MethodCallHandling
     

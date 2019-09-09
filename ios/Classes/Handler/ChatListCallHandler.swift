@@ -45,8 +45,6 @@ import Foundation
 class ChatListCallHandler: BaseCallHandler, MethodCallHandling {
 
     fileprivate var chatList: OpaquePointer!
-    fileprivate var mailboxPointer: OpaquePointer!
-
 
     // MARK: - Protocol MethodCallHandling
     
