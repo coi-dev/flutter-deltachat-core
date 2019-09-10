@@ -51,8 +51,9 @@ class DCEventHandler {
         case backgroundFetch
     }
 
+    var state = ApplicationState.stopped
+
     fileprivate var backgroundTask: UIBackgroundTaskIdentifier = .invalid
-    fileprivate var state = ApplicationState.stopped
     fileprivate let dcContext: DCContext!
 
     init(context: DCContext) {
