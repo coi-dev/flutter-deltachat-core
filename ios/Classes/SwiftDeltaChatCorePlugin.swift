@@ -49,7 +49,9 @@ let log = SwiftyBeaver.self
 public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
     
     fileprivate let registrar: FlutterPluginRegistrar!
+
     fileprivate let dcContext: DCContext!
+    fileprivate let dcEventHandler: DCEventHandler!
 
     fileprivate let chatCallHandler: ChatCallHandler!
     fileprivate let chatListCallHandler: ChatListCallHandler!
@@ -63,7 +65,10 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
 
     init(registrar: FlutterPluginRegistrar) {
         self.registrar = registrar
+        
         self.dcContext = DCContext()
+        self.dcEventHandler = DCEventHandler(context: dcContext)
+        self.dcEventHandler.start()
 
         self.chatCallHandler = ChatCallHandler(context: dcContext)
         self.chatListCallHandler = ChatListCallHandler(context: dcContext)
