@@ -44,20 +44,7 @@ import Foundation
 
 struct DCEventHandler {
 
-    @_silgen_name("handleDeltaChatEvent")
-    public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsignedLong, data1String: UnsafePointer<Int8>, data2String: UnsafePointer<Int8>) -> UnsafePointer<Int8>? {
-        log.debug("Received event: \(event)")
-
-        switch event {
-        case DC_EVENT_INCOMING_MSG:
-            log.debug("Message ID: \(Int(data2))")
-            
-        default:
-            log.error("Unknown event: \(event)")
-        }
-        
-        return nil
-    }
+    fileprivate var backgroundTask: UIBackgroundTaskIdentifier = .invalid
     
     public let DC_EVENT_INFO: CInt                        = 100
     public let DC_EVENT_WARNING: CInt                     = 300
@@ -82,4 +69,22 @@ struct DCEventHandler {
     public let DC_EVENT_HTTP_GET: CInt                    = 2100
     public let DC_EVENT_HTTP_POST: CInt                   = 2110
 
+}
+
+@_silgen_name("handleDeltaChatEvent")
+public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsignedLong, data1String: UnsafePointer<Int8>, data2String: UnsafePointer<Int8>) -> UnsafePointer<Int8>? {
+    log.debug("Received event: \(event)")
+    
+    switch event {
+    case DC_EVENT_INFO:
+        log.debug("event: \(String(cString: data2String))")
+        
+    case DC_EVENT_INCOMING_MSG:
+        log.debug("Message ID: \(Int(data2))")
+        
+    default:
+        log.error("Unknown event: \(event)")
+    }
+    
+    return nil
 }
