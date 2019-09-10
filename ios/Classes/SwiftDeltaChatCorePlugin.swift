@@ -63,7 +63,7 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
 
     init(registrar: FlutterPluginRegistrar) {
         self.registrar = registrar
-        self.dcContext = DCContext("OX Coi iOS")
+        self.dcContext = DCContext()
 
         self.chatCallHandler = ChatCallHandler(context: dcContext)
         self.chatListCallHandler = ChatListCallHandler(context: dcContext)

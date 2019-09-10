@@ -134,6 +134,6 @@ class ContactCallHandler: BaseCallHandler, MethodCallHandling {
     private func getContact(methodCall: FlutterMethodCall, result: FlutterResult) -> OpaquePointer {
         let id = methodCall.intValue(for: Argument.ID, result: result)
         
-        return dc_get_contact(mailboxPointer, UInt32(id))
+        return dc_get_contact(dcContext.context, UInt32(id))
     }
 }

@@ -61,7 +61,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
             configure(result: result)
             break
         case Method.Context.IS_CONFIGURED:
-            result(dcConfig.isConfigured)
+            result(dcContext.isConfigured)
             break
         case Method.Context.ADD_ADDRESS_BOOK:
             addAddressBook(methodCall: methodCall, result: result)
@@ -159,7 +159,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
             checkQr(methodCall: methodCall, result: result)
             break
         case Method.Context.STOP_ONGOING_PROCESS:
-            dc_stop_ongoing_process(mailboxPointer)
+            dc_stop_ongoing_process(dcContext.context)
             result(nil)
             break
         case Method.Context.DELETE_MESSAGES:
@@ -186,7 +186,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         if let key = parameters["key"] as? String,
             let value = parameters["value"] as? String {
             
-            let dc_result = dcConfig.set(value: value, for: key)
+            let dc_result = dcContext.set(value: value, for: key)
             result(NSNumber(value: dc_result))
         }
         else {
@@ -201,7 +201,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
             
             switch (type) {
             case ArgumentType.STRING:
-                let value = dc_get_config(mailboxPointer, key)
+                let value = dc_get_config(dcContext.context, key)
                 if let pSafe = value {
                     let c = String(cString: pSafe)
                     if c.isEmpty {
@@ -212,7 +212,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
                 break
                 
             case ArgumentType.INT:
-                let value = dc_get_config(mailboxPointer, key)
+                let value = dc_get_config(dcContext.context, key)
                 if let pSafe = value {
                     let c = Int(bitPattern: pSafe)
                     
@@ -229,7 +229,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
     }
     
     private func configure(result: FlutterResult) {
-        result(dc_configure(mailboxPointer));
+        result(dc_configure(dcContext.context));
     }
     
     private func addAddressBook(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -241,7 +241,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         let parameters = methodCall.parameters
         
         if let addressBook = parameters[Argument.ADDRESS_BOOK] as? String {
-            let dc_result = dc_add_address_book(mailboxPointer, addressBook)
+            let dc_result = dc_add_address_book(dcContext.context, addressBook)
             result(dc_result)
         }
         else {
@@ -259,7 +259,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
             let address = myArgs["address"] as? String {
             
             let name = myArgs["name"] as? String
-            let contactId = dc_create_contact(mailboxPointer, name, address)
+            let contactId = dc_create_contact(dcContext.context, name, address)
             result(Int(contactId))
         }
         else {
@@ -280,7 +280,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         if let myArgs = args as? [String: Any],
             let contactId = myArgs[Argument.ID] as? UInt32 {
             
-            let deleted = dc_delete_contact(mailboxPointer, contactId)
+            let deleted = dc_delete_contact(dcContext.context, contactId)
             result(deleted)
         }
         else {
@@ -303,7 +303,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         if let myArgs = args as? [String: Any],
             let contactId = myArgs[Argument.ID] as? UInt32 {
             
-            dc_block_contact(mailboxPointer, contactId, 1)
+            dc_block_contact(dcContext.context, contactId, 1)
             result(nil)
         }
         else {
@@ -314,7 +314,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
     }
     
     private func getBlockedContacts(result: FlutterResult) {
-        let blockedIds = dc_get_blocked_contacts(mailboxPointer)
+        let blockedIds = dc_get_blocked_contacts(dcContext.context)
         result(blockedIds)
         
     }
@@ -330,7 +330,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         }
         
         if let myArgs = args as? [String: Any], let contactId = myArgs[Argument.ID] as? UInt32 {
-            dc_block_contact(mailboxPointer, contactId, 0)
+            dc_block_contact(dcContext.context, contactId, 0)
             result(nil)
         }
         else {
@@ -348,7 +348,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         if let myArgs = args as? [String: Any],
             let contactId = myArgs[Argument.ID] as? UInt32 {
             
-            let chatId = dc_create_chat_by_contact_id(mailboxPointer, contactId)
+            let chatId = dc_create_chat_by_contact_id(dcContext.context, contactId)
             result(Int(chatId))
         }
         else {
@@ -364,7 +364,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         if let myArgs = args as? [String: Any],
             let messageId = myArgs[Argument.ID] as? UInt32 {
             
-            let chatId = dc_create_chat_by_msg_id(mailboxPointer, messageId)
+            let chatId = dc_create_chat_by_msg_id(dcContext.context, messageId)
             result(Int(chatId))
         }
         else {
@@ -391,7 +391,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
             }
             
             let name = myArgs[Argument.NAME] as? String
-            let chatId = dc_create_group_chat(mailboxPointer, Int32(truncating: verified! as NSNumber), name)
+            let chatId = dc_create_group_chat(dcContext.context, Int32(truncating: verified! as NSNumber), name)
             
             result(chatId)
         }
@@ -416,7 +416,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
                 return
             }
             
-            let successfullyAdded = dc_add_contact_to_chat(mailboxPointer, chatId!, contactId!)
+            let successfullyAdded = dc_add_contact_to_chat(dcContext.context, chatId!, contactId!)
             
             result(successfullyAdded)
         }
@@ -435,7 +435,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         
         if let myArgs = args as? [String: Any],
             let contactId = myArgs[Argument.CONTACT_ID] as? UInt32 {
-            let chatId = dc_get_chat_id_by_contact_id(mailboxPointer, contactId)
+            let chatId = dc_get_chat_id_by_contact_id(dcContext.context, contactId)
             result(chatId)
         }
         else {
@@ -451,7 +451,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
             return
         }
         if let myArgs = args as? [String: Any], let id = myArgs[Argument.ID] as? UInt32 {
-            result(dc_array_get_contact_id(mailboxPointer, Int(id)))
+            result(dc_array_get_contact_id(dcContext.context, Int(id)))
         }
         
     }
@@ -475,7 +475,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
                 return
             }
             
-            var contactIds = dc_get_contacts(mailboxPointer, flags!, query)
+            var contactIds = dc_get_contacts(dcContext.context, flags!, query)
             
             result(FlutterStandardTypedData(int32: Data(bytes: &contactIds, count: MemoryLayout.size(ofValue: contactIds))))
         }
@@ -500,7 +500,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
                 return
             }
             
-            var contactIds = dc_get_chat_contacts(mailboxPointer, id!)
+            var contactIds = dc_get_chat_contacts(dcContext.context, id!)
             
             result(FlutterStandardTypedData(int32: Data(bytes: &contactIds, count: MemoryLayout.size(ofValue: contactIds))))
         }
@@ -521,7 +521,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         if let myArgs = args as? [String: Any],
             let id = myArgs[Argument.ID] as? UInt32 {
             
-            result(dc_get_chat(mailboxPointer, id))
+            result(dc_get_chat(dcContext.context, id))
         }
         else {
             Method.errorMissingArgument(result: result);
@@ -662,7 +662,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
                 return
             }
             
-            let freshMessageCount = dc_get_fresh_msg_cnt(mailboxPointer, chatId!)
+            let freshMessageCount = dc_get_fresh_msg_cnt(dcContext.context, chatId!)
             
             result(freshMessageCount)
         }
@@ -687,7 +687,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
                 return
             }
             
-            dc_marknoticed_chat(mailboxPointer, chatId!)
+            dc_marknoticed_chat(dcContext.context, chatId!)
             result(nil)
         }
         
@@ -711,7 +711,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
                 return
             }
             
-            dc_delete_chat(mailboxPointer, chatId!)
+            dc_delete_chat(dcContext.context, chatId!)
             result(nil)
         }
         
@@ -729,7 +729,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         }
         
         if let myArgs = args as? [String: Any], let chatId = myArgs[Argument.CHAT_ID], let contactId = myArgs[Argument.CONTACT_ID] {
-            result(dc_remove_contact_from_chat(mailboxPointer, chatId as! UInt32, contactId as! UInt32))
+            result(dc_remove_contact_from_chat(dcContext.context, chatId as! UInt32, contactId as! UInt32))
         }
         else {
             Method.errorMissingArgument(result: result);
@@ -738,7 +738,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
     }
     
     private func getFreshMessages(result: FlutterResult) {
-        let freshMessages = dc_get_fresh_msgs(mailboxPointer)
+        let freshMessages = dc_get_fresh_msgs(dcContext.context)
         result(freshMessages)
     }
     
@@ -755,7 +755,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         
         if let myArgs = args as? [String: Any], let chatId = myArgs[Argument.CHAT_ID], let msgIdArray = myArgs[Argument.MESSAGE_IDS] {
             
-            result(dc_forward_msgs(mailboxPointer, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count), chatId as! UInt32))
+            result(dc_forward_msgs(dcContext.context, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count), chatId as! UInt32))
         }
         else {
             Method.errorMissingArgument(result: result);
@@ -775,7 +775,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         }
         
         if let myArgs = args as? [String: Any], let msgIdArray = myArgs[Argument.MESSAGE_IDS] {
-            result(dc_markseen_msgs(mailboxPointer, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count)))
+            result(dc_markseen_msgs(dcContext.context, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count)))
         }
         else {
             Method.errorMissingArgument(result: result);
@@ -807,7 +807,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
             let messageId = myArgs[Argument.ID],
             let setupCode = myArgs[Argument.SETUP_CODE] {
             
-            result(dc_continue_key_transfer(mailboxPointer, messageId as! UInt32, setupCode as? UnsafePointer<Int8>))
+            result(dc_continue_key_transfer(dcContext.context, messageId as! UInt32, setupCode as? UnsafePointer<Int8>))
         }
         else {
             Method.errorMissingArgument(result: result);
@@ -828,7 +828,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         
         if let myArgs = args as? [String: Any],
             let chatId = myArgs[Argument.CHAT_ID] {
-            result(dc_get_securejoin_qr(mailboxPointer, chatId as! UInt32))
+            result(dc_get_securejoin_qr(dcContext.context, chatId as! UInt32))
         }
         else {
             Method.errorMissingArgument(result: result);
@@ -897,7 +897,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         
         if let myArgs = args as? [String: Any],
             let msgIdArray = myArgs[Argument.MESSAGE_IDS] {
-            result(dc_delete_msgs(mailboxPointer, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count)))
+            result(dc_delete_msgs(dcContext.context, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count)))
         }
         else {
             Method.errorMissingArgument(result: result);
@@ -919,7 +919,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         if let msgIds = arguments[Argument.MESSAGE_IDS] {
             let star = methodCall.intValue(for: Argument.VALUE, result: result)
             
-            dc_star_msgs(mailboxPointer, msgIds as? UnsafePointer<UInt32>, Int32((msgIds as AnyObject).count), Int32(star))
+            dc_star_msgs(dcContext.context, msgIds as? UnsafePointer<UInt32>, Int32((msgIds as AnyObject).count), Int32(star))
             result(nil)
         }
         else {
@@ -943,7 +943,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
             let chatId = myArgs[Argument.CHAT_ID],
             let value = myArgs[Argument.VALUE] {
             
-            dc_set_chat_profile_image(mailboxPointer, chatId as! UInt32, value as? UnsafePointer<Int8>)
+            dc_set_chat_profile_image(dcContext.context, chatId as! UInt32, value as? UnsafePointer<Int8>)
             result(nil)
         }
         else {
@@ -968,7 +968,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
             let chatId = myArgs[Argument.CHAT_ID],
             let value = myArgs[Argument.VALUE] {
             
-            dc_set_chat_name(mailboxPointer, chatId as! UInt32, value as? UnsafePointer<Int8>)
+            dc_set_chat_name(dcContext.context, chatId as! UInt32, value as? UnsafePointer<Int8>)
             result(nil)
         }
         else {

@@ -55,8 +55,8 @@ class DCContext {
 
     // MARK: - Initialization
 
-    init(_ osName: String) {
-        context = dc_context_new(dcc_event_callback, nil, osName)
+    init() {
+        context = dc_context_new(dcc_event_callback, nil, UIApplication.name)
     }
     
     deinit {
@@ -69,4 +69,56 @@ class DCContext {
         let result = NSNumber(value: dc_open(context, userDatabasePath, nil))
         return Bool(truncating: result)
     }
+    
+    var isConfigured: Bool {
+        return 1 == dc_is_configured(context)
+    }
+    
+    func set(value: String, for key: String) -> Int32 {
+        return setString(value: value, for: key)
+    }
+    
+    // MARK: - Private Helper
+
+    fileprivate func stringValue(for key: String) -> String? {
+        guard let cString = dc_get_config(context, key) else { return nil }
+        let value = String(cString: cString)
+        free(cString)
+        
+        if value.isEmpty {
+            return nil
+        }
+        
+        return value
+    }
+    
+    fileprivate func setString(value: String?, for key: String) -> Int32 {
+        guard let value = value else {
+            return dc_set_config(context, key, nil)
+        }
+        
+        return dc_set_config(context, key, value)
+    }
+    
+    fileprivate func boolValue(for key: String) -> Bool {
+        return String.bool(for: stringValue(for: key))
+    }
+    
+    fileprivate func setBool(value: Bool, for key: String) -> Int32 {
+        return setString(value: value ? "1" : "0" , for: key)
+    }
+    
+    fileprivate func intValue(for key: String) -> Int {
+        guard let intString = stringValue(for: key),
+            let intValue = Int(intString) else {
+                return 0
+        }
+        
+        return intValue
+    }
+    
+    fileprivate func setIntValue(value: Int, for key: String) -> Int32 {
+        return setString(value: String(value), for: key)
+    }
+
 }

@@ -142,7 +142,7 @@ class ChatCallHandler: BaseCallHandler, MethodCallHandling {
     
     private func getChat(methodCall: FlutterMethodCall, result: FlutterResult) -> OpaquePointer {
         let id = methodCall.intValue(for: Argument.ID, result: result)
-        let chat: OpaquePointer = dc_get_chat(mailboxPointer, UInt32(id))
+        let chat: OpaquePointer = dc_get_chat(dcContext.context, UInt32(id))
         return chat;
     }
 }

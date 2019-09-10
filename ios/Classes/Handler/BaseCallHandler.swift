@@ -46,10 +46,7 @@ protocol MethodCallHandling {
 
 class BaseCallHandler {
     
-    var dcConfig = DCConfig()
     let dcContext: DCContext!
-
-    var mailboxPointer: OpaquePointer!
 
     // MARK: - Initialization
     
