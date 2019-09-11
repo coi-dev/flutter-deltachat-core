@@ -42,87 +42,74 @@
 
 import Foundation
 
-class DCContext {
-    
-    var context: OpaquePointer?
-
-    // MARK: - Computed Properties
+class DcContext {
+    static private(set) var contextPointer: OpaquePointer?
     
     var userDatabasePath: String {
         let paths = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)
         return "\(paths[0])/messenger.db"
     }
-
-    // MARK: - Initialization
-
+    
     init() {
-        context = dc_context_new(dcc_event_callback, nil, UIApplication.name)
+        DcContext.contextPointer = dc_context_new(dcc_event_callback, nil, UIApplication.name)
     }
     
     deinit {
-        dc_context_unref(context)
+        dc_context_unref(DcContext.contextPointer)
     }
     
-    // MARK: - Public API
-
     func openUserDataBase() -> Bool {
-        let result = NSNumber(value: dc_open(context, userDatabasePath, nil))
+        let result = NSNumber(value: dc_open(DcContext.contextPointer, userDatabasePath, nil))
         return Bool(truncating: result)
     }
     
-    var isConfigured: Bool {
-        return 0 != dc_is_configured(context)
+    func closeUserDataBase() {
+        dc_close(DcContext.contextPointer)
+        DcContext.contextPointer = nil
     }
     
-    func set(value: String?, for key: String) -> Int32 {
-        return setString(value: value, for: key)
+    func getChatlist(flags: Int32, queryString: String?, queryId: Int) -> DcChatlist {
+        let chatlistPointer = dc_get_chatlist(DcContext.contextPointer, flags, queryString, UInt32(queryId))
+        let chatlist = DcChatlist(chatListPointer: chatlistPointer)
+        return chatlist
     }
     
-    // MARK: - Private Helper
-
-    fileprivate func stringValue(for key: String) -> String? {
-        guard let cString = dc_get_config(context, key) else { return nil }
-        let value = String(cString: cString)
-        free(cString)
-        
-        if value.isEmpty {
-            return nil
+    func deleteChat(chatId: Int) {
+        dc_delete_chat(DcContext.contextPointer, UInt32(chatId))
+    }
+    
+    func archiveChat(chatId: Int, archive: Bool) {
+        dc_archive_chat(DcContext.contextPointer, UInt32(chatId), Int32(archive ? 1 : 0))
+    }
+    
+    func getSecurejoinQr (chatId: Int) -> String? {
+        if let cString = dc_get_securejoin_qr(DcContext.contextPointer, UInt32(chatId)) {
+            let swiftString = String(cString: cString)
+            free(cString)
+            return swiftString
         }
-        
-        return value
+        return nil
     }
     
-    fileprivate func setString(value: String?, for key: String) -> Int32 {
-        guard let value = value else {
-            log.debug("set config for key: '\(key)', value: 'nil'")
-            return dc_set_config(context, key, nil)
+    func joinSecurejoin (qrCode: String) -> Int {
+        return Int(dc_join_securejoin(DcContext.contextPointer, qrCode))
+    }
+    
+    func checkQR(qrCode: String) -> DcLot {
+        return DcLot(dc_check_qr(DcContext.contextPointer, qrCode))
+    }
+    
+    func stopOngoingProcess() {
+        dc_stop_ongoing_process(DcContext.contextPointer)
+    }
+    
+    func getMsgInfo(msgId: Int) -> String {
+        if let cString = dc_get_msg_info(DcContext.contextPointer, UInt32(msgId)) {
+            let swiftString = String(cString: cString)
+            free(cString)
+            return swiftString
         }
-        
-        log.debug("set config for key: '\(key)', value: '\(value)'")
-        return dc_set_config(context, key, value)
+        return "ErrGetMsgInfo"
     }
     
-    fileprivate func boolValue(for key: String) -> Bool {
-        return String.bool(for: stringValue(for: key))
-    }
-    
-    fileprivate func setBool(value: Bool, for key: String) -> Int32 {
-        log.debug("set config for key: '\(key)', value: '\(value)'")
-        return setString(value: value ? "1" : "0" , for: key)
-    }
-    
-    fileprivate func intValue(for key: String) -> Int {
-        guard let intString = stringValue(for: key),
-            let intValue = Int(intString) else {
-                return 0
-        }
-        
-        return intValue
-    }
-    
-    fileprivate func setIntValue(value: Int, for key: String) -> Int32 {
-        log.debug("set config for key: '\(key)', value: '\(value)'")
-        return setString(value: String(value), for: key)
-    }
-
 }

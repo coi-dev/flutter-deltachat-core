@@ -60,8 +60,10 @@ class DCEventHandler {
         self.dcContext = context
     }
     
-    func start() {
-        DispatchQueue.global(qos: .background).async {
+    func start(_ completion: (() -> Void)? = nil) {
+        DispatchQueue.global(qos: .background).async { [weak self] in
+            guard let self = self else { return }
+
             self.registerBackgroundTask()
             while self.state == .running {
                 dc_perform_imap_jobs(self.dcContext.contextPointer)
@@ -69,12 +71,14 @@ class DCEventHandler {
                 dc_perform_imap_idle(self.dcContext.contextPointer)
             }
             if self.backgroundTask != .invalid {
-//                completion?()
+                completion?()
                 self.endBackgroundTask()
             }
         }
         
-        DispatchQueue.global(qos: .utility).async {
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            guard let self = self else { return }
+            
             self.registerBackgroundTask()
             while self.state == .running {
                 dc_perform_smtp_jobs(self.dcContext.contextPointer)
@@ -85,14 +89,18 @@ class DCEventHandler {
             }
         }
         
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global(qos: .background).async { [weak self] in
+            guard let self = self else { return }
+            
             while self.state == .running {
                 dc_perform_sentbox_fetch(self.dcContext.contextPointer)
                 dc_perform_sentbox_idle(self.dcContext.contextPointer)
             }
         }
         
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global(qos: .background).async { [weak self] in
+            guard let self = self else { return }
+            
             while self.state == .running {
                 dc_perform_mvbox_fetch(self.dcContext.contextPointer)
                 dc_perform_mvbox_idle(self.dcContext.contextPointer)
@@ -120,111 +128,4 @@ class DCEventHandler {
         backgroundTask = .invalid
     }
 
-}
-
-// MARK: - Handle DeltaChat Callback Events
-
-@_silgen_name("handleDeltaChatEvent")
-public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsignedLong, data1String: UnsafePointer<Int8>, data2String: UnsafePointer<Int8>) -> UnsafePointer<Int8>? {
-    log.debug("Received event: \(event)")
-
-    guard let callbackEvent = DcEvent(rawValue: event) else {
-        log.error("Unknown event: \(event), '\(String(cString: data2String))'")
-        return nil
-    }
-
-    switch callbackEvent {
-    case .info:
-        log.debug("event: \(String(cString: data2String))")
-        
-    case .warning:
-        log.debug("event: \(String(cString: data2String))")
-        
-    case .error:
-        log.debug("event: \(String(cString: data2String))")
-
-    case .errorNetwork:
-        log.debug("event: \(String(cString: data2String))")
-
-    case .errorSelfNotInGroup:
-        log.debug("event: \(String(cString: data2String))")
-
-    case .msgsChanged:
-        log.debug("event: \(String(cString: data2String))")
-
-    case .msgIncoming:
-        log.debug("event: \(String(cString: data2String))")
-
-    case .msgDelivered:
-        log.debug("event: \(String(cString: data2String))")
-
-    case .msgFailed:
-        log.debug("event: \(String(cString: data2String))")
-
-    case .msgRead:
-        log.debug("event: \(String(cString: data2String))")
-
-    case .chatModified:
-        log.debug("event: \(String(cString: data2String))")
-
-    case .contactsChanged:
-        log.debug("event: \(String(cString: data2String))")
-
-    case .configureProgress:
-        log.debug("event: \(String(cString: data2String))")
-
-    case .imexProgress:
-        log.debug("event: \(String(cString: data2String))")
-
-    case .imexFileWritten:
-        log.debug("event: \(String(cString: data2String))")
-
-    case .secureJoinJoinerProgress:
-        log.debug("event: \(String(cString: data2String))")
-
-    case .secureJoinInviterProgress:
-        log.debug("event: \(String(cString: data2String))")
-
-    case .isOffline:
-        log.debug("event: \(String(cString: data2String))")
-
-    case .getString:
-        log.debug("event: \(String(cString: data2String))")
-
-    case .getQuantityString:
-        log.debug("event: \(String(cString: data2String))")
-
-    case .HTTP_GET:
-        log.debug("event: \(String(cString: data2String))")
-
-    case .HTTP_POST:
-        log.debug("event: \(String(cString: data2String))")
-    }
-
-    return nil
-}
-
-enum DcEvent: CInt {
-    case info                      = 100
-    case warning                   = 300
-    case error                     = 400
-    case errorNetwork              = 401
-    case errorSelfNotInGroup       = 410
-    case msgsChanged               = 2000
-    case msgIncoming               = 2005
-    case msgDelivered              = 2010
-    case msgFailed                 = 2012
-    case msgRead                   = 2015
-    case chatModified              = 2020
-    case contactsChanged           = 2030
-    case configureProgress         = 2041
-    case imexProgress              = 2051
-    case imexFileWritten           = 2052
-    case secureJoinInviterProgress = 2060
-    case secureJoinJoinerProgress  = 2061
-    case isOffline                 = 2081
-    case getString                 = 2091
-    case getQuantityString         = 2092
-    case HTTP_GET                  = 2100
-    case HTTP_POST                 = 2110
 }

@@ -40,10 +40,36 @@
  * for more details.
  */
 
-#include "wrapper.h"
+import Foundation
 
-long handleDeltaChatEvent(int, long, long, const char*, const char*);
-
-uintptr_t dcc_event_callback(dc_context_t* mailbox, int event, uintptr_t data1, uintptr_t data2) {
-    return handleDeltaChatEvent(event, data1, data2, (const char*)data1, (const char*)data2);
+class DcChatlist {
+    private var chatListPointer: OpaquePointer?
+    
+    // takes ownership of specified pointer
+    init(chatListPointer: OpaquePointer?) {
+        self.chatListPointer = chatListPointer
+    }
+    
+    deinit {
+        dc_chatlist_unref(chatListPointer)
+    }
+    
+    var length: Int {
+        return dc_chatlist_get_cnt(chatListPointer)
+    }
+    
+    func getChatId(index: Int) -> Int {
+        return Int(dc_chatlist_get_chat_id(chatListPointer, index))
+    }
+    
+    func getMsgId(index: Int) -> Int {
+        return Int(dc_chatlist_get_msg_id(chatListPointer, index))
+    }
+    
+    func getSummary(index: Int) -> DcLot {
+        guard let lotPointer = dc_chatlist_get_summary(self.chatListPointer, index, nil) else {
+            fatalError("lot-pointer was nil")
+        }
+        return DcLot(lotPointer)
+    }
 }

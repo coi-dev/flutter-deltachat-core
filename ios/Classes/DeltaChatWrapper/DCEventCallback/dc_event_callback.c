@@ -40,21 +40,10 @@
  * for more details.
  */
 
-#ifndef wrapper_h
-#define wrapper_h
+#include "dc_event_callback.h"
 
-#include <stdio.h>
-#include "deltachat.h"
+long handleDeltaChatEvent(int, long, long, const char*, const char*);
 
-// redeclare, so swift understands they are opaque types
-typedef dc_context_t dc_context_t;
-typedef dc_contact_t dc_contact_t;
-typedef dc_chat_t dc_chat_t;
-typedef dc_msg_t dc_msg_t;
-typedef dc_lot_t dc_lot_t;
-typedef dc_array_t dc_array_t;
-typedef dc_chatlist_t dc_chatlist_t;
-
-uintptr_t dcc_event_callback(dc_context_t* mailbox, int event, uintptr_t data1, uintptr_t data2);
-
-#endif /* wrapper_h */
+uintptr_t dc_event_callback(dc_context_t* mailbox, int event, uintptr_t data1, uintptr_t data2) {
+    return handleDeltaChatEvent(event, data1, data2, (const char*)data1, (const char*)data2);
+}
