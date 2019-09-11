@@ -11,16 +11,16 @@ Pod::Spec.new do |s|
   s.source                = { :path => '.' }
   s.source_files          = 'Libraries/*.a', 'Classes/**/*.{c,h,m,swift}', 'Libraries/**/*.h', '.swiftlint.yml'
   s.public_header_files   = 'Classes/**/*.h', 'Libraries/**/*.h'
-  s.dependency 'Flutter'
   
   s.xcconfig = {
     'HEADER_SEARCH_PATHS': '"$(SRCROOT)/../.symlinks/plugins/delta_chat_core/ios/Classes" "$(SRCROOT)/../.symlinks/plugins/delta_chat_core/ios/Libraries"',
     'LIBRARY_SEARCH_PATHS': '"$(SRCROOT)/../.symlinks/plugins/delta_chat_core/ios/Libraries"',
   }
   
-  # We need to use SwiftyBeaver for logging
+  s.dependency 'Flutter'
+  s.dependency 'MessageKit'
   s.dependency 'SwiftyBeaver', '~> 1.7'
-  
+
   s.description = <<-DESC
 A Flutter plugin for COI (Chat Over IMAP) via the DeltaChat Core library.
 DESC

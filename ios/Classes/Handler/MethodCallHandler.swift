@@ -40,26 +40,18 @@
  * for more details.
  */
 
-import Foundation
+protocol MethodCallHandling {
+    func handle(_ call: FlutterMethodCall, result: FlutterResult)
+}
 
-class EventChannelHandler: FlutterStreamHandler {
+class MethodCallHandler {
     
-    fileprivate let messanger: FlutterBinaryMessenger!
-    fileprivate var eventSink: FlutterEventSink?
+    let dcContext: DcContext!
+
+    // MARK: - Initialization
     
-    init(messanger: FlutterBinaryMessenger) {
-        self.messanger = messanger
+    init(context: DcContext) {
+        self.dcContext = context
     }
-    
-    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-        eventSink = events
-        return nil
-    }
-    
-    func onCancel(withArguments arguments: Any?) -> FlutterError? {
-        eventSink = nil
-        return nil
-    }
-    
-    
+
 }

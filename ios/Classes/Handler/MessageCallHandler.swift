@@ -42,70 +42,70 @@
 
 import Foundation
 
-class MessageCallHandler: BaseCallHandler, MethodCallHandling {
+class MessageCallHandler: MethodCallHandler, MethodCallHandling {
 
     // MARK: - Protocol MethodCallHandling
 
-    func handle(_ methodCall: FlutterMethodCall, result: (Any?) -> Void) {
-        switch (methodCall.method) {
+    func handle(_ call: FlutterMethodCall, result: (Any?) -> Void) {
+        switch (call.method) {
         case Method.Message.GET_ID:
-            getId(methodCall: methodCall, result: result);
+            getId(methodCall: call, result: result);
             break
         case Method.Message.GET_TEXT:
-            getText(methodCall: methodCall, result: result);
+            getText(methodCall: call, result: result);
             break
         case Method.Message.GET_TIMESTAMP:
-            getTimestamp(methodCall: methodCall, result: result);
+            getTimestamp(methodCall: call, result: result);
             break
         case Method.Message.GET_CHAT_ID:
-            getChatId(methodCall: methodCall, result: result);
+            getChatId(methodCall: call, result: result);
             break
         case Method.Message.GET_FROM_ID:
-            getFromId(methodCall: methodCall, result: result);
+            getFromId(methodCall: call, result: result);
             break
         case Method.Message.IS_OUTGOING:
-            isOutgoing(methodCall: methodCall, result: result);
+            isOutgoing(methodCall: call, result: result);
             break
         case Method.Message.HAS_FILE:
-            hasFile(methodCall: methodCall, result: result);
+            hasFile(methodCall: call, result: result);
             break
         case Method.Message.GET_TYPE:
-            getType(methodCall: methodCall, result: result);
+            getType(methodCall: call, result: result);
             break
         case Method.Message.GET_FILE:
-            getFile(methodCall: methodCall, result: result);
+            getFile(methodCall: call, result: result);
             break
         case Method.Message.GET_FILE_BYTES:
-            getFileBytes(methodCall: methodCall, result: result);
+            getFileBytes(methodCall: call, result: result);
             break
         case Method.Message.GET_FILENAME:
-            getFileName(methodCall: methodCall, result: result);
+            getFileName(methodCall: call, result: result);
             break
         case Method.Message.GET_FILE_MIME:
-            getFileMime(methodCall: methodCall, result: result);
+            getFileMime(methodCall: call, result: result);
             break
         case Method.Message.GET_SUMMARY_TEXT:
-            getSummaryText(methodCall: methodCall, result: result);
+            getSummaryText(methodCall: call, result: result);
             break
         case Method.Message.GET_STATE:
-            getState(methodCall: methodCall, result: result);
+            getState(methodCall: call, result: result);
             break
         case Method.Message.IS_SETUP_MESSAGE:
-            isSetupMessage(methodCall: methodCall, result: result);
+            isSetupMessage(methodCall: call, result: result);
             break
         case Method.Message.IS_INFO:
-            isInfo(methodCall: methodCall, result: result);
+            isInfo(methodCall: call, result: result);
             break
         case Method.Message.GET_SETUP_CODE_BEGIN:
-            getSetupCodeBegin(methodCall: methodCall, result: result);
+            getSetupCodeBegin(methodCall: call, result: result);
         case Method.Message.SHOW_PADLOCK:
-            showPadlock(methodCall: methodCall, result: result);
+            showPadlock(methodCall: call, result: result);
             break
         case Method.Message.IS_STARRED:
-            isStarred(methodCall: methodCall, result: result);
+            isStarred(methodCall: call, result: result);
             break
         default:
-            log.error("Context: Failing for \(methodCall.method)")
+            log.error("Context: Failing for \(call.method)")
             _ = FlutterMethodNotImplemented
         }
     }
@@ -214,7 +214,7 @@ class MessageCallHandler: BaseCallHandler, MethodCallHandling {
     
     private func getMessage(methodCall: FlutterMethodCall, result: FlutterResult) -> OpaquePointer? {
         let id = methodCall.intValue(for: Argument.ID, result: result)
-        guard let message = dc_get_contact(dcContext.context, UInt32(id)) else { return nil }
+        guard let message = dc_get_contact(dcContext.contextPointer, UInt32(id)) else { return nil }
         return message;
     }
 }

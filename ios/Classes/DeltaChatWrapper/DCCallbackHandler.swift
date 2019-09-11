@@ -54,9 +54,9 @@ class DCEventHandler {
     var state = ApplicationState.stopped
 
     fileprivate var backgroundTask: UIBackgroundTaskIdentifier = .invalid
-    fileprivate let dcContext: DCContext!
+    fileprivate let dcContext: DcContext!
 
-    init(context: DCContext) {
+    init(context: DcContext) {
         self.dcContext = context
     }
     
@@ -64,9 +64,9 @@ class DCEventHandler {
         DispatchQueue.global(qos: .background).async {
             self.registerBackgroundTask()
             while self.state == .running {
-                dc_perform_imap_jobs(self.dcContext.context)
-                dc_perform_imap_fetch(self.dcContext.context)
-                dc_perform_imap_idle(self.dcContext.context)
+                dc_perform_imap_jobs(self.dcContext.contextPointer)
+                dc_perform_imap_fetch(self.dcContext.contextPointer)
+                dc_perform_imap_idle(self.dcContext.contextPointer)
             }
             if self.backgroundTask != .invalid {
 //                completion?()
@@ -77,8 +77,8 @@ class DCEventHandler {
         DispatchQueue.global(qos: .utility).async {
             self.registerBackgroundTask()
             while self.state == .running {
-                dc_perform_smtp_jobs(self.dcContext.context)
-                dc_perform_smtp_idle(self.dcContext.context)
+                dc_perform_smtp_jobs(self.dcContext.contextPointer)
+                dc_perform_smtp_idle(self.dcContext.contextPointer)
             }
             if self.backgroundTask != .invalid {
                 self.endBackgroundTask()
@@ -87,15 +87,15 @@ class DCEventHandler {
         
         DispatchQueue.global(qos: .background).async {
             while self.state == .running {
-                dc_perform_sentbox_fetch(self.dcContext.context)
-                dc_perform_sentbox_idle(self.dcContext.context)
+                dc_perform_sentbox_fetch(self.dcContext.contextPointer)
+                dc_perform_sentbox_idle(self.dcContext.contextPointer)
             }
         }
         
         DispatchQueue.global(qos: .background).async {
             while self.state == .running {
-                dc_perform_mvbox_fetch(self.dcContext.context)
-                dc_perform_mvbox_idle(self.dcContext.context)
+                dc_perform_mvbox_fetch(self.dcContext.contextPointer)
+                dc_perform_mvbox_idle(self.dcContext.contextPointer)
             }
         }
     }
@@ -122,109 +122,109 @@ class DCEventHandler {
 
 }
 
+// MARK: - Handle DeltaChat Callback Events
+
 @_silgen_name("handleDeltaChatEvent")
 public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsignedLong, data1String: UnsafePointer<Int8>, data2String: UnsafePointer<Int8>) -> UnsafePointer<Int8>? {
     log.debug("Received event: \(event)")
 
-    switch event {
-    case DcEvent.INFO.rawValue:
+    guard let callbackEvent = DcEvent(rawValue: event) else {
+        log.error("Unknown event: \(event), '\(String(cString: data2String))'")
+        return nil
+    }
+
+    switch callbackEvent {
+    case .info:
         log.debug("event: \(String(cString: data2String))")
         
-    case DcEvent.INCOMING_MSG.rawValue:
-        log.debug("Message ID: \(Int(data2))")
+    case .warning:
+        log.debug("event: \(String(cString: data2String))")
         
-    case DcEvent.WARNING.rawValue:
-        log.debug("Message ID: \(Int(data2))")
-        
-    case DcEvent.ERROR.rawValue:
-        log.debug("Message ID: \(Int(data2))")
-        
-    case DcEvent.ERROR_NETWORK.rawValue:
-        log.debug("Message ID: \(Int(data2))")
-        
-    case DcEvent.ERROR_SELF_NOT_IN_GROUP.rawValue:
-        log.debug("Message ID: \(Int(data2))")
-        
-    case DcEvent.MSGS_CHANGED.rawValue:
-        log.debug("Message ID: \(Int(data2))")
-        
-    case DcEvent.INCOMING_MSG.rawValue:
-        log.debug("Message ID: \(Int(data2))")
-        
-    case DcEvent.MSG_DELIVERED.rawValue:
-        log.debug("Message ID: \(Int(data2))")
-        
-    case DcEvent.MSG_FAILED.rawValue:
-        log.debug("Message ID: \(Int(data2))")
-        
-    case DcEvent.MSG_READ.rawValue:
-        log.debug("Message ID: \(Int(data2))")
-        
-    case DcEvent.CHAT_MODIFIED.rawValue:
-        log.debug("Message ID: \(Int(data2))")
-        
-    case DcEvent.CONTACTS_CHANGED.rawValue:
-        log.debug("Message ID: \(Int(data2))")
-        
-    case DcEvent.CONFIGURE_PROGRESS.rawValue:
-        log.debug("Message ID: \(Int(data2))")
-        
-    case DcEvent.IMEX_PROGRESS.rawValue:
-        log.debug("Message ID: \(Int(data2))")
-        
-    case DcEvent.IMEX_FILE_WRITTEN.rawValue:
-        log.debug("Message ID: \(Int(data2))")
-        
-    case DcEvent.SECUREJOIN_JOINER_PROGRESS.rawValue:
-        log.debug("Message ID: \(Int(data2))")
-        
-    case DcEvent.SECUREJOIN_INVITER_PROGRESS.rawValue:
-        log.debug("Message ID: \(Int(data2))")
-        
-    case DcEvent.IS_OFFLINE.rawValue:
-        log.debug("Message ID: \(Int(data2))")
-        
-    case DcEvent.GET_STRING.rawValue:
-        log.debug("Message ID: \(Int(data2))")
-        
-    case DcEvent.GET_QUANTITIY_STRING.rawValue:
-        log.debug("Message ID: \(Int(data2))")
-        
-    case DcEvent.HTTP_GET.rawValue:
-        log.debug("Message ID: \(Int(data2))")
-        
-    case DcEvent.HTTP_POST.rawValue:
-        log.debug("Message ID: \(Int(data2))")
-        
-    default:
-        log.error("Unknown event: \(event)")
+    case .error:
+        log.debug("event: \(String(cString: data2String))")
+
+    case .errorNetwork:
+        log.debug("event: \(String(cString: data2String))")
+
+    case .errorSelfNotInGroup:
+        log.debug("event: \(String(cString: data2String))")
+
+    case .msgsChanged:
+        log.debug("event: \(String(cString: data2String))")
+
+    case .msgIncoming:
+        log.debug("event: \(String(cString: data2String))")
+
+    case .msgDelivered:
+        log.debug("event: \(String(cString: data2String))")
+
+    case .msgFailed:
+        log.debug("event: \(String(cString: data2String))")
+
+    case .msgRead:
+        log.debug("event: \(String(cString: data2String))")
+
+    case .chatModified:
+        log.debug("event: \(String(cString: data2String))")
+
+    case .contactsChanged:
+        log.debug("event: \(String(cString: data2String))")
+
+    case .configureProgress:
+        log.debug("event: \(String(cString: data2String))")
+
+    case .imexProgress:
+        log.debug("event: \(String(cString: data2String))")
+
+    case .imexFileWritten:
+        log.debug("event: \(String(cString: data2String))")
+
+    case .secureJoinJoinerProgress:
+        log.debug("event: \(String(cString: data2String))")
+
+    case .secureJoinInviterProgress:
+        log.debug("event: \(String(cString: data2String))")
+
+    case .isOffline:
+        log.debug("event: \(String(cString: data2String))")
+
+    case .getString:
+        log.debug("event: \(String(cString: data2String))")
+
+    case .getQuantityString:
+        log.debug("event: \(String(cString: data2String))")
+
+    case .HTTP_GET:
+        log.debug("event: \(String(cString: data2String))")
+
+    case .HTTP_POST:
+        log.debug("event: \(String(cString: data2String))")
     }
-    
+
     return nil
 }
 
-
 enum DcEvent: CInt {
-    case INFO                        = 100
-    case WARNING                     = 300
-    case ERROR                       = 400
-    case ERROR_NETWORK               = 401
-    case ERROR_SELF_NOT_IN_GROUP     = 410
-    case MSGS_CHANGED                = 2000
-    case INCOMING_MSG                = 2005
-    case MSG_DELIVERED               = 2010
-    case MSG_FAILED                  = 2012
-    case MSG_READ                    = 2015
-    case CHAT_MODIFIED               = 2020
-    case CONTACTS_CHANGED            = 2030
-    case CONFIGURE_PROGRESS          = 2041
-    case IMEX_PROGRESS               = 2051
-    case IMEX_FILE_WRITTEN           = 2052
-    case SECUREJOIN_INVITER_PROGRESS = 2060
-    case SECUREJOIN_JOINER_PROGRESS  = 2061
-    case IS_OFFLINE                  = 2081
-    case GET_STRING                  = 2091
-    case GET_QUANTITIY_STRING        = 2092
-    case HTTP_GET                    = 2100
-    case HTTP_POST                   = 2110
+    case info                      = 100
+    case warning                   = 300
+    case error                     = 400
+    case errorNetwork              = 401
+    case errorSelfNotInGroup       = 410
+    case msgsChanged               = 2000
+    case msgIncoming               = 2005
+    case msgDelivered              = 2010
+    case msgFailed                 = 2012
+    case msgRead                   = 2015
+    case chatModified              = 2020
+    case contactsChanged           = 2030
+    case configureProgress         = 2041
+    case imexProgress              = 2051
+    case imexFileWritten           = 2052
+    case secureJoinInviterProgress = 2060
+    case secureJoinJoinerProgress  = 2061
+    case isOffline                 = 2081
+    case getString                 = 2091
+    case getQuantityString         = 2092
+    case HTTP_GET                  = 2100
+    case HTTP_POST                 = 2110
 }

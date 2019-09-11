@@ -42,44 +42,44 @@
 
 import Foundation
 
-class ContactCallHandler: BaseCallHandler, MethodCallHandling {
+class ContactCallHandler: MethodCallHandler, MethodCallHandling {
 
     // MARK: - Protocol MethodCallHandling
 
-    func handle(_ methodCall: FlutterMethodCall, result: (Any?) -> Void) {
-        switch (methodCall.method) {
+    func handle(_ call: FlutterMethodCall, result: (Any?) -> Void) {
+        switch (call.method) {
         case Method.Contact.GET_ID:
-            getId(methodCall: methodCall, result: result);
+            getId(methodCall: call, result: result);
             break
         case Method.Contact.GET_NAME:
-            getName(methodCall: methodCall, result: result);
+            getName(methodCall: call, result: result);
             break
         case Method.Contact.GET_DISPLAY_NAME:
-            getDisplayName(methodCall: methodCall, result: result);
+            getDisplayName(methodCall: call, result: result);
             break
         case Method.Contact.GET_FIRST_NAME:
-            getFirstName(methodCall: methodCall, result: result);
+            getFirstName(methodCall: call, result: result);
             break
         case Method.Contact.GET_ADDRESS:
-            getAddress(methodCall: methodCall, result: result);
+            getAddress(methodCall: call, result: result);
             break
         case Method.Contact.GET_NAME_AND_ADDRESS:
-            getNameAndAddress(methodCall: methodCall, result: result);
+            getNameAndAddress(methodCall: call, result: result);
             break
         case Method.Contact.GET_PROFILE_IMAGE:
-            getProfileImage(methodCall: methodCall, result: result);
+            getProfileImage(methodCall: call, result: result);
             break
         case Method.Contact.GET_COLOR:
-            getColor(methodCall: methodCall, result: result);
+            getColor(methodCall: call, result: result);
             break
         case Method.Contact.IS_BLOCKED:
-            isBlocked(methodCall: methodCall, result: result);
+            isBlocked(methodCall: call, result: result);
             break
         case Method.Contact.IS_VERIFIED:
-            isVerified(methodCall: methodCall, result: result);
+            isVerified(methodCall: call, result: result);
             break
         default:
-            log.error("Context: Failing for \(methodCall.method)")
+            log.error("Context: Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
         }
     }
@@ -134,6 +134,6 @@ class ContactCallHandler: BaseCallHandler, MethodCallHandling {
     private func getContact(methodCall: FlutterMethodCall, result: FlutterResult) -> OpaquePointer {
         let id = methodCall.intValue(for: Argument.ID, result: result)
         
-        return dc_get_contact(dcContext.context, UInt32(id))
+        return dc_get_contact(dcContext.contextPointer, UInt32(id))
     }
 }

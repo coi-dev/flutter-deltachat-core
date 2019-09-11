@@ -42,40 +42,40 @@
 
 import Foundation
 
-class ChatListCallHandler: BaseCallHandler, MethodCallHandling {
+class ChatListCallHandler: MethodCallHandler, MethodCallHandling {
 
     fileprivate var chatList: OpaquePointer!
 
     // MARK: - Protocol MethodCallHandling
     
-    func handle(_ methodCall: FlutterMethodCall, result: (Any?) -> Void) {
-        switch (methodCall.method) {
+    func handle(_ call: FlutterMethodCall, result: (Any?) -> Void) {
+        switch (call.method) {
         case Method.ChatList.INTERNAL_SETUP:
-            setup(methodCall: methodCall, result: result)
+            setup(methodCall: call, result: result)
             break
         case Method.ChatList.GET_ID:
-            getChatId(methodCall: methodCall, result: result)
+            getChatId(methodCall: call, result: result)
             break
         case Method.ChatList.GET_CNT:
             getChatCnt(result: result)
             break
         case Method.ChatList.GET_CHAT:
-            getChat(methodCall: methodCall, result: result)
+            getChat(methodCall: call, result: result)
             break
         case Method.ChatList.GET_MSG_ID:
-            getChatMsgId(dcChatlist: chatList, methodCall: methodCall, result: result)
+            getChatMsgId(dcChatlist: chatList, methodCall: call, result: result)
             break
         case Method.ChatList.GET_MSG:
-            getChatMsg(dcChatlist: chatList, methodCall: methodCall, result: result)
+            getChatMsg(dcChatlist: chatList, methodCall: call, result: result)
             break
         case Method.ChatList.GET_SUMMARY:
-            getChatSummary(dcChatlist: chatList, methodCall: methodCall, result: result)
+            getChatSummary(dcChatlist: chatList, methodCall: call, result: result)
             break
         case Method.ChatList.INTERNAL_TEAR_DOWN:
-            tearDown(methodCall: methodCall, result: result)
+            tearDown(methodCall: call, result: result)
             break
         default:
-            log.error("ChatList: Failing for \(methodCall.method)")
+            log.error("ChatList: Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
             
         }
@@ -93,7 +93,7 @@ class ChatListCallHandler: BaseCallHandler, MethodCallHandling {
             } else {
                 chatListFlag = 0
             }
-            chatList = dc_get_chatlist(dcContext.context, Int32(chatListFlag), nil, 0)
+            chatList = dc_get_chatlist(dcContext.contextPointer, Int32(chatListFlag), nil, 0)
             result(1)
         } else {
             Method.errorMissingArgument(result: result)

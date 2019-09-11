@@ -40,26 +40,20 @@
  * for more details.
  */
 
-import Foundation
+import UIKit
 
-class EventChannelHandler: FlutterStreamHandler {
-    
-    fileprivate let messanger: FlutterBinaryMessenger!
-    fileprivate var eventSink: FlutterEventSink?
-    
-    init(messanger: FlutterBinaryMessenger) {
-        self.messanger = messanger
+struct Utils {
+
+    static func copyAndFreeArray(inputArray: OpaquePointer?) -> [Int] {
+        var acc: [Int] = []
+        let len = dc_array_get_cnt(inputArray)
+        for i in 0 ..< len {
+            let e = dc_array_get_id(inputArray, i)
+            acc.append(Int(e))
+        }
+        dc_array_unref(inputArray)
+        
+        return acc
     }
-    
-    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-        eventSink = events
-        return nil
-    }
-    
-    func onCancel(withArguments arguments: Any?) -> FlutterError? {
-        eventSink = nil
-        return nil
-    }
-    
-    
+
 }

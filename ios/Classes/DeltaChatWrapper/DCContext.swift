@@ -71,10 +71,10 @@ class DCContext {
     }
     
     var isConfigured: Bool {
-        return 1 == dc_is_configured(context)
+        return 0 != dc_is_configured(context)
     }
     
-    func set(value: String, for key: String) -> Int32 {
+    func set(value: String?, for key: String) -> Int32 {
         return setString(value: value, for: key)
     }
     
@@ -94,9 +94,11 @@ class DCContext {
     
     fileprivate func setString(value: String?, for key: String) -> Int32 {
         guard let value = value else {
+            log.debug("set config for key: '\(key)', value: 'nil'")
             return dc_set_config(context, key, nil)
         }
         
+        log.debug("set config for key: '\(key)', value: '\(value)'")
         return dc_set_config(context, key, value)
     }
     
@@ -105,6 +107,7 @@ class DCContext {
     }
     
     fileprivate func setBool(value: Bool, for key: String) -> Int32 {
+        log.debug("set config for key: '\(key)', value: '\(value)'")
         return setString(value: value ? "1" : "0" , for: key)
     }
     
@@ -118,6 +121,7 @@ class DCContext {
     }
     
     fileprivate func setIntValue(value: Int, for key: String) -> Int32 {
+        log.debug("set config for key: '\(key)', value: '\(value)'")
         return setString(value: String(value), for: key)
     }
 

@@ -42,44 +42,44 @@
 
 import Foundation
 
-class ChatCallHandler: BaseCallHandler, MethodCallHandling {
+class ChatCallHandler: MethodCallHandler, MethodCallHandling {
 
     // MARK: - Protocol MethodCallHandling
     
-    func handle(_ methodCall: FlutterMethodCall, result: (Any?) -> Void) {
-        switch (methodCall.method) {
+    func handle(_ call: FlutterMethodCall, result: (Any?) -> Void) {
+        switch (call.method) {
         case Method.Chat.GET_ID:
-            getChatId(methodCall: methodCall, result: result);
+            getChatId(methodCall: call, result: result);
             break
         case Method.Chat.IS_GROUP:
-            isGroup(methodCall: methodCall, result: result);
+            isGroup(methodCall: call, result: result);
             break
         case Method.Chat.GET_ARCHIVED:
-            getArchived(methodCall: methodCall, result: result);
+            getArchived(methodCall: call, result: result);
             break
         case Method.Chat.GET_COLOR:
-            getColor(methodCall: methodCall, result: result);
+            getColor(methodCall: call, result: result);
             break
         case Method.Chat.GET_NAME:
-            getName(methodCall: methodCall, result: result);
+            getName(methodCall: call, result: result);
             break
         case Method.Chat.GET_SUBTITLE:
-            getSubtitle(methodCall: methodCall, result: result);
+            getSubtitle(methodCall: call, result: result);
             break
         case Method.Chat.GET_PROFILE_IMAGE:
-            getProfileImage(methodCall: methodCall, result: result);
+            getProfileImage(methodCall: call, result: result);
             break
         case Method.Chat.IS_UNPROMOTED:
-            isUnpromoted(methodCall: methodCall, result: result);
+            isUnpromoted(methodCall: call, result: result);
             break
         case Method.Chat.IS_SELF_TALK:
-            isSelfTalk(methodCall: methodCall, result: result);
+            isSelfTalk(methodCall: call, result: result);
             break
         case Method.Chat.IS_VERIFIED:
-            isVerified(methodCall: methodCall, result: result);
+            isVerified(methodCall: call, result: result);
             break
         default:
-            log.error("Context: Failing for \(methodCall.method)")
+            log.error("Context: Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
         }
     }
@@ -142,7 +142,7 @@ class ChatCallHandler: BaseCallHandler, MethodCallHandling {
     
     private func getChat(methodCall: FlutterMethodCall, result: FlutterResult) -> OpaquePointer {
         let id = methodCall.intValue(for: Argument.ID, result: result)
-        let chat: OpaquePointer = dc_get_chat(dcContext.context, UInt32(id))
+        let chat: OpaquePointer = dc_get_chat(dcContext.contextPointer, UInt32(id))
         return chat;
     }
 }

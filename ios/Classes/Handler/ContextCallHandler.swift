@@ -42,20 +42,20 @@
 
 import Foundation
 
-class ContextCallHandler: BaseCallHandler, MethodCallHandling {
+class ContextCallHandler: MethodCallHandler, MethodCallHandling {
 
     // MARK: - Protocol MethodCallHandling
 
-    func handle(_ methodCall: FlutterMethodCall, result: (Any?) -> Void) {
-        switch (methodCall.method) {
+    func handle(_ call: FlutterMethodCall, result: (Any?) -> Void) {
+        switch (call.method) {
         case Method.Context.CONFIG_SET:
-            setConfig(methodCall: methodCall, result: result)
+            setConfig(methodCall: call, result: result)
             break
         case Method.Context.CONFIG_GET:
-            getConfig(methodCall: methodCall, result: result, type: ArgumentType.STRING)
+            getConfig(methodCall: call, result: result, type: ArgumentType.STRING)
             break
         case Method.Context.CONFIG_GET_INT:
-            getConfig(methodCall: methodCall, result: result, type: ArgumentType.INT)
+            getConfig(methodCall: call, result: result, type: ArgumentType.INT)
             break
         case Method.Context.CONFIGURE:
             configure(result: result)
@@ -64,70 +64,70 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
             result(dcContext.isConfigured)
             break
         case Method.Context.ADD_ADDRESS_BOOK:
-            addAddressBook(methodCall: methodCall, result: result)
+            addAddressBook(methodCall: call, result: result)
             break
         case Method.Context.CREATE_CONTACT:
-            createContact(methodCall: methodCall, result: result)
+            createContact(methodCall: call, result: result)
             break
         case Method.Context.DELETE_CONTACT:
-            deleteContact(methodCall: methodCall, result: result)
+            deleteContact(methodCall: call, result: result)
             break
         case Method.Context.BLOCK_CONTACT:
-            blockContact(methodCall: methodCall, result: result)
+            blockContact(methodCall: call, result: result)
             break
         case Method.Context.UNBLOCK_CONTACT:
-            unblockContact(methodCall: methodCall, result: result)
+            unblockContact(methodCall: call, result: result)
             break
         case Method.Context.CREATE_CHAT_BY_CONTACT_ID:
-            createChatByContactId(methodCall: methodCall, result: result)
+            createChatByContactId(methodCall: call, result: result)
             break
         case Method.Context.CREATE_CHAT_BY_MESSAGE_ID:
-            createChatByMessageId(methodCall: methodCall, result: result)
+            createChatByMessageId(methodCall: call, result: result)
             break
         case Method.Context.CREATE_GROUP_CHAT:
-            createGroupChat(methodCall: methodCall, result: result)
+            createGroupChat(methodCall: call, result: result)
             break
         case Method.Context.GET_CONTACT:
-            getContact(methodCall: methodCall, result: result)
+            getContact(methodCall: call, result: result)
             break
         case Method.Context.GET_CONTACTS:
-            getContacts(methodCall: methodCall, result: result)
+            getContacts(methodCall: call, result: result)
             break
         case Method.Context.GET_CHAT_CONTACTS:
-            getChatContacts(methodCall: methodCall, result: result)
+            getChatContacts(methodCall: call, result: result)
             break
         case Method.Context.GET_CHAT:
-            getChat(methodCall: methodCall, result: result)
+            getChat(methodCall: call, result: result)
             break
         case Method.Context.GET_CHAT_MESSAGES:
-            getChatMessages(methodCall: methodCall, result: result)
+            getChatMessages(methodCall: call, result: result)
             break
         case Method.Context.CREATE_CHAT_MESSAGE:
-            createChatMessage(methodCall: methodCall, result: result)
+            createChatMessage(methodCall: call, result: result)
             break
         case Method.Context.CREATE_CHAT_ATTACHMENT_MESSAGE:
-            createChatAttachmentMessage(methodCall: methodCall, result: result)
+            createChatAttachmentMessage(methodCall: call, result: result)
             break
         case Method.Context.ADD_CONTACT_TO_CHAT:
-            addContactToChat(methodCall: methodCall, result: result)
+            addContactToChat(methodCall: call, result: result)
             break
         case Method.Context.GET_CHAT_BY_CONTACT_ID:
-            getChatByContactId(methodCall: methodCall, result: result)
+            getChatByContactId(methodCall: call, result: result)
             break
         case Method.Context.GET_BLOCKED_CONTACTS:
             getBlockedContacts(result: result)
             break
         case Method.Context.GET_FRESH_MESSAGE_COUNT:
-            getFreshMessageCount(methodCall: methodCall, result: result)
+            getFreshMessageCount(methodCall: call, result: result)
             break
         case Method.Context.MARK_NOTICED_CHAT:
-            markNoticedChat(methodCall: methodCall, result: result)
+            markNoticedChat(methodCall: call, result: result)
             break
         case Method.Context.DELETE_CHAT:
-            deleteChat(methodCall: methodCall, result: result)
+            deleteChat(methodCall: call, result: result)
             break
         case Method.Context.REMOVE_CONTACT_FROM_CHAT:
-            removeContactFromChat(methodCall: methodCall, result: result)
+            removeContactFromChat(methodCall: call, result: result)
             break
         case Method.Context.EXPORT_KEYS:
             //exportImportKeys(methodCall, result, DcContext.DC_IMEX_EXPORT_SELF_KEYS)
@@ -139,42 +139,42 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
             getFreshMessages(result: result)
             break
         case Method.Context.FORWARD_MESSAGES:
-            forwardMessages(methodCall: methodCall, result: result)
+            forwardMessages(methodCall: call, result: result)
             break
         case Method.Context.MARK_SEEN_MESSAGES:
-            markSeenMessages(methodCall: methodCall, result: result)
+            markSeenMessages(methodCall: call, result: result)
             break
         case Method.Context.INITIATE_KEY_TRANSFER:
             initiateKeyTransfer(result: result)
             break
         case Method.Context.CONTINUE_KEY_TRANSFER:
-            continueKeyTransfer(methodCall: methodCall, result: result)
+            continueKeyTransfer(methodCall: call, result: result)
         case Method.Context.GET_SECUREJOIN_QR:
-            getSecurejoinQr(methodCall: methodCall, result: result)
+            getSecurejoinQr(methodCall: call, result: result)
             break
         case Method.Context.JOIN_SECUREJOIN:
-            joinSecurejoin(methodCall: methodCall, result: result)
+            joinSecurejoin(methodCall: call, result: result)
             break
         case Method.Context.CHECK_QR:
-            checkQr(methodCall: methodCall, result: result)
+            checkQr(methodCall: call, result: result)
             break
         case Method.Context.STOP_ONGOING_PROCESS:
-            dc_stop_ongoing_process(dcContext.context)
+            dc_stop_ongoing_process(dcContext.contextPointer)
             result(nil)
             break
         case Method.Context.DELETE_MESSAGES:
-            deleteMessages(methodCall: methodCall, result: result)
+            deleteMessages(methodCall: call, result: result)
         case Method.Context.STAR_MESSAGES:
-            starMessages(methodCall: methodCall, result: result)
+            starMessages(methodCall: call, result: result)
             break
         case Method.Context.SET_CHAT_NAME:
-            setChatName(methodCall: methodCall, result: result)
+            setChatName(methodCall: call, result: result)
             break
         case Method.Context.SET_CHAT_PROFILE_IMAGE:
-            setChatProfileImage(methodCall: methodCall, result: result)
+            setChatProfileImage(methodCall: call, result: result)
             break
         default:
-            log.error("Context: Failing for \(methodCall.method)")
+            log.error("Context: Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
         }
     }
@@ -183,8 +183,8 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
     private func setConfig(methodCall: FlutterMethodCall, result: FlutterResult) {
         let parameters = methodCall.parameters
         
-        if let key = parameters["key"] as? String,
-            let value = parameters["value"] as? String {
+        if let key = parameters["key"] as? String {
+            let value = parameters["value"] as? String
             
             let dc_result = dcContext.set(value: value, for: key)
             result(NSNumber(value: dc_result))
@@ -201,7 +201,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
             
             switch (type) {
             case ArgumentType.STRING:
-                let value = dc_get_config(dcContext.context, key)
+                let value = dc_get_config(dcContext.contextPointer, key)
                 if let pSafe = value {
                     let c = String(cString: pSafe)
                     if c.isEmpty {
@@ -212,7 +212,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
                 break
                 
             case ArgumentType.INT:
-                let value = dc_get_config(dcContext.context, key)
+                let value = dc_get_config(dcContext.contextPointer, key)
                 if let pSafe = value {
                     let c = Int(bitPattern: pSafe)
                     
@@ -229,7 +229,8 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
     }
     
     private func configure(result: FlutterResult) {
-        result(dc_configure(dcContext.context));
+        dc_configure(dcContext.contextPointer)
+        result(nil);
     }
     
     private func addAddressBook(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -241,7 +242,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         let parameters = methodCall.parameters
         
         if let addressBook = parameters[Argument.ADDRESS_BOOK] as? String {
-            let dc_result = dc_add_address_book(dcContext.context, addressBook)
+            let dc_result = dc_add_address_book(dcContext.contextPointer, addressBook)
             result(dc_result)
         }
         else {
@@ -259,7 +260,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
             let address = myArgs["address"] as? String {
             
             let name = myArgs["name"] as? String
-            let contactId = dc_create_contact(dcContext.context, name, address)
+            let contactId = dc_create_contact(dcContext.contextPointer, name, address)
             result(Int(contactId))
         }
         else {
@@ -280,7 +281,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         if let myArgs = args as? [String: Any],
             let contactId = myArgs[Argument.ID] as? UInt32 {
             
-            let deleted = dc_delete_contact(dcContext.context, contactId)
+            let deleted = dc_delete_contact(dcContext.contextPointer, contactId)
             result(deleted)
         }
         else {
@@ -303,7 +304,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         if let myArgs = args as? [String: Any],
             let contactId = myArgs[Argument.ID] as? UInt32 {
             
-            dc_block_contact(dcContext.context, contactId, 1)
+            dc_block_contact(dcContext.contextPointer, contactId, 1)
             result(nil)
         }
         else {
@@ -314,7 +315,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
     }
     
     private func getBlockedContacts(result: FlutterResult) {
-        let blockedIds = dc_get_blocked_contacts(dcContext.context)
+        let blockedIds = dc_get_blocked_contacts(dcContext.contextPointer)
         result(blockedIds)
         
     }
@@ -330,7 +331,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         }
         
         if let myArgs = args as? [String: Any], let contactId = myArgs[Argument.ID] as? UInt32 {
-            dc_block_contact(dcContext.context, contactId, 0)
+            dc_block_contact(dcContext.contextPointer, contactId, 0)
             result(nil)
         }
         else {
@@ -348,7 +349,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         if let myArgs = args as? [String: Any],
             let contactId = myArgs[Argument.ID] as? UInt32 {
             
-            let chatId = dc_create_chat_by_contact_id(dcContext.context, contactId)
+            let chatId = dc_create_chat_by_contact_id(dcContext.contextPointer, contactId)
             result(Int(chatId))
         }
         else {
@@ -364,7 +365,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         if let myArgs = args as? [String: Any],
             let messageId = myArgs[Argument.ID] as? UInt32 {
             
-            let chatId = dc_create_chat_by_msg_id(dcContext.context, messageId)
+            let chatId = dc_create_chat_by_msg_id(dcContext.contextPointer, messageId)
             result(Int(chatId))
         }
         else {
@@ -391,7 +392,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
             }
             
             let name = myArgs[Argument.NAME] as? String
-            let chatId = dc_create_group_chat(dcContext.context, Int32(truncating: verified! as NSNumber), name)
+            let chatId = dc_create_group_chat(dcContext.contextPointer, Int32(truncating: verified! as NSNumber), name)
             
             result(chatId)
         }
@@ -416,7 +417,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
                 return
             }
             
-            let successfullyAdded = dc_add_contact_to_chat(dcContext.context, chatId!, contactId!)
+            let successfullyAdded = dc_add_contact_to_chat(dcContext.contextPointer, chatId!, contactId!)
             
             result(successfullyAdded)
         }
@@ -435,7 +436,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         
         if let myArgs = args as? [String: Any],
             let contactId = myArgs[Argument.CONTACT_ID] as? UInt32 {
-            let chatId = dc_get_chat_id_by_contact_id(dcContext.context, contactId)
+            let chatId = dc_get_chat_id_by_contact_id(dcContext.contextPointer, contactId)
             result(chatId)
         }
         else {
@@ -451,7 +452,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
             return
         }
         if let myArgs = args as? [String: Any], let id = myArgs[Argument.ID] as? UInt32 {
-            result(dc_array_get_contact_id(dcContext.context, Int(id)))
+            result(dc_array_get_contact_id(dcContext.contextPointer, Int(id)))
         }
         
     }
@@ -475,7 +476,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
                 return
             }
             
-            var contactIds = dc_get_contacts(dcContext.context, flags!, query)
+            var contactIds = dc_get_contacts(dcContext.contextPointer, flags!, query)
             
             result(FlutterStandardTypedData(int32: Data(bytes: &contactIds, count: MemoryLayout.size(ofValue: contactIds))))
         }
@@ -500,7 +501,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
                 return
             }
             
-            var contactIds = dc_get_chat_contacts(dcContext.context, id!)
+            var contactIds = dc_get_chat_contacts(dcContext.contextPointer, id!)
             
             result(FlutterStandardTypedData(int32: Data(bytes: &contactIds, count: MemoryLayout.size(ofValue: contactIds))))
         }
@@ -521,7 +522,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         if let myArgs = args as? [String: Any],
             let id = myArgs[Argument.ID] as? UInt32 {
             
-            result(dc_get_chat(dcContext.context, id))
+            result(dc_get_chat(dcContext.contextPointer, id))
         }
         else {
             Method.errorMissingArgument(result: result);
@@ -662,7 +663,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
                 return
             }
             
-            let freshMessageCount = dc_get_fresh_msg_cnt(dcContext.context, chatId!)
+            let freshMessageCount = dc_get_fresh_msg_cnt(dcContext.contextPointer, chatId!)
             
             result(freshMessageCount)
         }
@@ -687,7 +688,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
                 return
             }
             
-            dc_marknoticed_chat(dcContext.context, chatId!)
+            dc_marknoticed_chat(dcContext.contextPointer, chatId!)
             result(nil)
         }
         
@@ -711,7 +712,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
                 return
             }
             
-            dc_delete_chat(dcContext.context, chatId!)
+            dc_delete_chat(dcContext.contextPointer, chatId!)
             result(nil)
         }
         
@@ -729,7 +730,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         }
         
         if let myArgs = args as? [String: Any], let chatId = myArgs[Argument.CHAT_ID], let contactId = myArgs[Argument.CONTACT_ID] {
-            result(dc_remove_contact_from_chat(dcContext.context, chatId as! UInt32, contactId as! UInt32))
+            result(dc_remove_contact_from_chat(dcContext.contextPointer, chatId as! UInt32, contactId as! UInt32))
         }
         else {
             Method.errorMissingArgument(result: result);
@@ -738,7 +739,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
     }
     
     private func getFreshMessages(result: FlutterResult) {
-        let freshMessages = dc_get_fresh_msgs(dcContext.context)
+        let freshMessages = dc_get_fresh_msgs(dcContext.contextPointer)
         result(freshMessages)
     }
     
@@ -755,7 +756,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         
         if let myArgs = args as? [String: Any], let chatId = myArgs[Argument.CHAT_ID], let msgIdArray = myArgs[Argument.MESSAGE_IDS] {
             
-            result(dc_forward_msgs(dcContext.context, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count), chatId as! UInt32))
+            result(dc_forward_msgs(dcContext.contextPointer, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count), chatId as! UInt32))
         }
         else {
             Method.errorMissingArgument(result: result);
@@ -775,7 +776,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         }
         
         if let myArgs = args as? [String: Any], let msgIdArray = myArgs[Argument.MESSAGE_IDS] {
-            result(dc_markseen_msgs(dcContext.context, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count)))
+            result(dc_markseen_msgs(dcContext.contextPointer, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count)))
         }
         else {
             Method.errorMissingArgument(result: result);
@@ -807,7 +808,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
             let messageId = myArgs[Argument.ID],
             let setupCode = myArgs[Argument.SETUP_CODE] {
             
-            result(dc_continue_key_transfer(dcContext.context, messageId as! UInt32, setupCode as? UnsafePointer<Int8>))
+            result(dc_continue_key_transfer(dcContext.contextPointer, messageId as! UInt32, setupCode as? UnsafePointer<Int8>))
         }
         else {
             Method.errorMissingArgument(result: result);
@@ -828,7 +829,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         
         if let myArgs = args as? [String: Any],
             let chatId = myArgs[Argument.CHAT_ID] {
-            result(dc_get_securejoin_qr(dcContext.context, chatId as! UInt32))
+            result(dc_get_securejoin_qr(dcContext.contextPointer, chatId as! UInt32))
         }
         else {
             Method.errorMissingArgument(result: result);
@@ -897,7 +898,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         
         if let myArgs = args as? [String: Any],
             let msgIdArray = myArgs[Argument.MESSAGE_IDS] {
-            result(dc_delete_msgs(dcContext.context, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count)))
+            result(dc_delete_msgs(dcContext.contextPointer, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count)))
         }
         else {
             Method.errorMissingArgument(result: result);
@@ -919,7 +920,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
         if let msgIds = arguments[Argument.MESSAGE_IDS] {
             let star = methodCall.intValue(for: Argument.VALUE, result: result)
             
-            dc_star_msgs(dcContext.context, msgIds as? UnsafePointer<UInt32>, Int32((msgIds as AnyObject).count), Int32(star))
+            dc_star_msgs(dcContext.contextPointer, msgIds as? UnsafePointer<UInt32>, Int32((msgIds as AnyObject).count), Int32(star))
             result(nil)
         }
         else {
@@ -943,7 +944,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
             let chatId = myArgs[Argument.CHAT_ID],
             let value = myArgs[Argument.VALUE] {
             
-            dc_set_chat_profile_image(dcContext.context, chatId as! UInt32, value as? UnsafePointer<Int8>)
+            dc_set_chat_profile_image(dcContext.contextPointer, chatId as! UInt32, value as? UnsafePointer<Int8>)
             result(nil)
         }
         else {
@@ -968,7 +969,7 @@ class ContextCallHandler: BaseCallHandler, MethodCallHandling {
             let chatId = myArgs[Argument.CHAT_ID],
             let value = myArgs[Argument.VALUE] {
             
-            dc_set_chat_name(dcContext.context, chatId as! UInt32, value as? UnsafePointer<Int8>)
+            dc_set_chat_name(dcContext.contextPointer, chatId as! UInt32, value as? UnsafePointer<Int8>)
             result(nil)
         }
         else {

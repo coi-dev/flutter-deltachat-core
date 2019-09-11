@@ -40,18 +40,96 @@
  * for more details.
  */
 
-protocol MethodCallHandling {
-    func handle(_ methodCall: FlutterMethodCall, result: FlutterResult)
-}
+import Foundation
 
-class BaseCallHandler {
-    
-    let dcContext: DCContext!
+class BaseCallHandler: MethodCallHandler, MethodCallHandling {
 
-    // MARK: - Initialization
+    // MARK: - Protocol MethodCallHandling
+
+    func handle(_ call: FlutterMethodCall, result: (Any?) -> Void) {
+        switch (call.method) {
+        case Method.Base.INIT:
+            baseInit(result: result)
+            break
+        case Method.Base.SYSTEM_INFO:
+            systemInfo(result: result)
+            break
+        case Method.Base.CORE_LISTENER:
+            coreListener(methodCall: call, result: result);
+            break
+        case Method.Base.SET_CORE_STRINGS:
+            setCoreStrings(methodCall: call, result: result);
+            break
+        default:
+            log.error("Failing for \(call.method)")
+            result(FlutterMethodNotImplemented)
+        }
+    }
     
-    init(context: DCContext) {
-        self.dcContext = context
+    // MARK: - Private Helper
+    
+    fileprivate func baseInit(result: FlutterResult) {
+        if dcContext.openUserDataBase() {
+            result(dcContext.userDatabasePath)
+            return
+        }
+        log.error("Couldn't open user database at path: \(dcContext.userDatabasePath)")
+        result(DCPluginError.couldNotOpenDataBase())
+    }
+    
+    fileprivate func systemInfo(result: FlutterResult) {
+        result(UIApplication.version)
+    }
+    
+    fileprivate func coreListener(methodCall: FlutterMethodCall, result: FlutterResult) {
+        guard let add: Bool = methodCall.value(for: Argument.ADD, result: result) as? Bool,
+            let eventId: Int = methodCall.value(for: Argument.EVENT_ID, result: result) as? Int else {
+                result(nil)
+                return
+        }
+        
+        // Add a new Listener
+        if true == add {
+            let listenerId = Int(1 /* TODO: Add new Listener here */)
+            result(eventId)
+            return
+        }
+        
+        // Remove a given Listener
+        if let listenerId: Int = methodCall.value(for: Argument.LISTENER_ID, result: result) as? Int {
+            // TODO: Add logic to remove the listener with listenerId
+        }
+        
+        result(nil)
+        
+        //        Boolean add = methodCall.argument(ARGUMENT_ADD);
+        //        Integer eventId = methodCall.argument(ARGUMENT_EVENT_ID);
+        //        Integer listenerId = methodCall.argument(ARGUMENT_LISTENER_ID);
+        //        if (eventId == null || add == null) {
+        //        return;
+        //        }
+        //        if (add) {
+        //        int newListenerId = eventChannelHandler.addListener(eventId);
+        //        result.success(newListenerId);
+        //        } else {
+        //        if (listenerId == null) {
+        //        return;
+        //        }
+        //        eventChannelHandler.removeListener(listenerId);
+        //        result.success(null);
+        //        }
+    }
+    
+    fileprivate func setCoreStrings(methodCall: FlutterMethodCall, result: FlutterResult) {
+        // TODO: Ask Daniel for NativeInteractionManager
+        //        guard let coreStrings = methodCall.arguments else {
+        //            return
+        //        }
+        //
+        //    Map<Long, String> coreStrings = methodCall.arguments();
+        //    nativeInteractionManager.setCoreStrings(coreStrings);
+        //    result.success(null);
+        result(nil)
     }
 
 }
