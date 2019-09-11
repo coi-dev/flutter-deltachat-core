@@ -133,6 +133,69 @@ public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsi
     case DcEvent.INCOMING_MSG.rawValue:
         log.debug("Message ID: \(Int(data2))")
         
+    case DcEvent.WARNING.rawValue:
+        log.debug("Message ID: \(Int(data2))")
+        
+    case DcEvent.ERROR.rawValue:
+        log.debug("Message ID: \(Int(data2))")
+        
+    case DcEvent.ERROR_NETWORK.rawValue:
+        log.debug("Message ID: \(Int(data2))")
+        
+    case DcEvent.ERROR_SELF_NOT_IN_GROUP.rawValue:
+        log.debug("Message ID: \(Int(data2))")
+        
+    case DcEvent.MSGS_CHANGED.rawValue:
+        log.debug("Message ID: \(Int(data2))")
+        
+    case DcEvent.INCOMING_MSG.rawValue:
+        log.debug("Message ID: \(Int(data2))")
+        
+    case DcEvent.MSG_DELIVERED.rawValue:
+        log.debug("Message ID: \(Int(data2))")
+        
+    case DcEvent.MSG_FAILED.rawValue:
+        log.debug("Message ID: \(Int(data2))")
+        
+    case DcEvent.MSG_READ.rawValue:
+        log.debug("Message ID: \(Int(data2))")
+        
+    case DcEvent.CHAT_MODIFIED.rawValue:
+        log.debug("Message ID: \(Int(data2))")
+        
+    case DcEvent.CONTACTS_CHANGED.rawValue:
+        log.debug("Message ID: \(Int(data2))")
+        
+    case DcEvent.CONFIGURE_PROGRESS.rawValue:
+        log.debug("Message ID: \(Int(data2))")
+        
+    case DcEvent.IMEX_PROGRESS.rawValue:
+        log.debug("Message ID: \(Int(data2))")
+        
+    case DcEvent.IMEX_FILE_WRITTEN.rawValue:
+        log.debug("Message ID: \(Int(data2))")
+        
+    case DcEvent.SECUREJOIN_JOINER_PROGRESS.rawValue:
+        log.debug("Message ID: \(Int(data2))")
+        
+    case DcEvent.SECUREJOIN_INVITER_PROGRESS.rawValue:
+        log.debug("Message ID: \(Int(data2))")
+        
+    case DcEvent.IS_OFFLINE.rawValue:
+        log.debug("Message ID: \(Int(data2))")
+        
+    case DcEvent.GET_STRING.rawValue:
+        log.debug("Message ID: \(Int(data2))")
+        
+    case DcEvent.GET_QUANTITIY_STRING.rawValue:
+        log.debug("Message ID: \(Int(data2))")
+        
+    case DcEvent.HTTP_GET.rawValue:
+        log.debug("Message ID: \(Int(data2))")
+        
+    case DcEvent.HTTP_POST.rawValue:
+        log.debug("Message ID: \(Int(data2))")
+        
     default:
         log.error("Unknown event: \(event)")
     }
