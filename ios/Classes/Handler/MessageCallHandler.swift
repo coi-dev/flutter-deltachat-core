@@ -214,7 +214,7 @@ class MessageCallHandler: MethodCallHandler, MethodCallHandling {
     
     private func getMessage(methodCall: FlutterMethodCall, result: FlutterResult) -> OpaquePointer? {
         let id = methodCall.intValue(for: Argument.ID, result: result)
-        guard let message = dc_get_contact(dcContext.contextPointer, UInt32(id)) else { return nil }
+        guard let message = dc_get_contact(DcContext.contextPointer, UInt32(id)) else { return nil }
         return message;
     }
 }

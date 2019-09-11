@@ -54,21 +54,16 @@ class DCEventHandler {
     var state = ApplicationState.stopped
 
     fileprivate var backgroundTask: UIBackgroundTaskIdentifier = .invalid
-    fileprivate let dcContext: DcContext!
 
-    init(context: DcContext) {
-        self.dcContext = context
-    }
+    // MARK: - Public API
     
     func start(_ completion: (() -> Void)? = nil) {
-        DispatchQueue.global(qos: .background).async { [weak self] in
-            guard let self = self else { return }
-
+        DispatchQueue.global(qos: .background).async {
             self.registerBackgroundTask()
             while self.state == .running {
-                dc_perform_imap_jobs(self.dcContext.contextPointer)
-                dc_perform_imap_fetch(self.dcContext.contextPointer)
-                dc_perform_imap_idle(self.dcContext.contextPointer)
+                dc_perform_imap_jobs(DcContext.contextPointer)
+                dc_perform_imap_fetch(DcContext.contextPointer)
+                dc_perform_imap_idle(DcContext.contextPointer)
             }
             if self.backgroundTask != .invalid {
                 completion?()
@@ -81,8 +76,8 @@ class DCEventHandler {
             
             self.registerBackgroundTask()
             while self.state == .running {
-                dc_perform_smtp_jobs(self.dcContext.contextPointer)
-                dc_perform_smtp_idle(self.dcContext.contextPointer)
+                dc_perform_smtp_jobs(DcContext.contextPointer)
+                dc_perform_smtp_idle(DcContext.contextPointer)
             }
             if self.backgroundTask != .invalid {
                 self.endBackgroundTask()
@@ -93,8 +88,8 @@ class DCEventHandler {
             guard let self = self else { return }
             
             while self.state == .running {
-                dc_perform_sentbox_fetch(self.dcContext.contextPointer)
-                dc_perform_sentbox_idle(self.dcContext.contextPointer)
+                dc_perform_sentbox_fetch(DcContext.contextPointer)
+                dc_perform_sentbox_idle(DcContext.contextPointer)
             }
         }
         
@@ -102,8 +97,8 @@ class DCEventHandler {
             guard let self = self else { return }
             
             while self.state == .running {
-                dc_perform_mvbox_fetch(self.dcContext.contextPointer)
-                dc_perform_mvbox_idle(self.dcContext.contextPointer)
+                dc_perform_mvbox_fetch(DcContext.contextPointer)
+                dc_perform_mvbox_idle(DcContext.contextPointer)
             }
         }
     }

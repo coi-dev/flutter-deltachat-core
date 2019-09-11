@@ -142,7 +142,7 @@ class ChatCallHandler: MethodCallHandler, MethodCallHandling {
     
     private func getChat(methodCall: FlutterMethodCall, result: FlutterResult) -> OpaquePointer {
         let id = methodCall.intValue(for: Argument.ID, result: result)
-        let chat: OpaquePointer = dc_get_chat(dcContext.contextPointer, UInt32(id))
+        let chat: OpaquePointer = dc_get_chat(DcContext.contextPointer, UInt32(id))
         return chat;
     }
 }

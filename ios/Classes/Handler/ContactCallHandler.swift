@@ -134,6 +134,6 @@ class ContactCallHandler: MethodCallHandler, MethodCallHandling {
     private func getContact(methodCall: FlutterMethodCall, result: FlutterResult) -> OpaquePointer {
         let id = methodCall.intValue(for: Argument.ID, result: result)
         
-        return dc_get_contact(dcContext.contextPointer, UInt32(id))
+        return dc_get_contact(DcContext.contextPointer, UInt32(id))
     }
 }

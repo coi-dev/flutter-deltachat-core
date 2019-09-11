@@ -51,7 +51,7 @@ class DcContext {
     }
     
     init() {
-        DcContext.contextPointer = dc_context_new(dcc_event_callback, nil, UIApplication.name)
+        DcContext.contextPointer = dc_context_new(dc_event_callback, nil, UIApplication.name)
     }
     
     deinit {

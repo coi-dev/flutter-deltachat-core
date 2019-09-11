@@ -67,7 +67,7 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         self.registrar = registrar
         
         self.dcContext = DcContext()
-        self.dcEventHandler = DCEventHandler(context: self.dcContext)
+        self.dcEventHandler = DCEventHandler()
         self.dcEventHandler.start()
 
         self.baseCallHandler = BaseCallHandler(context: dcContext)
@@ -82,7 +82,7 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
     // MARK: - Private Helper
     
     var isConfigured: Bool {
-        return 0 != dc_is_configured(dcContext.contextPointer)
+        return 0 != dc_is_configured(DcContext.contextPointer)
     }
     
     // This is out entry point

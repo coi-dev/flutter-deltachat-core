@@ -42,7 +42,32 @@
 
 import Foundation
 
+enum DcConfigKey: String {
+    case addr            = "addr"
+    case mailServer      = "mail_server"
+    case mailUser        = "mail_user"
+    case mailPw          = "mail_pw"
+    case mailPort        = "mail_port"
+    case sendServer      = "send_server"
+    case sendUser        = "send_user"
+    case sendPw          = "send_pw"
+    case sendPort        = "send_port"
+    case serverFlags     = "server_flags"
+    case displayname     = "displayname"
+    case selfstatus      = "selfstatus"
+    case selfavatar      = "selfavatar"
+    case e2eeEnabled     = "e2ee_enabled"
+    case mdnsEnabled     = "mdns_enabled"
+    case inboxWatch      = "inbox_watch"
+    case sentboxWatch    = "sentbox_watch"
+    case mvboxWatch      = "mvbox_watch"
+    case mvboxMove       = "mvbox_move"
+    case showEmails      = "show_emails"
+    case saveMimeHeaders = "save_mime_headers"
+}
+
 class DcConfig {
+
     private class func getConfig(_ key: String) -> String? {
         guard let cString = dc_get_config(DcContext.contextPointer, key) else { return nil }
         let value = String(cString: cString)
@@ -86,6 +111,30 @@ class DcConfig {
         setConfig(key, String(value))
     }
     
+    class func set(key: DcConfigKey, value: String?) -> Int {
+        switch key {
+        case .addr:         addr       = value
+        case .mailPw:       mailPw     = value
+        case .mailUser:     mailUser   = value
+        case .mailServer:   mailServer = value
+        case .mailPort:     mailPort   = value
+        case .sendServer:   sendServer = value
+        case .sendUser:     sendUser   = value
+        case .sendPort:     sendPort   = value
+        case .sendPw:       sendPw     = value
+            
+        default:
+            log.error("key not found: \(key)")
+            return 0
+        }
+        
+        return 1
+    }
+    
+    class func isConfigured() -> Bool {
+        return 0 != dc_is_configured(DcContext.contextPointer)
+    }
+    
     class var displayname: String? {
         set { setConfig("displayname", newValue) }
         get { return getConfig("displayname") }
@@ -102,48 +151,48 @@ class DcConfig {
     }
     
     class var addr: String? {
-        set { setConfig("addr", newValue) }
-        get { return getConfig("addr") }
+        set { setConfig(DcConfigKey.addr.rawValue, newValue) }
+        get { return getConfig(DcConfigKey.addr.rawValue) }
     }
     
     class var mailServer: String? {
-        set { setConfig("mail_server", newValue) }
-        get { return getConfig("mail_server") }
+        set { setConfig(DcConfigKey.mailServer.rawValue, newValue) }
+        get { return getConfig(DcConfigKey.mailServer.rawValue) }
     }
     
     class var mailUser: String? {
-        set { setConfig("mail_user", newValue) }
-        get { return getConfig("mail_user") }
+        set { setConfig(DcConfigKey.mailUser.rawValue, newValue) }
+        get { return getConfig(DcConfigKey.mailUser.rawValue) }
     }
     
     class var mailPw: String? {
-        set { setConfig("mail_pw", newValue) }
-        get { return getConfig("mail_pw") }
+        set { setConfig(DcConfigKey.mailPw.rawValue, newValue) }
+        get { return getConfig(DcConfigKey.mailPw.rawValue) }
     }
     
     class var mailPort: String? {
-        set { setConfig("mail_port", newValue) }
-        get { return getConfig("mail_port") }
+        set { setConfig(DcConfigKey.mailPort.rawValue, newValue) }
+        get { return getConfig(DcConfigKey.mailPort.rawValue) }
     }
     
     class var sendServer: String? {
-        set { setConfig("send_server", newValue) }
-        get { return getConfig("send_server") }
+        set { setConfig(DcConfigKey.sendServer.rawValue, newValue) }
+        get { return getConfig(DcConfigKey.sendServer.rawValue) }
     }
     
     class var sendUser: String? {
-        set { setConfig("send_user", newValue) }
-        get { return getConfig("send_user") }
+        set { setConfig(DcConfigKey.sendUser.rawValue, newValue) }
+        get { return getConfig(DcConfigKey.sendUser.rawValue) }
     }
     
     class var sendPw: String? {
-        set { setConfig("send_pw", newValue) }
-        get { return getConfig("send_pw") }
+        set { setConfig(DcConfigKey.sendPw.rawValue, newValue) }
+        get { return getConfig(DcConfigKey.sendPw.rawValue) }
     }
     
     class var sendPort: String? {
-        set { setConfig("send_port", newValue) }
-        get { return getConfig("send_port") }
+        set { setConfig(DcConfigKey.sendPort.rawValue, newValue) }
+        get { return getConfig(DcConfigKey.sendPort.rawValue) }
     }
     
     private class var serverFlags: Int {
@@ -279,4 +328,5 @@ class DcConfig {
     class var configured: Bool {
         return getConfigBool("configured")
     }
+
 }

@@ -93,7 +93,7 @@ class ChatListCallHandler: MethodCallHandler, MethodCallHandling {
             } else {
                 chatListFlag = 0
             }
-            chatList = dc_get_chatlist(dcContext.contextPointer, Int32(chatListFlag), nil, 0)
+            chatList = dc_get_chatlist(DcContext.contextPointer, Int32(chatListFlag), nil, 0)
             result(1)
         } else {
             Method.errorMissingArgument(result: result)
