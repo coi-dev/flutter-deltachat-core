@@ -122,6 +122,8 @@ class DcConfig {
         case .sendUser:     sendUser   = value
         case .sendPort:     sendPort   = value
         case .sendPw:       sendPw     = value
+//        case .serverFlags:  serverFlags = value
+        case .displayname: displayname = value
             
         default:
             log.error("key not found: \(key)")
@@ -136,8 +138,8 @@ class DcConfig {
     }
     
     class var displayname: String? {
-        set { setConfig("displayname", newValue) }
-        get { return getConfig("displayname") }
+        set { setConfig(DcConfigKey.displayname.rawValue, newValue) }
+        get { return getConfig(DcConfigKey.displayname.rawValue) }
     }
     
     class var selfstatus: String? {
@@ -198,10 +200,10 @@ class DcConfig {
     private class var serverFlags: Int {
         // IMAP-/SMTP-flags as a combination of DC_LP flags
         set {
-            setConfig("server_flags", "\(newValue)")
+            setConfig(DcConfigKey.serverFlags.rawValue, "\(newValue)")
         }
         get {
-            if let str = getConfig("server_flags") {
+            if let str = getConfig(DcConfigKey.serverFlags.rawValue) {
                 return Int(str) ?? 0
             } else {
                 return 0
