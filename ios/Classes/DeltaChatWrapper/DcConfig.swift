@@ -137,6 +137,49 @@ class DcConfig {
             } else {
                 showEmails = 0     // according to deltachat.h: show direct replies to chats only (default)
             }
+            
+        case .selfavatar:   selfavatar = value
+        case .e2eeEnabled:
+            if let value = value, let boolVal = Bool(value) {
+                e2eeEnabled = boolVal
+            } else {
+                e2eeEnabled = true
+            }
+            
+        case .mdnsEnabled:
+            if let value = value, let boolVal = Bool(value) {
+                mdnsEnabled = boolVal
+            } else {
+                mdnsEnabled = true
+            }
+
+        case .inboxWatch:
+            if let value = value, let boolVal = Bool(value) {
+                inboxWatch = boolVal
+            } else {
+                inboxWatch = true
+            }
+            
+        case .sentboxWatch:
+            if let value = value, let boolVal = Bool(value) {
+                sentboxWatch = boolVal
+            } else {
+                sentboxWatch = true
+            }
+            
+        case .mvboxWatch:
+            if let value = value, let boolVal = Bool(value) {
+                mvboxWatch = boolVal
+            } else {
+                mvboxWatch = true
+            }
+            
+        case .mvboxMove:
+            if let value = value, let boolVal = Bool(value) {
+                mvboxMove = boolVal
+            } else {
+                mvboxMove = true
+            }
 
         default:
             log.error("key not found: \(key)")
@@ -156,13 +199,13 @@ class DcConfig {
     }
     
     class var selfstatus: String? {
-        set { setConfig("selfstatus", newValue) }
-        get { return getConfig("selfstatus") }
+        set { setConfig(DcConfigKey.selfstatus.rawValue, newValue) }
+        get { return getConfig(DcConfigKey.selfstatus.rawValue) }
     }
     
     class var selfavatar: String? {
-        set { setConfig("selfavatar", newValue) }
-        get { return getConfig("selfavatar") }
+        set { setConfig(DcConfigKey.selfavatar.rawValue, newValue) }
+        get { return getConfig(DcConfigKey.selfavatar.rawValue) }
     }
     
     class var addr: String? {
@@ -265,40 +308,41 @@ class DcConfig {
     }
     
     class var e2eeEnabled: Bool {
-        set { setConfigBool("e2ee_enabled", newValue) }
-        get { return getConfigBool("e2ee_enabled") }
+        set { setConfigBool(DcConfigKey.e2eeEnabled.rawValue, newValue) }
+        get { return getConfigBool(DcConfigKey.e2eeEnabled.rawValue) }
     }
     
     class var mdnsEnabled: Bool {
-        set { setConfigBool("mdns_enabled", newValue) }
-        get { return getConfigBool("mdns_enabled") }
+        set { setConfigBool(DcConfigKey.mdnsEnabled.rawValue, newValue) }
+        get { return getConfigBool(DcConfigKey.mdnsEnabled.rawValue) }
     }
     
     class var inboxWatch: Bool {
-        set { setConfigBool("inbox_watch", newValue) }
-        get { return getConfigBool("inbox_watch") }
+        set { setConfigBool(DcConfigKey.inboxWatch.rawValue, newValue) }
+        get { return getConfigBool(DcConfigKey.inboxWatch.rawValue) }
     }
     
     class var sentboxWatch: Bool {
-        set { setConfigBool("sentbox_watch", newValue) }
-        get { return getConfigBool("sentbox_watch") }
+        set { setConfigBool(DcConfigKey.sentboxWatch.rawValue, newValue) }
+        get { return getConfigBool(DcConfigKey.sentboxWatch.rawValue) }
     }
     
     class var mvboxWatch: Bool {
-        set { setConfigBool("mvbox_watch", newValue) }
-        get { return getConfigBool("mvbox_watch") }
+        set { setConfigBool(DcConfigKey.mvboxWatch.rawValue, newValue) }
+        get { return getConfigBool(DcConfigKey.mvboxWatch.rawValue) }
     }
     
     class var mvboxMove: Bool {
-        set { setConfigBool("mvbox_move", newValue) }
-        get { return getConfigBool("mvbox_move") }
+        set { setConfigBool(DcConfigKey.mvboxMove.rawValue, newValue) }
+        get { return getConfigBool(DcConfigKey.mvboxMove.rawValue) }
     }
     
     class var showEmails: Int {
         // one of DC_SHOW_EMAILS_*
-        set { setConfigInt("show_emails", newValue) }
-        get { return getConfigInt("show_emails") }
+        set { setConfigInt(DcConfigKey.showEmails.rawValue, newValue) }
+        get { return getConfigInt(DcConfigKey.showEmails.rawValue) }
     }
+    
     
     class var configuredEmail: String {
         return getConfig("configured_addr") ?? ""

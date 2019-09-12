@@ -107,7 +107,8 @@ public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsi
         log.debug("event: \(String(cString: data2String))")
         
     case .getString:
-        log.debug("event: \(String(cString: data2String))")
+//        log.debug("event: \(String(cString: data2String))")
+        break
         
     case .getQuantityString:
         log.debug("event: \(String(cString: data2String))")
