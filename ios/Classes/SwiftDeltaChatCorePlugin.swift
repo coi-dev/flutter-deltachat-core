@@ -79,12 +79,6 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         self.eventChannelHandler = EventChannelHandler(messanger: registrar.messenger())
     }
     
-    // MARK: - Private Helper
-    
-    var isConfigured: Bool {
-        return 0 != dc_is_configured(DcContext.contextPointer)
-    }
-    
     // This is out entry point
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "deltaChatCore", binaryMessenger: registrar.messenger())

@@ -189,7 +189,7 @@ class DcConfig {
         return 1
     }
     
-    class func isConfigured() -> Bool {
+    class var isConfigured: Bool {
         return 0 != dc_is_configured(DcContext.contextPointer)
     }
     
