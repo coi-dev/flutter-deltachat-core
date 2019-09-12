@@ -90,34 +90,18 @@ class BaseCallHandler: MethodCallHandler {
         
         // Add a new Listener
         if true == add {
-            let listenerId = Int(1 /* TODO: Add new Listener here */)
-            result(eventId)
+            let listenerId = eventChannelHandler.addListener(eventId: eventId)
+            result(listenerId)
+            return
+        }
+
+        // Remove a given Listener
+        guard let listenerId: Int = methodCall.value(for: Argument.LISTENER_ID, result: result) as? Int else {
             return
         }
         
-        // Remove a given Listener
-        if let listenerId: Int = methodCall.value(for: Argument.LISTENER_ID, result: result) as? Int {
-            // TODO: Add logic to remove the listener with listenerId
-        }
-        
+        eventChannelHandler.remove(listener: listenerId)
         result(nil)
-        
-        //        Boolean add = methodCall.argument(ARGUMENT_ADD);
-        //        Integer eventId = methodCall.argument(ARGUMENT_EVENT_ID);
-        //        Integer listenerId = methodCall.argument(ARGUMENT_LISTENER_ID);
-        //        if (eventId == null || add == null) {
-        //        return;
-        //        }
-        //        if (add) {
-        //        int newListenerId = eventChannelHandler.addListener(eventId);
-        //        result.success(newListenerId);
-        //        } else {
-        //        if (listenerId == null) {
-        //        return;
-        //        }
-        //        eventChannelHandler.removeListener(listenerId);
-        //        result.success(null);
-        //        }
     }
     
     fileprivate func setCoreStrings(methodCall: FlutterMethodCall, result: FlutterResult) {

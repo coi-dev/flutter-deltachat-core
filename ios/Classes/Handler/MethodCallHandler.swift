@@ -47,11 +47,13 @@ protocol MethodCallHandling {
 class MethodCallHandler: MethodCallHandling {
     
     let dcContext: DcContext!
+    let eventChannelHandler: EventChannelHandler!
 
     // MARK: - Initialization
     
-    init(context: DcContext) {
+    init(context: DcContext, eventChannelHandler: EventChannelHandler) {
         self.dcContext = context
+        self.eventChannelHandler = eventChannelHandler
     }
 
     // MARK: - MethodCallHandling

@@ -67,13 +67,12 @@ class DcEventCenter {
     func remove(observer: DcEventDelegate, with eventId: Int) {
         objc_sync_enter(allObservers)
 
-        guard let idObservers = allObservers[eventId] else {
-            return
-        }
+//        guard let idObservers = allObservers[eventId] else {
+//            return
+//        }
         
         // TODO: We need to find a way to make DcEventDelegate equatable!
 //        var observers = idObservers.filter({ $0 != observer })
-        allObservers[eventId] = observers
 
         objc_sync_exit(allObservers)
     }

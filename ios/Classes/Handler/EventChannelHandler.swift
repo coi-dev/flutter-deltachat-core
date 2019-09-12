@@ -42,14 +42,46 @@
 
 import Foundation
 
-class EventChannelHandler: FlutterStreamHandler {
+class EventChannelHandler: FlutterStreamHandler, DcEventDelegate {
     
     fileprivate let messanger: FlutterBinaryMessenger!
     fileprivate var eventSink: FlutterEventSink?
+    fileprivate var eventDelegate: DcEventDelegate!
+    fileprivate var listeners: [Int: Int] = [:]
+    fileprivate var listenerId = 0
+    
+    let dcEventCenter: DcEventCenter = DcEventCenter()
+
+    // MARK: - Initialization
     
     init(messanger: FlutterBinaryMessenger) {
         self.messanger = messanger
+        self.eventDelegate = self
     }
+    
+    // MARK: - Public API
+    
+    func addListener(eventId: Int) -> Int {
+        guard hasListeners(for: eventId) else {
+            return -1
+        }
+
+        listenerId += 1
+        listeners[listenerId] = eventId
+        dcEventCenter.add(observer: eventDelegate, for: eventId)
+
+        return listenerId
+    }
+    
+    func remove(listener listenerId: Int) {
+        guard let eventId = listeners[listenerId] else {
+            return
+        }
+        
+        listeners.removeValue(forKey: listenerId)
+    }
+ 
+    // MARK: - FlutterStreamHandler
     
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
         eventSink = events
@@ -61,5 +93,24 @@ class EventChannelHandler: FlutterStreamHandler {
         return nil
     }
     
+    // MARK: - DcEventDelegate
     
+    func handle(eventWith eventId: Int, data1: Any, data2: Any) {
+        if !hasListeners(for: eventId) {
+            return
+        }
+
+        let result = [eventId, data1, data2]
+        self.eventSink?(result)
+    }
+    
+    // MARK: - Private Helper
+    
+    private func hasListeners(for eventId: Int) -> Bool {
+        guard let index: Int = listeners.values.firstIndex(of: eventId) as? Int else {
+            return false
+        }
+        return eventId != 0 && index >= 0
+    }
+
 }
