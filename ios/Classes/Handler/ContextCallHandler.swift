@@ -42,11 +42,11 @@
 
 import Foundation
 
-class ContextCallHandler: MethodCallHandler, MethodCallHandling {
+class ContextCallHandler: MethodCallHandler {
 
     // MARK: - Protocol MethodCallHandling
 
-    func handle(_ call: FlutterMethodCall, result: (Any?) -> Void) {
+    override func handle(_ call: FlutterMethodCall, result: FlutterResult) {
         switch (call.method) {
         case Method.Context.CONFIG_SET:
             setConfig(methodCall: call, result: result)

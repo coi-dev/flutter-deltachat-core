@@ -40,21 +40,60 @@
  * for more details.
  */
 
-protocol MethodCallHandling {
-    func handle(_ call: FlutterMethodCall, result: FlutterResult)
+import Foundation
+
+protocol DcEventDelegate {
+    func handle(eventWith eventId: Int, data1: Any, data2: Any)
 }
 
-class MethodCallHandler: MethodCallHandling {
+class DcEventCenter {
+    var allObservers: [Int: [DcEventDelegate]] = [:]
     
-    let dcContext: DcContext!
+    func add(observer: DcEventDelegate, for eventId: Int) {
+        objc_sync_enter(allObservers)
 
-    // MARK: - Initialization
-    
-    init(context: DcContext) {
-        self.dcContext = context
+        guard let observers = allObservers[eventId] else {
+            allObservers[eventId] = [observer]
+            return
+        }
+
+        var newObservers = observers
+        newObservers.append(observer)
+        allObservers[eventId] = newObservers
+
+        objc_sync_exit(allObservers)
     }
-
-    // MARK: - MethodCallHandling
     
-    func handle(_ call: FlutterMethodCall, result: FlutterResult) {}
+    func remove(observer: DcEventDelegate, with eventId: Int) {
+        objc_sync_enter(allObservers)
+
+        guard let idObservers = allObservers[eventId] else {
+            return
+        }
+        
+        // TODO: We need to find a way to make DcEventDelegate equatable!
+//        var observers = idObservers.filter({ $0 != observer })
+        allObservers[eventId] = observers
+
+        objc_sync_exit(allObservers)
+    }
+    
+    func remove(observers observer: DcEventDelegate) {
+        
+    }
+    
+    func send(data1: Any, data2: Any, toObserversWith eventId: Int) {
+        objc_sync_enter(allObservers)
+        
+        guard let observers = allObservers[eventId] else {
+            return
+        }
+        
+        for observer in observers {
+            observer.handle(eventWith: eventId, data1: data1, data2: data2)
+        }
+
+        objc_sync_exit(allObservers)
+    }
+    
 }

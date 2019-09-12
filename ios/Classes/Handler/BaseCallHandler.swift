@@ -42,11 +42,11 @@
 
 import Foundation
 
-class BaseCallHandler: MethodCallHandler, MethodCallHandling {
+class BaseCallHandler: MethodCallHandler {
 
     // MARK: - Protocol MethodCallHandling
 
-    func handle(_ call: FlutterMethodCall, result: (Any?) -> Void) {
+    override func handle(_ call: FlutterMethodCall, result: FlutterResult) {
         switch (call.method) {
         case Method.Base.INIT:
             baseInit(result: result)

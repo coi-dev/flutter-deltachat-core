@@ -42,11 +42,11 @@
 
 import Foundation
 
-class ChatCallHandler: MethodCallHandler, MethodCallHandling {
+class ChatCallHandler: MethodCallHandler {
 
     // MARK: - Protocol MethodCallHandling
     
-    func handle(_ call: FlutterMethodCall, result: (Any?) -> Void) {
+    override func handle(_ call: FlutterMethodCall, result: FlutterResult) {
         switch (call.method) {
         case Method.Chat.GET_ID:
             getChatId(methodCall: call, result: result);

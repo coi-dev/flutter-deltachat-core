@@ -56,4 +56,15 @@ struct Utils {
         return acc
     }
 
+    static func strToBool(_ value: String?) -> Bool {
+        if let vStr = value {
+            if let vInt = Int(vStr) {
+                return vInt == 1
+            }
+            return false
+        }
+        
+        return false
+    }
+
 }

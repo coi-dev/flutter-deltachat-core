@@ -87,7 +87,7 @@ class DcConfig {
     }
     
     private class func getConfigBool(_ key: String) -> Bool {
-        return strToBool(getConfig(key))
+        return Utils.strToBool(getConfig(key))
     }
     
     private class func setConfigBool(_ key: String, _ value: Bool) {

@@ -42,13 +42,13 @@
 
 import Foundation
 
-class ChatListCallHandler: MethodCallHandler, MethodCallHandling {
+class ChatListCallHandler: MethodCallHandler {
 
     fileprivate var chatList: OpaquePointer!
 
     // MARK: - Protocol MethodCallHandling
     
-    func handle(_ call: FlutterMethodCall, result: (Any?) -> Void) {
+    override func handle(_ call: FlutterMethodCall, result: FlutterResult) {
         switch (call.method) {
         case Method.ChatList.INTERNAL_SETUP:
             setup(methodCall: call, result: result)

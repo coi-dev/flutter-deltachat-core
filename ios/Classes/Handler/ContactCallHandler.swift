@@ -42,11 +42,11 @@
 
 import Foundation
 
-class ContactCallHandler: MethodCallHandler, MethodCallHandling {
+class ContactCallHandler: MethodCallHandler {
 
     // MARK: - Protocol MethodCallHandling
 
-    func handle(_ call: FlutterMethodCall, result: (Any?) -> Void) {
+    override func handle(_ call: FlutterMethodCall, result: FlutterResult) {
         switch (call.method) {
         case Method.Contact.GET_ID:
             getId(methodCall: call, result: result);

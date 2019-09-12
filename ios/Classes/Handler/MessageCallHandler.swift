@@ -42,11 +42,11 @@
 
 import Foundation
 
-class MessageCallHandler: MethodCallHandler, MethodCallHandling {
+class MessageCallHandler: MethodCallHandler {
 
     // MARK: - Protocol MethodCallHandling
 
-    func handle(_ call: FlutterMethodCall, result: (Any?) -> Void) {
+    override func handle(_ call: FlutterMethodCall, result: FlutterResult) {
         switch (call.method) {
         case Method.Message.GET_ID:
             getId(methodCall: call, result: result);
@@ -217,5 +217,6 @@ class MessageCallHandler: MethodCallHandler, MethodCallHandling {
         guard let message = dc_get_contact(DcContext.contextPointer, UInt32(id)) else { return nil }
         return message;
     }
+
 }
 
