@@ -79,8 +79,8 @@ class DcConfig {
     }
     
     private class func setConfig(_ key: String, _ value: String?) {
-        if let v = value {
-            dc_set_config(DcContext.contextPointer, key, v)
+        if let value = value {
+            dc_set_config(DcContext.contextPointer, key, value)
         } else {
             dc_set_config(DcContext.contextPointer, key, nil)
         }
@@ -122,9 +122,22 @@ class DcConfig {
         case .sendUser:     sendUser   = value
         case .sendPort:     sendPort   = value
         case .sendPw:       sendPw     = value
-//        case .serverFlags:  serverFlags = value
+        case .serverFlags:
+            if let value = value, let flags = Int(value) {
+                serverFlags = flags
+            } else {
+                serverFlags = 0     // TODO: Check if this is correct!
+            }
+
         case .displayname: displayname = value
-            
+        case .selfstatus: selfstatus = value
+        case .showEmails:
+            if let value = value, let intVal = Int(value) {
+                showEmails = intVal
+            } else {
+                showEmails = 0     // according to deltachat.h: show direct replies to chats only (default)
+            }
+
         default:
             log.error("key not found: \(key)")
             return 0
