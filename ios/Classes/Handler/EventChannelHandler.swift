@@ -42,13 +42,16 @@
 
 import Foundation
 
-class EventChannelHandler: FlutterStreamHandler, DcEventDelegate {
+class EventChannelHandler: NSObject, FlutterStreamHandler, DcEventDelegate {
+    
+    fileprivate let CHANNEL_DELTA_CHAT_CORE_EVENTS = "deltaChatCoreEvents"
     
     fileprivate let messanger: FlutterBinaryMessenger!
     fileprivate var eventSink: FlutterEventSink?
     fileprivate var eventDelegate: DcEventDelegate!
     fileprivate var listeners: [Int: Int] = [:]
     fileprivate var listenerId = 0
+    fileprivate var eventChannel: FlutterEventChannel!
     
     let dcEventCenter: DcEventCenter = DcEventCenter()
 
@@ -56,13 +59,18 @@ class EventChannelHandler: FlutterStreamHandler, DcEventDelegate {
     
     init(messanger: FlutterBinaryMessenger) {
         self.messanger = messanger
+        self.eventChannel = FlutterEventChannel(name: CHANNEL_DELTA_CHAT_CORE_EVENTS, binaryMessenger: messanger)
+
+        super.init()
+
         self.eventDelegate = self
+        self.eventChannel.setStreamHandler(self)
     }
     
     // MARK: - Public API
     
     func addListener(eventId: Int) -> Int {
-        guard hasListeners(for: eventId) else {
+        guard !hasListeners(for: eventId) else {
             return -1
         }
 
@@ -84,6 +92,9 @@ class EventChannelHandler: FlutterStreamHandler, DcEventDelegate {
     // MARK: - FlutterStreamHandler
     
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        log.debug("onListen arguments: \(arguments)")
+        log.debug("onListen arguments: \(events)")
+        
         eventSink = events
         return nil
     }

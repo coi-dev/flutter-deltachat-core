@@ -34,6 +34,7 @@ struct Argument {
     static let ADD               = "add"
     static let EVENT_ID          = "eventId"
     static let LISTENER_ID       = "listenerId"
+    static let DB_NAME           = "dbName"
     
     struct Error {
         static let MISSING       = "1"
