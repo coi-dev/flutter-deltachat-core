@@ -4,4 +4,4 @@
 [submodule "ios/Libraries/delta_chat_core"]
 	path = ios/Libraries/delta_chat_core
 	url = https://github.com/open-xchange/deltachat-core-rust.git
-    branch = coi-metadata
+	branch = coi-metadata
