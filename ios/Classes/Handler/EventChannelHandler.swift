@@ -46,7 +46,7 @@ class EventChannelHandler: NSObject, FlutterStreamHandler, DcEventDelegate {
     
     fileprivate let CHANNEL_DELTA_CHAT_CORE_EVENTS = "deltaChatCoreEvents"
     
-    fileprivate let messanger: FlutterBinaryMessenger!
+    fileprivate let messenger: FlutterBinaryMessenger!
     fileprivate var eventSink: FlutterEventSink?
     fileprivate var eventDelegate: DcEventDelegate!
     fileprivate var listeners: [Int: Int] = [:]
@@ -57,9 +57,9 @@ class EventChannelHandler: NSObject, FlutterStreamHandler, DcEventDelegate {
 
     // MARK: - Initialization
     
-    init(messanger: FlutterBinaryMessenger) {
-        self.messanger = messanger
-        self.eventChannel = FlutterEventChannel(name: CHANNEL_DELTA_CHAT_CORE_EVENTS, binaryMessenger: messanger)
+    init(messenger: FlutterBinaryMessenger) {
+        self.messenger = messenger
+        self.eventChannel = FlutterEventChannel(name: CHANNEL_DELTA_CHAT_CORE_EVENTS, binaryMessenger: messenger)
 
         super.init()
 
@@ -82,7 +82,7 @@ class EventChannelHandler: NSObject, FlutterStreamHandler, DcEventDelegate {
     }
     
     func remove(listener listenerId: Int) {
-        guard let eventId = listeners[listenerId] else {
+        guard listeners[listenerId] != nil else {
             return
         }
         
@@ -92,8 +92,9 @@ class EventChannelHandler: NSObject, FlutterStreamHandler, DcEventDelegate {
     // MARK: - FlutterStreamHandler
     
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-        log.debug("onListen arguments: \(arguments)")
-        log.debug("onListen arguments: \(events)")
+        if nil != self.eventSink {
+            return nil
+        }
         
         eventSink = events
         return nil
@@ -118,7 +119,8 @@ class EventChannelHandler: NSObject, FlutterStreamHandler, DcEventDelegate {
     // MARK: - Private Helper
     
     private func hasListeners(for eventId: Int) -> Bool {
-        guard let index: Int = listeners.values.firstIndex(of: eventId) as? Int else {
+        let values =  Array(listeners.values)
+        guard let index = values.firstIndex(of: eventId) else {
             return false
         }
         return eventId != 0 && index >= 0

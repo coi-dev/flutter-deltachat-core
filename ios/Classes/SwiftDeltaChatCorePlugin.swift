@@ -70,7 +70,7 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         self.dcEventHandler = DCEventHandler()
         self.dcEventHandler.start()
 
-        self.eventChannelHandler = EventChannelHandler(messanger: registrar.messenger())
+        self.eventChannelHandler = EventChannelHandler(messenger: registrar.messenger())
         self.baseCallHandler = BaseCallHandler(context: dcContext, eventChannelHandler: self.eventChannelHandler)
         self.chatCallHandler = ChatCallHandler(context: dcContext, eventChannelHandler: self.eventChannelHandler)
         self.chatListCallHandler = ChatListCallHandler(context: dcContext, eventChannelHandler: self.eventChannelHandler)

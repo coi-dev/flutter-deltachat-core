@@ -44,28 +44,28 @@ import Foundation
 
 @_silgen_name("handleDeltaChatEvent")
 public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsignedLong, data1String: UnsafePointer<Int8>, data2String: UnsafePointer<Int8>) -> UnsafePointer<Int8>? {
-    log.debug("Received event: \(event)")
+    log.debug("Received DCC event: \(event)")
     
     guard let callbackEvent = DcEvent(rawValue: event) else {
-        log.error("Unknown event: \(event), '\(String(cString: data2String))'")
+        log.error("Unknown DCC event: \(event), '\(String(cString: data2String))'")
         return nil
     }
     
     switch callbackEvent {
     case .info:
-        log.debug("event: \(String(cString: data2String))")
+        log.debug("DCC event message: \(String(cString: data2String))")
         
     case .warning:
-        log.debug("event: \(String(cString: data2String))")
+        log.debug("DCC event message: \(String(cString: data2String))")
         
     case .error:
-        log.debug("event: \(String(cString: data2String))")
+        log.debug("DCC event message: \(String(cString: data2String))")
         
     case .errorNetwork:
-        log.debug("event: \(String(cString: data2String))")
+        log.debug("DCC event message: \(String(cString: data2String))")
         
     case .errorSelfNotInGroup:
-        log.debug("event: \(String(cString: data2String))")
+        log.debug("DCC event message: \(String(cString: data2String))")
         
 //    case .msgsChanged:
 //        log.debug("event: \(String(cString: data2String))")
@@ -114,10 +114,10 @@ public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsi
 //        log.debug("event: \(String(cString: data2String))")
         
     case .HTTP_GET:
-        log.debug("event: \(String(cString: data2String))")
+        log.debug("DCC event message: \(String(cString: data2String))")
         
     case .HTTP_POST:
-        log.debug("event: \(String(cString: data2String))")
+        log.debug("DCC event message: \(String(cString: data2String))")
         
     default:
         break
