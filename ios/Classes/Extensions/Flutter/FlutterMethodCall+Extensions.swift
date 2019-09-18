@@ -47,12 +47,12 @@ extension FlutterMethodCall {
         }
         
         if !contains(keys: [key]) {
-            Method.errorMissingArgument(result: result)
+            Method.Error.missingArgument(result: result)
             fatalError()
         }
         
         guard let value: Int = arguments[key] as? Int else {
-            Method.errorNoInt(for: key, result: result)
+            Method.Error.noInt(for: key, result: result)
             fatalError()
         }
         
@@ -64,7 +64,7 @@ extension FlutterMethodCall {
             return parameters[key]
         }
 
-        Method.errorMissingArgument(result: result);
+        Method.Error.missingArgument(result: result);
         return nil
     }
     

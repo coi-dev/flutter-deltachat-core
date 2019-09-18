@@ -61,6 +61,15 @@ public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsi
     switch callbackEvent {
     case .info:
         break
+        
+    case .smtpConnected:
+        break
+        
+    case .imapConnected:
+        break
+        
+    case .smtpMessageSent:
+        break
 
     case .warning:
         break
@@ -94,6 +103,9 @@ public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsi
 
 enum DcEvent: CInt {
     case info                      = 100
+    case smtpConnected             = 101
+    case imapConnected             = 102
+    case smtpMessageSent           = 103
     case warning                   = 300
     case error                     = 400
     case errorNetwork              = 401

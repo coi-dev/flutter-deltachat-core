@@ -8,7 +8,10 @@
 import Foundation
 
 
-struct Method {
+struct Method {}
+
+extension Method {
+
     struct Prefix {
         static let SEPERATOR: Character           = "_"
         static let BASE                           = "base"
@@ -20,6 +23,10 @@ struct Method {
         static let MEDIA                          = "media"
         static let MSG                            = "msg"
     }
+
+}
+
+extension Method {
     
     struct Base {
         static let INIT                           = "base_init"
@@ -27,6 +34,10 @@ struct Method {
         static let CORE_LISTENER                  = "base_coreListener"
         static let SET_CORE_STRINGS               = "base_setCoreStrings"
     }
+
+}
+
+extension Method {
     
     struct Chat {
         static let GET_ID                         = "chat_getId"
@@ -40,6 +51,10 @@ struct Method {
         static let IS_SELF_TALK                   = "chat_isSelfTalk"
         static let IS_VERIFIED                    = "chat_isVerified"
     }
+
+}
+
+extension Method {
     
     struct ChatList {
         static let INTERNAL_SETUP                 = "chatList_internal_setup"
@@ -51,6 +66,10 @@ struct Method {
         static let GET_MSG                        = "chatList_getMag"
         static let GET_SUMMARY                    = "chatList_getSummary"
     }
+
+}
+
+extension Method {
     
     struct Contact {
         static let GET_ID                         = "contact_getId"
@@ -64,6 +83,10 @@ struct Method {
         static let IS_BLOCKED                     = "contact_isBlocked"
         static let IS_VERIFIED                    = "contact_isVerified"
     }
+
+}
+
+extension Method {
     
     struct Message {
         static let GET_ID                         = "msg_getId"
@@ -97,6 +120,10 @@ struct Method {
         static let IS_OUTGOING                    = "msg_isOutgoing"
         static let IS_STARRED                     = "msg_isStarred"
     }
+
+}
+
+extension Method {
     
     struct Context {
         static let CONFIG_SET                     = "context_configSet"
@@ -142,32 +169,31 @@ struct Method {
         static let SET_CHAT_NAME                  = "context_setChatName"
         static let SET_CHAT_PROFILE_IMAGE         = "context_setChatProfileImage"
     }
+
 }
 
 extension Method {
     
-    static func errorMissingArgument(result: FlutterResult) {
-        result(FlutterError(code: Argument.Error.MISSING, message: "Argument is missing", details: nil))
-    }
+    struct Error {
+        static func missingArgument(result: FlutterResult) {
+            result(FlutterError(code: Argument.Error.MISSING, message: "Argument is missing", details: nil))
+        }
+        
+        static func missingArgumentValue(result: FlutterResult) {
+            result(FlutterError(code: Argument.Error.MISSING_VALUE, message: "Argument value is missing or null", details: nil))
+        }
 
-    static func errorTypeMismatch(for argument: String, result: FlutterResult) {
-        result(FlutterError(code: Argument.Error.TYPE_MISMATCH, message: "Wrong type for argument " + argument, details: nil))
-    }
-    
-    static func errorArgumentMissingValue(result: FlutterResult) {
-        result(FlutterError(code: Argument.Error.MISSING_VALUE, message: "Argument value is missing or null", details: nil))
-    }
-    
-    static func errorNoInt(for argument: String, result: FlutterResult) {
-        result(FlutterError(code: Argument.Error.NO_INT, message: "Argument is no integer: " + argument, details: nil))
-    }
-    
-    static func errorArgumentNoValidInt(result: FlutterResult, argument: String) {
-        result(FlutterError(code: Argument.Error.NO_INT, message: "Argument has no valid int value: " + argument, details: nil))
-    }
-    
-    static func resultErrorGeneric(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(FlutterError(code: methodCall.method, message: nil, details: nil));
+        static func typeMismatch(for argument: String, result: FlutterResult) {
+            result(FlutterError(code: Argument.Error.TYPE_MISMATCH, message: "Wrong type for argument " + argument, details: nil))
+        }
+        
+        static func noInt(for argument: String, result: FlutterResult) {
+            result(FlutterError(code: Argument.Error.NO_INT, message: "Argument is no integer: " + argument, details: nil))
+        }
+        
+        static func generic(methodCall: FlutterMethodCall, result: FlutterResult) {
+            result(FlutterError(code: methodCall.method, message: nil, details: nil));
+        }
     }
 
 }

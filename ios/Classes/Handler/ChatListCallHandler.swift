@@ -96,7 +96,7 @@ class ChatListCallHandler: MethodCallHandler {
             chatList = dc_get_chatlist(DcContext.contextPointer, Int32(chatListFlag), nil, 0)
             result(1)
         } else {
-            Method.errorMissingArgument(result: result)
+            Method.Error.missingArgument(result: result)
         }
         
         

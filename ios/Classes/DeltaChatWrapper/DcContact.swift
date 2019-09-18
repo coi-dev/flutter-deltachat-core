@@ -114,7 +114,6 @@ class DcContact {
         }()
     
     var color: Int {
-//        return UIColor(netHex: Int(dc_contact_get_color(contactPointer)))
         return Int(dc_contact_get_color(contactPointer))
     }
     

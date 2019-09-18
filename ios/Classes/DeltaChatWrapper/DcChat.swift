@@ -73,7 +73,7 @@ class DcChat {
     }
     
     var chatType: ChatType {
-        return ChatType(rawValue: type) ?? ChatType.GROUP // group as fallback - shouldn't get here
+        return ChatType(rawValue: type) ?? .group // group as fallback - shouldn't get here
     }
     
     var isVerified: Bool {
@@ -110,4 +110,10 @@ class DcChat {
         }
         return nil
     }
+}
+
+enum ChatType: Int {
+    case single        = 100
+    case group         = 120
+    case verifiedGroup = 130
 }

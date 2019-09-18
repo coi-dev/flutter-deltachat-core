@@ -76,7 +76,7 @@ class EventChannelHandler: NSObject, FlutterStreamHandler, DcEventDelegate {
 
         listenerId += 1
         listeners[listenerId] = eventId
-        dcEventCenter.add(observer: eventDelegate, for: eventId)
+        dcEventCenter.add(observer: self, for: eventId)
 
         return listenerId
     }
@@ -87,6 +87,7 @@ class EventChannelHandler: NSObject, FlutterStreamHandler, DcEventDelegate {
         }
         
         listeners.removeValue(forKey: listenerId)
+//        dcEventCenter.remove(observer: self, with: <#T##Int#>)
     }
  
     // MARK: - FlutterStreamHandler

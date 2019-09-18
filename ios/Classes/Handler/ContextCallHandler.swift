@@ -236,7 +236,7 @@ class ContextCallHandler: MethodCallHandler {
     
     private func addAddressBook(methodCall: FlutterMethodCall, result: FlutterResult) {
         if !methodCall.contains(keys: [Argument.ADDRESS_BOOK]) {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
@@ -247,7 +247,7 @@ class ContextCallHandler: MethodCallHandler {
             result(dc_result)
         }
         else {
-            Method.errorArgumentMissingValue(result: result)
+            Method.Error.missingArgumentValue(result: result)
             return
         }
         
@@ -265,13 +265,13 @@ class ContextCallHandler: MethodCallHandler {
             result(Int(contactId))
         }
         else {
-            result(Method.errorArgumentMissingValue(result: result))
+            Method.Error.missingArgument(result: result)
         }
     }
     
     private func deleteContact(methodCall: FlutterMethodCall, result: FlutterResult) {
         if !methodCall.contains(keys: [Argument.ID]) {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
@@ -286,7 +286,7 @@ class ContextCallHandler: MethodCallHandler {
             result(deleted)
         }
         else {
-            Method.errorArgumentMissingValue(result: result)
+            Method.Error.missingArgumentValue(result: result)
             return
         }
         
@@ -294,7 +294,7 @@ class ContextCallHandler: MethodCallHandler {
     
     private func blockContact(methodCall: FlutterMethodCall, result: FlutterResult) {
         if !methodCall.contains(keys: [Argument.ID]) {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
@@ -309,7 +309,7 @@ class ContextCallHandler: MethodCallHandler {
             result(nil)
         }
         else {
-            Method.errorArgumentMissingValue(result: result)
+            Method.Error.missingArgumentValue(result: result)
             return
         }
         
@@ -323,7 +323,7 @@ class ContextCallHandler: MethodCallHandler {
     
     private func unblockContact(methodCall: FlutterMethodCall, result: FlutterResult) {
         if !methodCall.contains(keys: [Argument.ID]) {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
@@ -336,7 +336,7 @@ class ContextCallHandler: MethodCallHandler {
             result(nil)
         }
         else {
-            Method.errorArgumentMissingValue(result: result)
+            Method.Error.missingArgumentValue(result: result)
             return
         }
         
@@ -354,7 +354,7 @@ class ContextCallHandler: MethodCallHandler {
             result(Int(chatId))
         }
         else {
-            result(Method.errorMissingArgument(result: result))
+            Method.Error.missingArgument(result: result)
         }
     }
     
@@ -370,7 +370,7 @@ class ContextCallHandler: MethodCallHandler {
             result(Int(chatId))
         }
         else {
-            result(Method.errorMissingArgument(result: result))
+            Method.Error.missingArgument(result: result)
         }
         
     }
@@ -381,14 +381,14 @@ class ContextCallHandler: MethodCallHandler {
         }
         
         if !methodCall.contains(keys: [Argument.VERIFIED, Argument.NAME]) {
-            result(Method.errorMissingArgument(result: result))
+            Method.Error.missingArgument(result: result)
             return
         }
         
         if let myArgs = args as? [String: Any] {
             let verified = myArgs[Argument.VERIFIED] as? Bool
             if (verified == nil) {
-                result(Method.errorMissingArgument(result: result))
+                Method.Error.missingArgument(result: result)
                 return
             }
             
@@ -405,7 +405,7 @@ class ContextCallHandler: MethodCallHandler {
         }
         
         if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.CONTACT_ID]) {
-            result(Method.errorMissingArgument(result: result))
+            Method.Error.missingArgument(result: result)
             return
         }
         
@@ -414,7 +414,7 @@ class ContextCallHandler: MethodCallHandler {
             let contactId = myArgs[Argument.CONTACT_ID] as? UInt32
             
             if (chatId == nil || contactId == nil) {
-                result(Method.errorMissingArgument(result: result))
+                Method.Error.missingArgument(result: result)
                 return
             }
             
@@ -431,7 +431,7 @@ class ContextCallHandler: MethodCallHandler {
         }
         
         if !methodCall.contains(keys: [Argument.CONTACT_ID]) {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
@@ -441,7 +441,7 @@ class ContextCallHandler: MethodCallHandler {
             result(chatId)
         }
         else {
-            Method.errorArgumentMissingValue(result: result);
+            Method.Error.missingArgumentValue(result: result);
             return
         }
         
@@ -449,7 +449,7 @@ class ContextCallHandler: MethodCallHandler {
     
     private func getContact(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
-            Method.errorMissingArgument(result: result)
+            Method.Error.missingArgument(result: result)
             return
         }
         if let myArgs = args as? [String: Any], let id = myArgs[Argument.ID] as? UInt32 {
@@ -459,29 +459,25 @@ class ContextCallHandler: MethodCallHandler {
     }
     
     private func getContacts(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
+        guard let args = methodCall.arguments as? [String: Any] else {
             fatalError()
         }
         
-        if !methodCall.contains(keys: [Argument.FLAGS, Argument.QUERY]) {
-            result(Method.errorMissingArgument(result: result))
+        if let flags = args[Argument.FLAGS] as? UInt32 {
+            let query = args[Argument.QUERY]  as? String
+            var contactIds = dc_get_contacts(DcContext.contextPointer, flags, query)
+            
+            var ids: [NSNumber] = []
+            for idx in 0 ..< dc_array_get_cnt(contactIds) {
+                let id = dc_array_get_id(contactIds, idx)
+                ids.append(NSNumber(integerLiteral: Int(id)))
+            }
+
+            result(FlutterStandardTypedData(int32: Data(bytes: &contactIds, count: MemoryLayout.size(ofValue: contactIds))))
             return
         }
         
-        if let myArgs = args as? [String: Any] {
-            let flags = myArgs[Argument.FLAGS] as? UInt32
-            let query = myArgs[Argument.QUERY]  as? String
-            
-            if (flags == nil) {
-                result(Method.errorMissingArgument(result: result))
-                return
-            }
-            
-            var contactIds = dc_get_contacts(DcContext.contextPointer, flags!, query)
-            
-            result(FlutterStandardTypedData(int32: Data(bytes: &contactIds, count: MemoryLayout.size(ofValue: contactIds))))
-        }
-        
+        Method.Error.missingArgument(result: result)
     }
     
     private func getChatContacts(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -490,7 +486,7 @@ class ContextCallHandler: MethodCallHandler {
         }
         
         if !methodCall.contains(keys: [Argument.CHAT_ID]) {
-            result(Method.errorMissingArgument(result: result))
+            Method.Error.missingArgument(result: result)
             return
         }
         
@@ -498,7 +494,7 @@ class ContextCallHandler: MethodCallHandler {
             let id = myArgs[Argument.CHAT_ID] as? UInt32
             
             if id == nil {
-                result(Method.errorMissingArgument(result: result))
+                Method.Error.missingArgument(result: result)
                 return
             }
             
@@ -511,12 +507,12 @@ class ContextCallHandler: MethodCallHandler {
     
     private func getChat(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
-            Method.errorMissingArgument(result: result)
+            Method.Error.missingArgument(result: result)
             return
         }
         
         if !methodCall.contains(keys: [Argument.ID]) {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
@@ -526,18 +522,18 @@ class ContextCallHandler: MethodCallHandler {
             result(dc_get_chat(DcContext.contextPointer, id))
         }
         else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
         }
     }
     
     private func getChatMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
-            Method.errorMissingArgument(result: result)
+            Method.Error.missingArgument(result: result)
             return
         }
         
         if !methodCall.contains(keys: [Argument.CHAT_ID]) {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
@@ -548,7 +544,7 @@ class ContextCallHandler: MethodCallHandler {
             result(chat.id)
         }
         else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
         }
         //        Integer id = methodCall.argument(ARGUMENT_CHAT_ID);
         //        if (id == null) {
@@ -574,12 +570,12 @@ class ContextCallHandler: MethodCallHandler {
     
     private func createChatMessage(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
-            Method.errorMissingArgument(result: result)
+            Method.Error.missingArgument(result: result)
             return
         }
         
         if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.TEXT]) {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
@@ -590,7 +586,7 @@ class ContextCallHandler: MethodCallHandler {
             
         }
         else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
         }
         
         //    Integer id = methodCall.argument(ARGUMENT_CHAT_ID);
@@ -609,12 +605,12 @@ class ContextCallHandler: MethodCallHandler {
     
     private func createChatAttachmentMessage(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
-            Method.errorMissingArgument(result: result)
+            Method.Error.missingArgument(result: result)
             return
         }
         
         if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.TYPE, Argument.PATH, Argument.TEXT]) {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
@@ -627,7 +623,7 @@ class ContextCallHandler: MethodCallHandler {
             
         }
         else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
         }
         
         //    Integer chatId = methodCall.argument(ARGUMENT_CHAT_ID);
@@ -653,7 +649,7 @@ class ContextCallHandler: MethodCallHandler {
         }
         
         if !methodCall.contains(keys: [Argument.CHAT_ID]) {
-            result(Method.errorMissingArgument(result: result))
+            Method.Error.missingArgument(result: result)
             return
         }
         
@@ -661,7 +657,7 @@ class ContextCallHandler: MethodCallHandler {
             let chatId = myArgs[Argument.CHAT_ID] as? UInt32
             
             if chatId == nil {
-                result(Method.errorMissingArgument(result: result))
+                Method.Error.missingArgument(result: result)
                 return
             }
             
@@ -678,7 +674,7 @@ class ContextCallHandler: MethodCallHandler {
         }
         
         if !methodCall.contains(keys: [Argument.CHAT_ID]) {
-            result(Method.errorMissingArgument(result: result))
+            Method.Error.missingArgument(result: result)
             return
         }
         
@@ -686,7 +682,7 @@ class ContextCallHandler: MethodCallHandler {
             let chatId = myArgs[Argument.CHAT_ID] as? UInt32
             
             if chatId == nil {
-                result(Method.errorMissingArgument(result: result))
+                Method.Error.missingArgument(result: result)
                 return
             }
             
@@ -702,7 +698,7 @@ class ContextCallHandler: MethodCallHandler {
         }
         
         if !methodCall.contains(keys: [Argument.CHAT_ID]) {
-            result(Method.errorMissingArgument(result: result))
+            Method.Error.missingArgument(result: result)
             return
         }
         
@@ -710,7 +706,7 @@ class ContextCallHandler: MethodCallHandler {
             let chatId = myArgs[Argument.CHAT_ID] as? UInt32
             
             if chatId == nil {
-                result(Method.errorMissingArgument(result: result))
+                Method.Error.missingArgument(result: result)
                 return
             }
             
@@ -722,12 +718,12 @@ class ContextCallHandler: MethodCallHandler {
     
     private func removeContactFromChat(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
         if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.CONTACT_ID]) {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
@@ -735,7 +731,7 @@ class ContextCallHandler: MethodCallHandler {
             result(dc_remove_contact_from_chat(DcContext.contextPointer, chatId as! UInt32, contactId as! UInt32))
         }
         else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
         }
         
     }
@@ -747,12 +743,12 @@ class ContextCallHandler: MethodCallHandler {
     
     private func forwardMessages(methodCall: FlutterMethodCall, result: FlutterResult){
         guard let args = methodCall.arguments else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
         if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.MESSAGE_IDS]) {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
@@ -761,19 +757,19 @@ class ContextCallHandler: MethodCallHandler {
             result(dc_forward_msgs(DcContext.contextPointer, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count), chatId as! UInt32))
         }
         else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
         }
         
     }
     
     private func markSeenMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
         if !methodCall.contains(keys: [Argument.MESSAGE_IDS]) {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
@@ -781,7 +777,7 @@ class ContextCallHandler: MethodCallHandler {
             result(dc_markseen_msgs(DcContext.contextPointer, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count)))
         }
         else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
         }
         
     }
@@ -797,12 +793,12 @@ class ContextCallHandler: MethodCallHandler {
     
     private func continueKeyTransfer(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
         if !methodCall.contains(keys: [Argument.ID, Argument.SETUP_CODE]) {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
@@ -813,19 +809,19 @@ class ContextCallHandler: MethodCallHandler {
             result(dc_continue_key_transfer(DcContext.contextPointer, messageId as! UInt32, setupCode as? UnsafePointer<Int8>))
         }
         else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
         }
         
     }
     
     private func getSecurejoinQr(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
         if !methodCall.contains(keys: [Argument.CHAT_ID]) {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
@@ -834,19 +830,19 @@ class ContextCallHandler: MethodCallHandler {
             result(dc_get_securejoin_qr(DcContext.contextPointer, chatId as! UInt32))
         }
         else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
         }
         
     }
     
     private func  joinSecurejoin(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
         if !methodCall.contains(keys: [Argument.QR_TEXT]) {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
@@ -860,19 +856,19 @@ class ContextCallHandler: MethodCallHandler {
             //                }).start();
         }
         else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
         }
         
     }
     
     private func checkQr(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
         if !methodCall.contains(keys: [Argument.QR_TEXT]) {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
@@ -882,19 +878,19 @@ class ContextCallHandler: MethodCallHandler {
             //            result.success(mapLotToList(qrCode));
         }
         else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
         }
         
     }
     
     private func deleteMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
         if !methodCall.contains(keys: [Argument.MESSAGE_IDS]) {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
@@ -903,19 +899,19 @@ class ContextCallHandler: MethodCallHandler {
             result(dc_delete_msgs(DcContext.contextPointer, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count)))
         }
         else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
         }
         
     }
     
     private func starMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let arguments: [String: Any] = methodCall.arguments as? [String: Any] else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
         if !methodCall.contains(keys: [Argument.MESSAGE_IDS, Argument.VALUE]) {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
@@ -926,19 +922,19 @@ class ContextCallHandler: MethodCallHandler {
             result(nil)
         }
         else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
         }
         
     }
     
     private func setChatProfileImage(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
         if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.VALUE]) {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
@@ -950,7 +946,7 @@ class ContextCallHandler: MethodCallHandler {
             result(nil)
         }
         else {
-            Method.errorMissingArgument(result: result)
+            Method.Error.missingArgument(result: result)
             return
         }
         
@@ -958,12 +954,12 @@ class ContextCallHandler: MethodCallHandler {
     
     private func setChatName(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
         if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.VALUE]) {
-            Method.errorMissingArgument(result: result);
+            Method.Error.missingArgument(result: result);
             return
         }
         
@@ -975,7 +971,7 @@ class ContextCallHandler: MethodCallHandler {
             result(nil)
         }
         else {
-            Method.errorMissingArgument(result: result)
+            Method.Error.missingArgument(result: result)
             return
         }
         
