@@ -121,7 +121,7 @@ public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsi
         
     default:
         log.debug("Default Event: \(event)")
-        DcEventCenter.sharedInstance.send(data1: data1, data2: data2, toObserversWith: Int(callbackEvent.rawValue))
+        DcEventCenter.sharedInstance.send(data1: data1, data2: data2, toObserversWith: Int(callbackEvent.eventId))
         break
 
     }
@@ -152,4 +152,8 @@ enum DcEvent: CInt {
     case getQuantityString         = 2092
     case HTTP_GET                  = 2100
     case HTTP_POST                 = 2110
+    
+    var eventId: CInt {
+        return self.rawValue
+    }
 }
