@@ -138,7 +138,8 @@ class DcConfig {
                 showEmails = 0     // according to deltachat.h: show direct replies to chats only (default)
             }
             
-        case .selfavatar:   selfavatar = value
+        case .selfavatar: selfavatar = value
+            
         case .e2eeEnabled:
             if let value = value, let boolVal = Bool(value) {
                 e2eeEnabled = boolVal
@@ -185,6 +186,8 @@ class DcConfig {
             log.error("key not found: \(key)")
             return 0
         }
+        
+        log.debug("setConfig for key: \(key), value: \(String(describing: value))")
         
         return 1
     }
