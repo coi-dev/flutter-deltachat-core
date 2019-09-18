@@ -542,9 +542,10 @@ class ContextCallHandler: MethodCallHandler {
         }
         
         if let myArgs = args as? [String: Any],
-            let chatId = myArgs[Argument.CHAT_ID] as? UInt32,
+            let chatId = myArgs[Argument.CHAT_ID] as? Int,
             let flags = myArgs[Argument.FLAGS] {
-            //result(dc_get_chat(mailboxPointer, chatId))
+            let chat = DcChat(id: chatId)
+            result(chat.id)
         }
         else {
             Method.errorMissingArgument(result: result);

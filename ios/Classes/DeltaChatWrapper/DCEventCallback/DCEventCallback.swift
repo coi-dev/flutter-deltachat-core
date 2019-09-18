@@ -44,29 +44,34 @@ import Foundation
 
 @_silgen_name("handleDeltaChatEvent")
 public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsignedLong, data1String: UnsafePointer<Int8>, data2String: UnsafePointer<Int8>) -> UnsafePointer<Int8>? {
-    log.debug("Received DCC event: \(event)")
-    
     guard let callbackEvent = DcEvent(rawValue: event) else {
         log.error("Unknown DCC event: \(event), '\(String(cString: data2String))'")
         return nil
     }
-    
+
+    if nil != data2String {
+        log.debug("Received DCC event [\(callbackEvent.eventId)]: \(String(cString: data2String))")
+    }
+    else {
+        log.debug("Received DCC event [\(callbackEvent.eventId)]")
+    }
+
     switch callbackEvent {
     case .info:
-        log.debug("DCC event message: \(String(cString: data2String))")
-        
+        break
+
     case .warning:
-        log.debug("DCC event message: \(String(cString: data2String))")
-        
+        break
+
     case .error:
-        log.debug("DCC event message: \(String(cString: data2String))")
-        
+        break
+
     case .errorNetwork:
-        log.debug("DCC event message: \(String(cString: data2String))")
-        
+        break
+
     case .errorSelfNotInGroup:
-        log.debug("DCC event message: \(String(cString: data2String))")
-        
+        break
+
 //    case .msgsChanged:
 //        log.debug("event: \(String(cString: data2String))")
 //
@@ -114,13 +119,12 @@ public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsi
 //        log.debug("event: \(String(cString: data2String))")
         
     case .HTTP_GET:
-        log.debug("DCC event message: \(String(cString: data2String))")
-        
+        break
+
     case .HTTP_POST:
-        log.debug("DCC event message: \(String(cString: data2String))")
-        
+        break
+
     default:
-        log.debug("Default Event: \(event)")
         DcEventCenter.sharedInstance.send(data1: data1, data2: data2, toObserversWith: Int(callbackEvent.eventId))
         break
 
