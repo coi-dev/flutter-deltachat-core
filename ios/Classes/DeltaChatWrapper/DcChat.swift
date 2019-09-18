@@ -46,8 +46,8 @@ class DcChat {
     var chatPointer: OpaquePointer?
     
     init(id: Int) {
-        if let p = dc_get_chat(DcContext.contextPointer, UInt32(id)) {
-            chatPointer = p
+        if let pointer = dc_get_chat(DcContext.contextPointer, UInt32(id)) {
+            chatPointer = pointer
         } else {
             fatalError("Invalid chatID opened \(id)")
         }
@@ -82,6 +82,12 @@ class DcChat {
     
     var contactIds: [Int] {
         return Utils.copyAndFreeArray(inputArray: dc_get_chat_contacts(DcContext.contextPointer, UInt32(id)))
+    }
+    
+    var messageIds: [Int] {
+        let messageIds = dc_get_chat_msgs(DcContext.contextPointer, UInt32(id), 0, 0)
+        let ids = Utils.copyAndFreeArray(inputArray: messageIds)
+        return ids
     }
     
     lazy var profileImage: UIImage? = { [unowned self] in

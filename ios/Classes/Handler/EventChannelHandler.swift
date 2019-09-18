@@ -82,12 +82,12 @@ class EventChannelHandler: NSObject, FlutterStreamHandler, DcEventDelegate {
     }
     
     func remove(listener listenerId: Int) {
-        guard listeners[listenerId] != nil else {
+        guard let eventId = listeners[listenerId] else {
             return
         }
         
         listeners.removeValue(forKey: listenerId)
-//        dcEventCenter.remove(observer: self, with: <#T##Int#>)
+        dcEventCenter.remove(observer: self, with: eventId)
     }
  
     // MARK: - FlutterStreamHandler

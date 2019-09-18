@@ -527,25 +527,22 @@ class ContextCallHandler: MethodCallHandler {
     }
     
     private func getChatMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
+        guard let args = methodCall.arguments as? [String: Any],
+            let chatId = args[Argument.CHAT_ID] as? Int else {
+                
             Method.Error.missingArgument(result: result)
             return
         }
         
-        if !methodCall.contains(keys: [Argument.CHAT_ID]) {
-            Method.Error.missingArgument(result: result);
-            return
+        var flags = args[Argument.FLAGS] as? Int
+        if nil == flags {
+            flags = 0
         }
         
-        if let myArgs = args as? [String: Any],
-            let chatId = myArgs[Argument.CHAT_ID] as? Int,
-            let flags = myArgs[Argument.FLAGS] {
-            let chat = DcChat(id: chatId)
-            result(chat.id)
-        }
-        else {
-            Method.Error.missingArgument(result: result);
-        }
+        let chat = DcChat(id: chatId)
+        var messageIds = chat.messageIds
+        result(FlutterStandardTypedData(int32: Data(bytes: &messageIds, count: MemoryLayout.size(ofValue: messageIds))))
+
         //        Integer id = methodCall.argument(ARGUMENT_CHAT_ID);
         //        if (id == null) {
         //        resultErrorArgumentMissingValue(result);
