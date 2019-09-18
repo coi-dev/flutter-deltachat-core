@@ -51,13 +51,18 @@ class DCEventHandler {
         case backgroundFetch
     }
 
-    var state = ApplicationState.stopped
-
+    fileprivate var state: ApplicationState = .stopped
     fileprivate var backgroundTask: UIBackgroundTaskIdentifier = .invalid
 
     // MARK: - Public API
     
     func start(_ completion: (() -> Void)? = nil) {
+        if state == .running {
+            return
+        }
+        
+        state = .running
+
         DispatchQueue.global(qos: .background).async {
             self.registerBackgroundTask()
             while self.state == .running {

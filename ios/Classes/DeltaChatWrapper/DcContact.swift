@@ -60,7 +60,7 @@ class DcContact {
         return swiftString
     }
     
-    var nameNAddr: String {
+    var nameAndAddress: String {
         guard let cString = dc_contact_get_name_n_addr(contactPointer) else { return "" }
         let swiftString = String(cString: cString)
         free(cString)
@@ -74,13 +74,20 @@ class DcContact {
         return swiftString
     }
     
+    var firstName: String {
+        guard let cString = dc_contact_get_first_name(contactPointer) else { return "" }
+        let swiftString = String(cString: cString)
+        free(cString)
+        return swiftString
+    }
+    
     var email: String {
         guard let cString = dc_contact_get_addr(contactPointer) else { return "" }
         let swiftString = String(cString: cString)
         free(cString)
         return swiftString
     }
-    
+
     var isVerified: Bool {
         return dc_contact_is_verified(contactPointer) > 0
     }
@@ -106,8 +113,9 @@ class DcContact {
         return nil
         }()
     
-    var color: UIColor {
-        return UIColor(netHex: Int(dc_contact_get_color(contactPointer)))
+    var color: Int {
+//        return UIColor(netHex: Int(dc_contact_get_color(contactPointer)))
+        return Int(dc_contact_get_color(contactPointer))
     }
     
     var id: Int {

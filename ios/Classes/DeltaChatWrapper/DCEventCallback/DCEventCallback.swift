@@ -120,6 +120,8 @@ public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsi
         log.debug("DCC event message: \(String(cString: data2String))")
         
     default:
+        log.debug("Default Event: \(event)")
+        DcEventCenter.sharedInstance.send(data1: data1, data2: data2, toObserversWith: Int(callbackEvent.rawValue))
         break
 
     }

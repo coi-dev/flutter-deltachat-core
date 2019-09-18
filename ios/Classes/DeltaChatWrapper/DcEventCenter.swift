@@ -47,6 +47,9 @@ protocol DcEventDelegate {
 }
 
 class DcEventCenter {
+    
+    static let sharedInstance: DcEventCenter = DcEventCenter()
+    
     var allObservers: [Int: [DcEventDelegate]] = [:]
     
     func add(observer: DcEventDelegate, for eventId: Int) {

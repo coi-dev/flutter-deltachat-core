@@ -89,51 +89,60 @@ class ContactCallHandler: MethodCallHandler {
     }
     
     private func getId(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_contact_get_id(getContact(methodCall: methodCall, result: result)))
+        let contact = getContact(methodCall: methodCall, result: result)
+        result(contact.id)
     }
     
     private func getName(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_contact_get_name(getContact(methodCall: methodCall, result: result)))
+        let contact = getContact(methodCall: methodCall, result: result)
+        result(contact.name)
     }
     
     private func getDisplayName(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_contact_get_display_name(getContact(methodCall: methodCall, result: result)))
+        let contact = getContact(methodCall: methodCall, result: result)
+        result(contact.displayName)
     }
     
     private func getFirstName(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_contact_get_first_name(getContact(methodCall: methodCall, result: result)))
+        let contact = getContact(methodCall: methodCall, result: result)
+        result(contact.firstName)
     }
     
     
     private func getAddress(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_contact_get_addr(getContact(methodCall: methodCall, result: result)))
+        let contact = getContact(methodCall: methodCall, result: result)
+        result(contact.email)
     }
     
     
     private func getNameAndAddress(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_contact_get_name_n_addr(getContact(methodCall: methodCall, result: result)))
+        let contact = getContact(methodCall: methodCall, result: result)
+        result(contact.nameAndAddress)
     }
     
     private func getProfileImage(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_contact_get_profile_image(getContact(methodCall: methodCall, result: result)))
+        let contact = getContact(methodCall: methodCall, result: result)
+        result(contact.profileImage)
     }
     
     private func getColor(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_contact_get_color(getContact(methodCall: methodCall, result: result)))
+        let contact = getContact(methodCall: methodCall, result: result)
+        result(contact.color)
     }
     
     private func isBlocked(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_contact_is_blocked(getContact(methodCall: methodCall, result: result)))
+        let contact = getContact(methodCall: methodCall, result: result)
+        result(contact.isBlocked)
     }
     
     
     private func isVerified(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_contact_is_verified(getContact(methodCall: methodCall, result: result)))
+        let contact = getContact(methodCall: methodCall, result: result)
+        result(contact.isVerified)
     }
     
-    private func getContact(methodCall: FlutterMethodCall, result: FlutterResult) -> OpaquePointer {
+    fileprivate func getContact(methodCall: FlutterMethodCall, result: FlutterResult) -> DcContact {
         let id = methodCall.intValue(for: Argument.ID, result: result)
-        
-        return dc_get_contact(DcContext.contextPointer, UInt32(id))
+        return DcContact(id: Int(id))
     }
 }

@@ -53,7 +53,7 @@ class EventChannelHandler: NSObject, FlutterStreamHandler, DcEventDelegate {
     fileprivate var listenerId = 0
     fileprivate var eventChannel: FlutterEventChannel!
     
-    let dcEventCenter: DcEventCenter = DcEventCenter()
+    let dcEventCenter: DcEventCenter = DcEventCenter.sharedInstance
 
     // MARK: - Initialization
     
