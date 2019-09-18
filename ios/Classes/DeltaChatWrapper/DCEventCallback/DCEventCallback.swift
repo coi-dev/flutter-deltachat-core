@@ -49,11 +49,13 @@ public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsi
         return nil
     }
 
-    if nil != data2String {
-        log.debug("Received DCC event [\(callbackEvent.eventId)]: \(String(cString: data2String))")
-    }
-    else {
-        log.debug("Received DCC event [\(callbackEvent.eventId)]")
+    let logMessage = "Received DCC event [\(callbackEvent.eventId)]"
+    let eventMessage: UnsafePointer<Int8>? = data2String
+    
+    if nil != eventMessage {
+        log.debug("\(logMessage): \(String(cString: data2String))")
+    } else {
+        log.debug(logMessage)
     }
 
     switch callbackEvent {
@@ -71,52 +73,9 @@ public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsi
 
     case .errorSelfNotInGroup:
         break
-
-//    case .msgsChanged:
-//        log.debug("event: \(String(cString: data2String))")
-//
-//    case .msgIncoming:
-//        log.debug("event: \(String(cString: data2String))")
-//
-//    case .msgDelivered:
-//        log.debug("event: \(String(cString: data2String))")
-//
-//    case .msgFailed:
-//        log.debug("event: \(String(cString: data2String))")
-//
-//    case .msgRead:
-//        log.debug("event: \(String(cString: data2String))")
-//
-//    case .chatModified:
-//        log.debug("event: \(String(cString: data2String))")
-//
-//    case .contactsChanged:
-//        log.debug("event: \(String(cString: data2String))")
-//
-//    case .configureProgress:
-//        log.debug("event: \(String(cString: data2String))")
-//
-//    case .imexProgress:
-//        log.debug("event: \(String(cString: data2String))")
-//
-//    case .imexFileWritten:
-//        log.debug("event: \(String(cString: data2String))")
-//
-//    case .secureJoinJoinerProgress:
-//        log.debug("event: \(String(cString: data2String))")
-//
-//    case .secureJoinInviterProgress:
-//        log.debug("event: \(String(cString: data2String))")
-//
-//    case .isOffline:
-//        log.debug("event: \(String(cString: data2String))")
         
     case .getString:
-//        log.debug("event: \(String(cString: data2String))")
         break
-        
-//    case .getQuantityString:
-//        log.debug("event: \(String(cString: data2String))")
         
     case .HTTP_GET:
         break
