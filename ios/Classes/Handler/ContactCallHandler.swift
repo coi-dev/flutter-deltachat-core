@@ -84,59 +84,62 @@ class ContactCallHandler: MethodCallHandler {
         }
     }
 
+    // MARK: - Public API
     
     public func handleContactCalls(methodCall: FlutterMethodCall, result: FlutterResult) {
     }
     
-    private func getId(methodCall: FlutterMethodCall, result: FlutterResult) {
+    // MARK: - Private Helper
+    
+    fileprivate func getId(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
         result(contact.id)
     }
     
-    private func getName(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func getName(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
         result(contact.name)
     }
     
-    private func getDisplayName(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func getDisplayName(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
         result(contact.displayName)
     }
     
-    private func getFirstName(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func getFirstName(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
         result(contact.firstName)
     }
     
     
-    private func getAddress(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func getAddress(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
         result(contact.email)
     }
     
     
-    private func getNameAndAddress(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func getNameAndAddress(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
         result(contact.nameAndAddress)
     }
     
-    private func getProfileImage(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func getProfileImage(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
         result(contact.profileImage)
     }
     
-    private func getColor(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func getColor(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
         result(contact.color)
     }
     
-    private func isBlocked(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func isBlocked(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
         result(contact.isBlocked)
     }
     
     
-    private func isVerified(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func isVerified(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
         result(contact.isVerified)
     }

@@ -168,6 +168,7 @@ extension Method {
         static let STAR_MESSAGES                  = "context_starMessages"
         static let SET_CHAT_NAME                  = "context_setChatName"
         static let SET_CHAT_PROFILE_IMAGE         = "context_setChatProfileImage"
+        static let GET_SHARED_DATA                = "context_getSharedData"
     }
 
 }

@@ -44,12 +44,7 @@ import Foundation
 
 @_silgen_name("handleDeltaChatEvent")
 public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsignedLong, data1String: UnsafePointer<Int8>, data2String: UnsafePointer<Int8>) -> UnsafePointer<Int8>? {
-    guard let callbackEvent = DcEvent(rawValue: event) else {
-        log.error("Unknown DCC event: \(event), '\(String(cString: data2String))'")
-        return nil
-    }
-
-    let logMessage = "Received DCC event [\(callbackEvent.eventId)]"
+    let logMessage = "Received DCC event [\(event)]"
     let eventMessage: UnsafePointer<Int8>? = data2String
     
     if nil != eventMessage {
@@ -58,77 +53,79 @@ public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsi
         log.debug(logMessage)
     }
 
-    switch callbackEvent {
-    case .info:
+    switch Int32(event) {
+    case DC_EVENT_INFO:
         break
         
-    case .smtpConnected:
+//    case DC_EVENT_SMTP_CONNECTED:
+//        break
+//        
+//    case DC_EVENT_IMAP_CONNECTED:
+//        break
+//        
+//    case DC_EVENT_SMTP_MESSAGE_SENT:
+//        break
+
+    case DC_EVENT_WARNING:
+        break
+
+    case DC_EVENT_ERROR:
+        break
+
+    case DC_EVENT_ERROR_NETWORK:
+        break
+
+    case DC_EVENT_ERROR_SELF_NOT_IN_GROUP:
         break
         
-    case .imapConnected:
-        break
+//    case DC_EVENT_MSGS_CHANGED:
+//        break
+//
+//    case DC_EVENT_INCOMING_MSG:
+//        break
+//
+//    case DC_EVENT_MSG_DELIVERED:
+//        break
+//
+//    case DC_EVENT_MSG_FAILED:
+//        break
+//
+//    case DC_EVENT_MSG_READ:
+//        break
+//
+//    case DC_EVENT_CHAT_MODIFIED:
+//        break
+//
+//    case DC_EVENT_CONTACTS_CHANGED:
+//        break
+//
+//    case DC_EVENT_LOCATION_CHANGED:
+//        break
+//
+//    case DC_EVENT_CONFIGURE_PROGRESS:
+//        break
+//
+//    case DC_EVENT_IMEX_PROGRESS:
+//        break
+//
+//    case DC_EVENT_IMEX_FILE_WRITTEN:
+//        break
+//
+//    case DC_EVENT_SECUREJOIN_INVITER_PROGRESS:
+//        break
+//
+//    case DC_EVENT_SECUREJOIN_JOINER_PROGRESS:
+//        break
         
-    case .smtpMessageSent:
-        break
-
-    case .warning:
-        break
-
-    case .error:
-        break
-
-    case .errorNetwork:
-        break
-
-    case .errorSelfNotInGroup:
-        break
-        
-    case .getString:
-        break
-        
-    case .HTTP_GET:
-        break
-
-    case .HTTP_POST:
+    case DC_EVENT_GET_STRING:
         break
 
     default:
-        DcEventCenter.sharedInstance.send(data1: data1, data2: data2, toObserversWith: Int(callbackEvent.eventId))
+        log.error("Unknown DCC event: \(event), '\(String(cString: data2String))'")
+        DcEventCenter.sharedInstance.send(data1: data1, data2: data2, toObserversWith: Int(event))
         break
 
     }
     
     return nil
-}
-
-enum DcEvent: CInt {
-    case info                      = 100
-    case smtpConnected             = 101
-    case imapConnected             = 102
-    case smtpMessageSent           = 103
-    case warning                   = 300
-    case error                     = 400
-    case errorNetwork              = 401
-    case errorSelfNotInGroup       = 410
-    case msgsChanged               = 2000
-    case msgIncoming               = 2005
-    case msgDelivered              = 2010
-    case msgFailed                 = 2012
-    case msgRead                   = 2015
-    case chatModified              = 2020
-    case contactsChanged           = 2030
-    case configureProgress         = 2041
-    case imexProgress              = 2051
-    case imexFileWritten           = 2052
-    case secureJoinInviterProgress = 2060
-    case secureJoinJoinerProgress  = 2061
-    case isOffline                 = 2081
-    case getString                 = 2091
-    case getQuantityString         = 2092
-    case HTTP_GET                  = 2100
-    case HTTP_POST                 = 2110
-    
-    var eventId: CInt {
-        return self.rawValue
-    }
 }
