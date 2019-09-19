@@ -87,7 +87,7 @@ class DcConfig {
     }
     
     private class func getConfigBool(_ key: String) -> Bool {
-        return Utils.strToBool(getConfig(key))
+        return Utils.bool(for: getConfig(key))
     }
     
     private class func setConfigBool(_ key: String, _ value: Bool) {
@@ -111,83 +111,47 @@ class DcConfig {
         setConfig(key, String(value))
     }
     
+    private class func int(for value: String?, defaultValue: Int? = 0) -> Int {
+        if let value = value, let intVal = Int(value) {
+            return intVal
+        } else {
+            return defaultValue!
+        }
+    }
+
     class func set(key: DcConfigKey, value: String?) -> Int {
+        var val = value
+        
         switch key {
-        case .addr:         addr       = value
-        case .mailPw:       mailPw     = value
-        case .mailUser:     mailUser   = value
-        case .mailServer:   mailServer = value
-        case .mailPort:     mailPort   = value
-        case .sendServer:   sendServer = value
-        case .sendUser:     sendUser   = value
-        case .sendPort:     sendPort   = value
-        case .sendPw:       sendPw     = value
-        case .serverFlags:
-            if let value = value, let flags = Int(value) {
-                serverFlags = flags
-            } else {
-                serverFlags = 0     // TODO: Check if this is correct!
-            }
+        case .addr:         addr         = val
+        case .mailPw:
+            mailPw = val
+            val = "***"   // NOTE: this is just for hiding from logs
 
-        case .displayname: displayname = value
-        case .selfstatus: selfstatus = value
-        case .showEmails:
-            if let value = value, let intVal = Int(value) {
-                showEmails = intVal
-            } else {
-                showEmails = 0     // according to deltachat.h: show direct replies to chats only (default)
-            }
-            
-        case .selfavatar: selfavatar = value
-            
-        case .e2eeEnabled:
-            if let value = value, let boolVal = Bool(value) {
-                e2eeEnabled = boolVal
-            } else {
-                e2eeEnabled = true
-            }
-            
-        case .mdnsEnabled:
-            if let value = value, let boolVal = Bool(value) {
-                mdnsEnabled = boolVal
-            } else {
-                mdnsEnabled = true
-            }
-
-        case .inboxWatch:
-            if let value = value, let boolVal = Bool(value) {
-                inboxWatch = boolVal
-            } else {
-                inboxWatch = true
-            }
-            
-        case .sentboxWatch:
-            if let value = value, let boolVal = Bool(value) {
-                sentboxWatch = boolVal
-            } else {
-                sentboxWatch = true
-            }
-            
-        case .mvboxWatch:
-            if let value = value, let boolVal = Bool(value) {
-                mvboxWatch = boolVal
-            } else {
-                mvboxWatch = true
-            }
-            
-        case .mvboxMove:
-            if let value = value, let boolVal = Bool(value) {
-                mvboxMove = boolVal
-            } else {
-                mvboxMove = true
-            }
-
+        case .mailUser:     mailUser     = val
+        case .mailServer:   mailServer   = val
+        case .mailPort:     mailPort     = val
+        case .sendServer:   sendServer   = val
+        case .sendUser:     sendUser     = val
+        case .sendPort:     sendPort     = val
+        case .sendPw:       sendPw       = val
+        case .serverFlags:  serverFlags  = Utils.int(for: val)
+        case .displayname:  displayname  = val
+        case .selfstatus:   selfstatus   = val
+        case .showEmails:   showEmails   = Utils.int(for: val)
+        case .selfavatar:   selfavatar   = val
+        case .e2eeEnabled:  e2eeEnabled  = Utils.bool(for: val)
+        case .mdnsEnabled:  mdnsEnabled  = Utils.bool(for: val)
+        case .inboxWatch:   inboxWatch   = Utils.bool(for: val)
+        case .sentboxWatch: sentboxWatch = Utils.bool(for: val)
+        case .mvboxWatch:   mvboxWatch   = Utils.bool(for: val)
+        case .mvboxMove:    mvboxMove    = Utils.bool(for: val)
         default:
             log.error("key not found: \(key)")
             return 0
         }
         
-        log.debug("setConfig for key: \(key), value: \(String(describing: value))")
+        log.debug("setConfig for key: \(key), value: \(String(describing: val))")
         
         return 1
     }

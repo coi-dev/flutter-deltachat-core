@@ -43,229 +43,227 @@
 import Foundation
 import MessageKit
 
-class DcMsg: MessageType {
-    private var messagePointer: OpaquePointer?
-
-    init(id: Int) {
-        messagePointer = dc_get_msg(DcContext.contextPointer, UInt32(id))
-    }
-
-    deinit {
-        dc_msg_unref(messagePointer)
-    }
-
-    // MARK: - MessageType Protocol
-
-    lazy var sender: SenderType = {
-        Sender(id: "\(fromContactId)", displayName: fromContact.displayName)
-    }()
-
-    var messageId: String {
-        return "\(id)"
-    }
-
-    lazy var sentDate: Date = {
-        Date(timeIntervalSince1970: Double(timestamp))
-    }()
-
-    lazy var kind: MessageKind = {
-        if isInfo {
-            let text = NSAttributedString(string: self.text ?? "", attributes: [
-                NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 12),
-                NSAttributedString.Key.foregroundColor: UIColor.darkGray,
-                ])
-            return MessageKind.attributedText(text)
-        }
-
-        let text = self.text ?? ""
-
-        if self.viewtype == nil {
-            return MessageKind.text(text)
-        }
-
-        switch self.viewtype! {
-        case .image:
-            return MessageKind.photo(Media(image: image))
-        case .video:
-            return MessageKind.video(Media(url: fileURL))
-        default:
-            // TODO: custom views for audio, etc
-            if let filename = self.filename {
-                return MessageKind.text("File: \(self.filename ?? "") (\(self.filesize) bytes)")
-            }
-            return MessageKind.text(text)
-        }
-    }()
-
-    // MARK: - Helper
-
-    let localDateFormatter: DateFormatter = {
-        let result = DateFormatter()
-        result.dateStyle = .none
-        result.timeStyle = .short
-        return result
-    }()
-
-    func formattedSentDate() -> String {
-        return localDateFormatter.string(from: sentDate)
-    }
-
-    var id: Int {
-        return Int(dc_msg_get_id(messagePointer))
-    }
-
-    var fromContactId: Int {
-        return Int(dc_msg_get_from_id(messagePointer))
-    }
-
-    lazy var fromContact: DcContact = {
-        DcContact(id: fromContactId)
-    }()
-
-    var chatId: Int {
-        return Int(dc_msg_get_chat_id(messagePointer))
-    }
-
-    var text: String? {
-        guard let cString = dc_msg_get_text(messagePointer) else { return nil }
-        let swiftString = String(cString: cString)
-        free(cString)
-        return swiftString
-    }
-
-    var viewtype: MessageViewType? {
-        switch dc_msg_get_viewtype(messagePointer) {
-        case 0:
-            return nil
-        case DC_MSG_AUDIO:
-            return .audio
-        case DC_MSG_FILE:
-            return .file
-        case DC_MSG_GIF:
-            return .gif
-        case DC_MSG_TEXT:
-            return .text
-        case DC_MSG_IMAGE:
-            return .image
-        case DC_MSG_VIDEO:
-            return .video
-        case DC_MSG_VOICE:
-            return .voice
-        default:
-            return nil
-        }
-    }
-
-    var fileURL: URL? {
-        if let file = self.file {
-            return URL(fileURLWithPath: file, isDirectory: false)
-        }
-        return nil
-    }
-
-    private lazy var image: UIImage? = { [unowned self] in
-        let filetype = dc_msg_get_viewtype(messagePointer)
-        if let path = fileURL, filetype == DC_MSG_IMAGE {
-            if path.isFileURL {
-                do {
-                    let data = try Data(contentsOf: path)
-                    let image = UIImage(data: data)
-                    return image
-                } catch {
-                    log.warning("failed to load image: \(path), \(error)")
-                    return nil
-                }
-            }
-            return nil
-        } else {
-            return nil
-        }
-        }()
-
-    var file: String? {
-        if let cString = dc_msg_get_file(messagePointer) {
-            let str = String(cString: cString)
-            free(cString)
-            return str.isEmpty ? nil : str
-        }
-
-        return nil
-    }
-
-    var filemime: String? {
-        if let cString = dc_msg_get_filemime(messagePointer) {
-            let str = String(cString: cString)
-            free(cString)
-            return str.isEmpty ? nil : str
-        }
-
-        return nil
-    }
-
-    var filename: String? {
-        if let cString = dc_msg_get_filename(messagePointer) {
-            let str = String(cString: cString)
-            free(cString)
-            return str.isEmpty ? nil : str
-        }
-
-        return nil
-    }
-
-    var filesize: Int {
-        return Int(dc_msg_get_filebytes(messagePointer))
-    }
-
-    // DC_MSG_*
-    var type: Int {
-        return Int(dc_msg_get_viewtype(messagePointer))
-    }
-
-    // DC_STATE_*
-    var state: Int {
-        return Int(dc_msg_get_state(messagePointer))
-    }
-
-    func stateDescription() -> String {
-        switch Int32(state) {
-        case DC_STATE_IN_FRESH:
-            return "Fresh"
-        case DC_STATE_IN_NOTICED:
-            return "Noticed"
-        case DC_STATE_IN_SEEN:
-            return "Seen"
-        case DC_STATE_OUT_DRAFT:
-            return "Draft"
-        case DC_STATE_OUT_PENDING:
-            return "Pending"
-        case DC_STATE_OUT_DELIVERED:
-            return "Sent"
-        case DC_STATE_OUT_MDN_RCVD:
-            return "Read"
-        case DC_STATE_OUT_FAILED:
-            return "Failed"
-        default:
-            return "Unknown"
-        }
-    }
-
-    var timestamp: Int64 {
-        return Int64(dc_msg_get_timestamp(messagePointer))
-    }
-
-    var isInfo: Bool {
-        return dc_msg_is_info(messagePointer) == 1
-    }
-
-    func summary(chars: Int) -> String? {
-        guard let cString = dc_msg_get_summarytext(messagePointer, Int32(chars)) else { return nil }
-        let swiftString = String(cString: cString)
-        free(cString)
-        return swiftString
-    }
-
-    func createChat() -> DcChat {
-        let chatId = dc_create_chat_by_msg_id(DcContext.contextPointer, UInt32(id))
-        return DcChat(id: Int(chatId))
-    }
-}
+//class DcMsg: MessageType {
+//    private var messagePointer: OpaquePointer?
+//
+//    init(id: Int) {
+//        messagePointer = dc_get_msg(DcContext.contextPointer, UInt32(id))
+//    }
+//
+//    deinit {
+//        dc_msg_unref(messagePointer)
+//    }
+//
+//    // MARK: - MessageType Protocol
+//
+//    lazy var sender: SenderType = {
+//        Sender(id: "\(fromContactId)", displayName: fromContact.displayName)
+//    }()
+//
+//    var messageId: String {
+//        return "\(id)"
+//    }
+//
+//    lazy var sentDate: Date = {
+//        Date(timeIntervalSince1970: Double(timestamp))
+//    }()
+//
+//    lazy var kind: MessageKind = {
+//        if isInfo {
+//            let text = NSAttributedString(string: self.text ?? "", attributes: [
+//                NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 12),
+//                NSAttributedString.Key.foregroundColor: UIColor.darkGray,
+//                ])
+//            return MessageKind.attributedText(text)
+//        }
+//
+//        let text = self.text ?? ""
+//
+//        if self.viewtype == nil {
+//            return MessageKind.text(text)
+//        }
+//
+//        switch self.viewtype! {
+//        case .image:
+//            return MessageKind.photo(Media(image: image))
+//        case .video:
+//            return MessageKind.video(Media(url: fileURL))
+//        default:
+//            // TODO: custom views for audio, etc
+//            if let filename = self.filename {
+//                return MessageKind.text("File: \(self.filename ?? "") (\(self.filesize) bytes)")
+//            }
+//            return MessageKind.text(text)
+//        }
+//    }()
+//
+//    // MARK: - Helper
+//
+//    let localDateFormatter: DateFormatter = {
+//        let result = DateFormatter()
+//        result.dateStyle = .none
+//        result.timeStyle = .short
+//        return result
+//    }()
+//
+//    func formattedSentDate() -> String {
+//        return localDateFormatter.string(from: sentDate)
+//    }
+//
+//    var id: Int {
+//        return Int(dc_msg_get_id(messagePointer))
+//    }
+//
+//    var fromContactId: Int {
+//        return Int(dc_msg_get_from_id(messagePointer))
+//    }
+//
+//    lazy var fromContact: DcContact = {
+//        DcContact(id: fromContactId)
+//    }()
+//
+//    var chatId: Int {
+//        return Int(dc_msg_get_chat_id(messagePointer))
+//    }
+//
+//    var text: String? {
+//        guard let cString = dc_msg_get_text(messagePointer) else { return nil }
+//        let swiftString = String(cString: cString)
+//        free(cString)
+//        return swiftString
+//    }
+//
+//    var viewtype: MessageViewType? {
+//        switch dc_msg_get_viewtype(messagePointer) {
+//        case DC_MSG_AUDIO:
+//            return .audio
+//        case DC_MSG_FILE:
+//            return .file
+//        case DC_MSG_GIF:
+//            return .gif
+//        case DC_MSG_TEXT:
+//            return .text
+//        case DC_MSG_IMAGE:
+//            return .image
+//        case DC_MSG_VIDEO:
+//            return .video
+//        case DC_MSG_VOICE:
+//            return .voice
+//        default:
+//            return nil
+//        }
+//    }
+//
+//    var fileURL: URL? {
+//        if let file = self.file {
+//            return URL(fileURLWithPath: file, isDirectory: false)
+//        }
+//        return nil
+//    }
+//
+//    private lazy var image: UIImage? = { [unowned self] in
+//        let filetype = dc_msg_get_viewtype(messagePointer)
+//        if let path = fileURL, filetype == DC_MSG_IMAGE {
+//            if path.isFileURL {
+//                do {
+//                    let data = try Data(contentsOf: path)
+//                    let image = UIImage(data: data)
+//                    return image
+//                } catch {
+//                    log.warning("failed to load image: \(path), \(error)")
+//                    return nil
+//                }
+//            }
+//            return nil
+//        } else {
+//            return nil
+//        }
+//        }()
+//
+//    var file: String? {
+//        if let cString = dc_msg_get_file(messagePointer) {
+//            let str = String(cString: cString)
+//            free(cString)
+//            return str.isEmpty ? nil : str
+//        }
+//
+//        return nil
+//    }
+//
+//    var filemime: String? {
+//        if let cString = dc_msg_get_filemime(messagePointer) {
+//            let str = String(cString: cString)
+//            free(cString)
+//            return str.isEmpty ? nil : str
+//        }
+//
+//        return nil
+//    }
+//
+//    var filename: String? {
+//        if let cString = dc_msg_get_filename(messagePointer) {
+//            let str = String(cString: cString)
+//            free(cString)
+//            return str.isEmpty ? nil : str
+//        }
+//
+//        return nil
+//    }
+//
+//    var filesize: Int {
+//        return Int(dc_msg_get_filebytes(messagePointer))
+//    }
+//
+//    // DC_MSG_*
+//    var type: Int {
+//        return Int(dc_msg_get_viewtype(messagePointer))
+//    }
+//
+//    // DC_STATE_*
+//    var state: Int {
+//        return Int(dc_msg_get_state(messagePointer))
+//    }
+//
+//    func stateDescription() -> String {
+//        switch Int32(state) {
+//        case DC_STATE_IN_FRESH:
+//            return "Fresh"
+//        case DC_STATE_IN_NOTICED:
+//            return "Noticed"
+//        case DC_STATE_IN_SEEN:
+//            return "Seen"
+//        case DC_STATE_OUT_DRAFT:
+//            return "Draft"
+//        case DC_STATE_OUT_PENDING:
+//            return "Pending"
+//        case DC_STATE_OUT_DELIVERED:
+//            return "Sent"
+//        case DC_STATE_OUT_MDN_RCVD:
+//            return "Read"
+//        case DC_STATE_OUT_FAILED:
+//            return "Failed"
+//        default:
+//            return "Unknown"
+//        }
+//    }
+//
+//    var timestamp: Int64 {
+//        return Int64(dc_msg_get_timestamp(messagePointer))
+//    }
+//
+//    var isInfo: Bool {
+//        return dc_msg_is_info(messagePointer) == 1
+//    }
+//
+//    func summary(chars: Int) -> String? {
+//        guard let cString = dc_msg_get_summarytext(messagePointer, Int32(chars)) else { return nil }
+//        let swiftString = String(cString: cString)
+//        free(cString)
+//        return swiftString
+//    }
+//
+//    func createChat() -> DcChat {
+//        let chatId = dc_create_chat_by_msg_id(DcContext.contextPointer, UInt32(id))
+//        return DcChat(id: Int(chatId))
+//    }
+//}

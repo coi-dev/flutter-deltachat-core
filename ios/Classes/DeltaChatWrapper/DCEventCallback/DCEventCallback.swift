@@ -121,7 +121,6 @@ public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsi
         break
 
     default:
-        log.error("Unknown DCC event: \(event), '\(String(cString: data2String))'")
         DcEventCenter.sharedInstance.send(data1: data1, data2: data2, toObserversWith: Int(event))
         break
 
