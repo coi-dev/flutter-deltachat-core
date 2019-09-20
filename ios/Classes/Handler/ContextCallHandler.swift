@@ -466,7 +466,7 @@ class ContextCallHandler: MethodCallHandler {
         if let flags = args[Argument.FLAGS] as? UInt32 {
             let query = args[Argument.QUERY]  as? String
 
-            let contactIds = dc_get_contacts(DcContext.contextPointer, flags, query)
+            var contactIds = dc_get_contacts(DcContext.contextPointer, flags, query)
             result(FlutterStandardTypedData(int32: Data(bytes: &contactIds, count: MemoryLayout.size(ofValue: contactIds))))
     
             return
