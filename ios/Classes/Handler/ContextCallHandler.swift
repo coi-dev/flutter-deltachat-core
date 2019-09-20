@@ -467,14 +467,7 @@ class ContextCallHandler: MethodCallHandler {
             let query = args[Argument.QUERY]  as? String
 
             let contactIds = dc_get_contacts(DcContext.contextPointer, flags, query)
-//            result(FlutterStandardTypedData(int32: Data(bytes: &contactIds, count: MemoryLayout.size(ofValue: contactIds))))
-
-            var ids: NSMutableArray = NSMutableArray()
-            for idx in 0 ..< dc_array_get_cnt(contactIds) {
-                let id = dc_array_get_id(contactIds, idx)
-                ids.add(Int(id))
-            }
-            result(FlutterStandardTypedData(int32: Data(bytes: &ids, count: MemoryLayout.size(ofValue: ids))))
+            result(FlutterStandardTypedData(int32: Data(bytes: &contactIds, count: MemoryLayout.size(ofValue: contactIds))))
     
             return
         }
