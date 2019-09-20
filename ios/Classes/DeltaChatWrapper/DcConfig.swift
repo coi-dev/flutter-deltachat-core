@@ -150,7 +150,7 @@ class DcConfig {
             log.error("key not found: \(key)")
             return 0
         }
-        
+
         log.debug("setConfig for key: \(key), value: \(String(describing: val))")
         
         return 1
