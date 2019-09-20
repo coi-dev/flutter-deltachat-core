@@ -466,8 +466,19 @@ class ContextCallHandler: MethodCallHandler {
         if let flags = args[Argument.FLAGS] as? UInt32 {
             let query = args[Argument.QUERY]  as? String
 
-            var contactIds = dc_get_contacts(DcContext.contextPointer, flags, query)
-            result(FlutterStandardTypedData(int32: Data(bytes: &contactIds, count: MemoryLayout.size(ofValue: contactIds))))
+            let contactIds = dc_get_contacts(DcContext.contextPointer, flags, query)
+
+            let count = dc_array_get_cnt(contactIds)
+            var ids: [UInt32] = [UInt32](repeating: 0, count: count)
+            for idx in 0 ..< count {
+                let id = UInt32(dc_array_get_id(contactIds, idx))
+                ids[idx] = id
+            }
+            
+            let buffer = ids.withUnsafeBufferPointer { Data(buffer: $0) }
+            result(FlutterStandardTypedData(int32: buffer))
+            
+            dc_array_unref(contactIds)
     
             return
         }

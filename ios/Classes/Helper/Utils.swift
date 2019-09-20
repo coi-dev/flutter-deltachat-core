@@ -77,5 +77,9 @@ struct Utils {
         
         return defaultValue!
     }
+    
+//    static func flutterData(fromDCCArray array: dc_array_t*, withLength length: Int) -> FlutterStandardTypedData {
+//        
+//    }
 
 }
