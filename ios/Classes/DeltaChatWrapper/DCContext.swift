@@ -46,8 +46,8 @@ class DcContext {
     static private(set) var contextPointer: OpaquePointer?
     
     var userDatabasePath: String {
-        let paths = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)
-        return "\(paths[0])/messenger.db"
+        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
+        return "\(paths)/messenger.db"
     }
     
     init() {
