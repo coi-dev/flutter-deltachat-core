@@ -809,6 +809,15 @@ JNIEXPORT void Java_com_b44t_messenger_DcContext_subscribeWebPush(JNIEnv *env, j
 	CHAR_UNREF(json);
 }
 
+JNIEXPORT void Java_com_b44t_messenger_DcContext_validateWebPush(JNIEnv *env, jobject obj, jstring uid, jstring msg, jint id)
+{
+	CHAR_REF(uid);
+	CHAR_REF(msg);
+		dc_validate_webpush(get_dc_context(env, obj), uidPtr, msgPtr, id);
+	CHAR_UNREF(uid);
+	CHAR_UNREF(msg);
+}
+
 JNIEXPORT void Java_com_b44t_messenger_DcContext_getWebPushSubscription(JNIEnv *env, jobject obj, jstring uid, jint id)
 {
 	CHAR_REF(uid);
@@ -825,7 +834,6 @@ JNIEXPORT void Java_com_b44t_messenger_DcContext_setCoiMessageFilter(JNIEnv *env
 {
 	    dc_set_coi_message_filter(get_dc_context(env, obj), mode, id);
 }
-
 
 /*******************************************************************************
  * DcArray

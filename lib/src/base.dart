@@ -67,6 +67,7 @@ abstract class Base {
   static const String argumentMessageIds = "messageIds";
   static const String argumentQrText = "qrText";
   static const String argumentJson = "json";
+  static const String argumentMessage = "message";
   static const String argumentUid = "uid";
   static const String argumentMode = "mode";
   static const String argumentEnable = "enable";

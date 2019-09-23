@@ -96,6 +96,7 @@ class Context {
   static const String methodIsWebPushSupported = "context_isWebPushSupported";
   static const String methodGetWebPushVapidKey = "context_getWebPushVapidKey";
   static const String methodSubscribeWebPush = "context_subscribeWebPush";
+  static const String methodValidateWebPush = "context_validateWebPush";
   static const String methodGetWebPushSubscription = "context_getWebPushSubscription";
   static const String methodSetCoiEnabled = "context_setCoiEnabled";
   static const String methodSetCoiMessageFilter = "context_setCoiMessageFilter";
@@ -353,10 +354,14 @@ class Context {
     return await core.invokeMethod(methodSubscribeWebPush, getWebPushSubscribeArguments(uid, json, id));
   }
 
+  Future<void> validateWebPush(String uid, String message, int id) async {
+    return await core.invokeMethod(methodValidateWebPush, getWebPushValidateArguments(uid, message, id));
+  }
+
   Future<void> getWebPushSubscription(String uid, int id) async {
     return await core.invokeMethod(methodGetWebPushSubscription, getWebPushGetSubscriptionArguments(uid, id));
   }
-
+  
   Future<void> setCoiEnabled(int enable, int id) async {
     return await core.invokeMethod(methodSetCoiEnabled, getSetCoiEnabledArguments(enable, id));
   }
@@ -418,6 +423,8 @@ class Context {
   Map<String, dynamic> getSetNameOrImageArguments(int chatId, String newValue) => <String, dynamic>{Base.argumentChatId: chatId, Base.argumentValue: newValue};
 
   Map<String, dynamic> getWebPushSubscribeArguments(String uid, String json, int id) => <String, dynamic>{Base.argumentUid: uid, Base.argumentJson: json, Base.argumentId: id};
+  
+  Map<String, dynamic> getWebPushValidateArguments(String uid, String message, int id) => <String, dynamic>{Base.argumentUid: uid, Base.argumentMessage: message, Base.argumentId: id};
 
   Map<String, dynamic> getWebPushGetSubscriptionArguments(String uid, int id) => <String, dynamic>{Base.argumentUid: uid, Base.argumentId: id};
 
