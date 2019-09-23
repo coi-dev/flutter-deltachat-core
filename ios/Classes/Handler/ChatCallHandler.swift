@@ -104,14 +104,21 @@ class ChatCallHandler: MethodCallHandler {
     }
     
     private func getSubtitle(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_chat_get_subtitle(getChat(methodCall: methodCall, result: result)))
-        
+        let chat = getChat(methodCall: methodCall, result: result)
+        guard let chatSubTitle = dc_chat_get_subtitle(chat) else {
+            result("")
+            return
+        }
+        result(String(cString: chatSubTitle))
     }
     
     private func getName(methodCall: FlutterMethodCall, result: FlutterResult) {
         let chat = getChat(methodCall: methodCall, result: result)
-        let chatName = dc_chat_get_name(chat)
-        result(chatName)
+        guard let chatName = dc_chat_get_name(chat) else {
+            result("")
+            return
+        }
+        result(String(cString: chatName))
     }
     
     private func getArchived(methodCall: FlutterMethodCall, result: FlutterResult) {

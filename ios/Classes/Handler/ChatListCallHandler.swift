@@ -83,23 +83,18 @@ class ChatListCallHandler: MethodCallHandler {
 
     
     fileprivate func setup(methodCall: FlutterMethodCall, result: FlutterResult) {
-        var chatListFlag: Int
-        guard let args = methodCall.arguments else {
+        guard let args = methodCall.arguments as? [String: Any] else {
+            Method.Error.missingArgument(result: result)
             return
         }
-        if let myArgs = args as? [String: Any] {
-            if let type = myArgs["type"] as? Int {
-                chatListFlag = type
-            } else {
-                chatListFlag = 0
-            }
-            chatList = dc_get_chatlist(DcContext.contextPointer, Int32(chatListFlag), nil, 0)
-            result(1)
-        } else {
-            Method.Error.missingArgument(result: result)
+
+        var chatListFlag: Int = 0
+        if let type = args["type"] as? Int {
+            chatListFlag = type
         }
-        
-        
+
+        chatList = dc_get_chatlist(DcContext.contextPointer, Int32(chatListFlag), nil, 0)
+        result(chatList)
     }
     
     private func getChatId(methodCall: FlutterMethodCall, result: FlutterResult) {
