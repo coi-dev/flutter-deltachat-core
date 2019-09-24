@@ -80,6 +80,14 @@ class DcChat {
         return dc_chat_is_verified(chatPointer) > 0
     }
     
+    var isUnpromoted: Bool {
+        return dc_chat_is_unpromoted(chatPointer) > 0
+    }
+    
+    var isSelfTalk: Bool {
+        return dc_chat_is_self_talk(chatPointer) > 0
+    }
+    
     var contactIds: [Int] {
         return Utils.copyAndFreeArray(inputArray: dc_get_chat_contacts(DcContext.contextPointer, UInt32(id)))
     }
@@ -115,6 +123,14 @@ class DcChat {
             return str.isEmpty ? nil : str
         }
         return nil
+    }
+    
+    var archived: Int32 {
+        return dc_chat_get_archived(chatPointer)
+    }
+    
+    var color: UInt32 {
+        return dc_chat_get_color(chatPointer)
     }
 }
 

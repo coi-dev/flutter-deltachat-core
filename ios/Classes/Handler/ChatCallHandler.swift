@@ -43,6 +43,8 @@
 import Foundation
 
 class ChatCallHandler: MethodCallHandler {
+    
+    fileprivate let cache: Cache = Cache.shared
 
     // MARK: - Protocol MethodCallHandling
     
@@ -86,47 +88,39 @@ class ChatCallHandler: MethodCallHandler {
 
     
     private func isSelfTalk(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_chat_is_self_talk(getChat(methodCall: methodCall, result: result)))
+        let chat = getChat(methodCall: methodCall, result: result)
+        result(NSNumber(value: chat.isSelfTalk))
     }
     
     private func isUnpromoted(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_chat_is_unpromoted(getChat(methodCall: methodCall, result: result)))
+        let chat = getChat(methodCall: methodCall, result: result)
+        result(NSNumber(value: chat.isUnpromoted))
     }
     
     private func getProfileImage(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_chat_get_profile_image(getChat(methodCall: methodCall, result: result)))
-        //    DcChat chat = getChat(methodCall, result);
-        //    if (chat == null) {
-        //    resultErrorGeneric(methodCall, result);
-        //    return;
-        //    }
-        //    result.success(chat.getProfileImage());
+        let chat = getChat(methodCall: methodCall, result: result)
+        var image = chat.profileImage
+        result(FlutterStandardTypedData(bytes: Data(bytes: &image, count: MemoryLayout.size(ofValue: image))))
     }
     
     private func getSubtitle(methodCall: FlutterMethodCall, result: FlutterResult) {
         let chat = getChat(methodCall: methodCall, result: result)
-        guard let chatSubTitle = dc_chat_get_subtitle(chat) else {
-            result("")
-            return
-        }
-        result(String(cString: chatSubTitle))
+        result(chat.subtitle)
     }
     
     private func getName(methodCall: FlutterMethodCall, result: FlutterResult) {
         let chat = getChat(methodCall: methodCall, result: result)
-        guard let chatName = dc_chat_get_name(chat) else {
-            result("")
-            return
-        }
-        result(String(cString: chatName))
+        result(chat.name)
     }
     
     private func getArchived(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_chat_get_archived(getChat(methodCall: methodCall, result: result)))
+        let chat = getChat(methodCall: methodCall, result: result)
+        result(NSNumber(value: chat.archived))
     }
     
     private func getColor(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_chat_get_color(getChat(methodCall: methodCall, result: result)))
+        let chat = getChat(methodCall: methodCall, result: result)
+        result(NSNumber(value: chat.color))
     }
     
     private func isGroup(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -141,17 +135,18 @@ class ChatCallHandler: MethodCallHandler {
     }
     
     private func getChatId(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_chat_get_id(getChat(methodCall: methodCall, result: result)))
+        let chat = getChat(methodCall: methodCall, result: result)
+        result(NSNumber(value: chat.id))
     }
     
     private func isVerified(methodCall: FlutterMethodCall, result: FlutterResult) {
-        // TODO : ???
-        result(dc_chat_is_verified(getChat(methodCall: methodCall, result: result)))
+        let chat = getChat(methodCall: methodCall, result: result)
+        result(NSNumber(value: chat.isVerified))
     }
     
-    private func getChat(methodCall: FlutterMethodCall, result: FlutterResult) -> OpaquePointer {
+    private func getChat(methodCall: FlutterMethodCall, result: FlutterResult) -> DcChat {
         let id = methodCall.intValue(for: Argument.ID, result: result)
-        let chat: OpaquePointer = dc_get_chat(DcContext.contextPointer, UInt32(id))
+        let chat = DcChat(id: id)
         return chat;
     }
 }

@@ -45,38 +45,42 @@ import Foundation
 class ChatListCallHandler: MethodCallHandler {
 
     fileprivate var chatList: OpaquePointer!
+    fileprivate let chatListCache: Cache = Cache.shared
 
     // MARK: - Protocol MethodCallHandling
     
     override func handle(_ call: FlutterMethodCall, result: FlutterResult) {
         switch (call.method) {
-        case Method.ChatList.INTERNAL_SETUP:
-            setup(methodCall: call, result: result)
-            break
-        case Method.ChatList.GET_ID:
-            getChatId(methodCall: call, result: result)
-            break
-        case Method.ChatList.GET_CNT:
-            getChatCnt(result: result)
-            break
-        case Method.ChatList.GET_CHAT:
-            getChat(methodCall: call, result: result)
-            break
-        case Method.ChatList.GET_MSG_ID:
-            getChatMsgId(dcChatlist: chatList, methodCall: call, result: result)
-            break
-        case Method.ChatList.GET_MSG:
-            getChatMsg(dcChatlist: chatList, methodCall: call, result: result)
-            break
-        case Method.ChatList.GET_SUMMARY:
-            getChatSummary(dcChatlist: chatList, methodCall: call, result: result)
-            break
-        case Method.ChatList.INTERNAL_TEAR_DOWN:
-            tearDown(methodCall: call, result: result)
-            break
-        default:
-            log.error("ChatList: Failing for \(call.method)")
-            result(FlutterMethodNotImplemented)
+            case Method.ChatList.INTERNAL_SETUP:
+                setup(methodCall: call, result: result)
+                break
+            case Method.ChatList.INTERNAL_TEAR_DOWN:
+                tearDown(methodCall: call, result: result)
+                break
+            case Method.ChatList.GET_ID:
+                getChatId(methodCall: call, result: result)
+                break
+            case Method.ChatList.GET_CNT:
+                getChatCnt(result: result)
+                break
+            case Method.ChatList.GET_CHAT:
+                getChat(methodCall: call, result: result)
+                break
+            case Method.ChatList.GET_MSG_ID:
+                getChatMsgId(dcChatlist: chatList, methodCall: call, result: result)
+                break
+            case Method.ChatList.GET_MSG:
+                getChatMsg(dcChatlist: chatList, methodCall: call, result: result)
+                break
+            case Method.ChatList.GET_SUMMARY:
+                getChatSummary(dcChatlist: chatList, methodCall: call, result: result)
+                break
+            case Method.ChatList.INTERNAL_TEAR_DOWN:
+                tearDown(methodCall: call, result: result)
+                break
+            default:
+                log.error("ChatList: Failing for \(call.method)")
+                result(FlutterMethodNotImplemented)
             
         }
     }
@@ -94,9 +98,21 @@ class ChatListCallHandler: MethodCallHandler {
         }
         
         let query = args[Argument.QUERY] as? String
-        var dcChatList = dcContext.getChatlist(flags: chatListFlag, queryString: query, queryId: 0)
+        let dcChatList = dcContext.getChatlist(flags: chatListFlag, queryString: query, queryId: 0)
+        let cacheId = chatListCache.add(object: dcChatList)
 
-        result(FlutterStandardTypedData(bytes: Data(bytes: &dcChatList, count: MemoryLayout.size(ofValue: dcChatList))))
+        result(cacheId)
+    }
+    
+    fileprivate func tearDown(methodCall: FlutterMethodCall, result: FlutterResult) {
+        guard let args = methodCall.arguments as? [String: Any],
+            let cacheId = args[Argument.CACHE_ID] as? Int else {
+            Method.Error.missingArgument(result: result)
+            return
+        }
+
+        chatListCache.removeValue(for: cacheId)
+        result(nil)
     }
     
     private func getChatId(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -145,8 +161,5 @@ class ChatListCallHandler: MethodCallHandler {
         
         result(summary)
     }
-    
-    private func tearDown(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(nil);
-    }
+
 }
