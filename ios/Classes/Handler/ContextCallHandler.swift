@@ -351,7 +351,7 @@ class ContextCallHandler: MethodCallHandler {
             let contactId = myArgs[Argument.ID] as? UInt32 {
             
             let chatId = dc_create_chat_by_contact_id(DcContext.contextPointer, contactId)
-            result(Int(chatId))
+            result(NSNumber(value: chatId))
         }
         else {
             Method.Error.missingArgument(result: result)
@@ -547,7 +547,7 @@ class ContextCallHandler: MethodCallHandler {
         
         let chat = DcChat(id: chatId)
         var messageIds = chat.messageIds
-        result(FlutterStandardTypedData(int32: Data(bytes: &messageIds, count: MemoryLayout.size(ofValue: messageIds))))
+        result(FlutterStandardTypedData(bytes: Data(bytes: &messageIds, count: MemoryLayout.size(ofValue: messageIds))))
 
         //        Integer id = methodCall.argument(ARGUMENT_CHAT_ID);
         //        if (id == null) {
@@ -572,7 +572,7 @@ class ContextCallHandler: MethodCallHandler {
     }
     
     private func createChatMessage(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
+        guard let args = methodCall.arguments as? [String: Any] else {
             Method.Error.missingArgument(result: result)
             return
         }
@@ -582,15 +582,24 @@ class ContextCallHandler: MethodCallHandler {
             return
         }
         
-        if let myArgs = args as? [String: Any],
-            let chatId = myArgs[Argument.CHAT_ID] as? UInt32,
-            let flags = myArgs[Argument.TEXT] {
-            //result(dc_get_chat(mailboxPointer, chatId))
-            
+        guard let chatId = args[Argument.CHAT_ID] as? UInt32 else {
+                Method.Error.missingArgument(result: result)
+                return
         }
-        else {
-            Method.Error.missingArgument(result: result);
-        }
+        
+        let text = args[Argument.TEXT] as? String ?? ""
+        let draft = dc_msg_new(DcContext.contextPointer, DC_MSG_TEXT)
+        dc_msg_set_text(draft, text.cString(using: .utf8))
+        let messageId = dc_send_msg(DcContext.contextPointer, chatId, draft)
+        
+        result(NSNumber(value: messageId))
+//        let newMessage = DcMsg(id: chatId)
+//        newMessage.text = text
+//            
+//        }
+//        else {
+//            Method.Error.missingArgument(result: result);
+//        }
         
         //    Integer id = methodCall.argument(ARGUMENT_CHAT_ID);
         //    if (id == null) {

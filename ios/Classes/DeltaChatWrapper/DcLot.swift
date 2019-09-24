@@ -85,25 +85,25 @@ class DcLot {
     }
 }
 
-enum MessageViewType: CustomStringConvertible {
-    case audio
-    case file
-    case gif
-    case image
-    case text
-    case video
-    case voice
+enum MessageViewType: Int {
+    case text  = 10
+    case image = 20
+    case gif   = 21
+    case audio = 40
+    case voice = 41
+    case video = 50
+    case file  = 60
     
     var description: String {
         switch self {
         // Use Internationalization, as appropriate.
-        case .audio: return "Audio"
-        case .file: return "File"
-        case .gif: return "GIF"
-        case .image: return "Image"
-        case .text: return "Text"
-        case .video: return "Video"
-        case .voice: return "Voice"
+        case .text:     return "Text"
+        case .image:    return "Image"
+        case .gif:      return "GIF"
+        case .audio:    return "Audio"
+        case .voice:    return "Voice"
+        case .video:    return "Video"
+        case .file:     return "File"
         }
     }
 }

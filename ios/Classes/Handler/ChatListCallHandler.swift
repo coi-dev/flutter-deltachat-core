@@ -88,13 +88,15 @@ class ChatListCallHandler: MethodCallHandler {
             return
         }
 
-        var chatListFlag: Int = 0
-        if let type = args["type"] as? Int {
+        var chatListFlag: Int32 = 0
+        if let type = args[Argument.TYPE] as? Int32 {
             chatListFlag = type
         }
+        
+        let query = args[Argument.QUERY] as? String
+        var dcChatList = dcContext.getChatlist(flags: chatListFlag, queryString: query, queryId: 0)
 
-        chatList = dc_get_chatlist(DcContext.contextPointer, Int32(chatListFlag), nil, 0)
-        result(chatList)
+        result(FlutterStandardTypedData(bytes: Data(bytes: &dcChatList, count: MemoryLayout.size(ofValue: dcChatList))))
     }
     
     private func getChatId(methodCall: FlutterMethodCall, result: FlutterResult) {
