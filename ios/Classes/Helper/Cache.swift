@@ -42,16 +42,14 @@
 
 import Foundation
 
-class Cache {
+class Cache<T> {
     
-    static let shared: Cache = Cache()
-    
-    fileprivate var items: [Int: Any] = [:]
+    fileprivate var items: [Int: T] = [:]
     private(set) var lastKey: Int = 0
     
     // MARK: - Public API
     
-    func add(object: Any) -> Int {
+    func add(object: T) -> Int {
         let usedKey = lastKey
         
         items[lastKey] = object
@@ -60,7 +58,7 @@ class Cache {
         return usedKey
     }
     
-    func set(value: Any?, for key: Int) {
+    func set(value: T?, for key: Int) {
         if nil == value {
             _ = items.removeValue(forKey: key)
             return
@@ -68,8 +66,7 @@ class Cache {
         items[key] = value
     }
     
-    func getValue(for key: Int) -> Any? {
-        if !items.keys.contains(key) { return nil }
+    func value(for key: Int) -> T? {
         return items[key]
     }
     

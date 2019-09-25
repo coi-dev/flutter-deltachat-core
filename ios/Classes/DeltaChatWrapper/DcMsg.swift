@@ -69,7 +69,7 @@ class DcMsg: MessageType {
     }()
 
     lazy var kind: MessageKind = {
-        if isInfo {
+        if isInfoMessage {
             let text = NSAttributedString(string: self.text ?? "", attributes: [
                 NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 12),
                 NSAttributedString.Key.foregroundColor: UIColor.darkGray,
@@ -251,10 +251,6 @@ class DcMsg: MessageType {
         return Int64(dc_msg_get_timestamp(messagePointer))
     }
 
-    var isInfo: Bool {
-        return dc_msg_is_info(messagePointer) == 1
-    }
-
     func summary(chars: Int) -> String? {
         guard let cString = dc_msg_get_summarytext(messagePointer, Int32(chars)) else { return nil }
         let swiftString = String(cString: cString)
@@ -266,4 +262,43 @@ class DcMsg: MessageType {
         let chatId = dc_create_chat_by_msg_id(DcContext.contextPointer, UInt32(id))
         return DcChat(id: Int(chatId))
     }
+    
+    var isSetupMessage: Bool {
+        return dc_msg_is_setupmessage(messagePointer) == 1
+    }
+    
+    var isInfoMessage: Bool {
+        return dc_msg_is_info(messagePointer) == 1
+    }
+    
+    var isOutgoing: Bool {
+        return fromContactId == DC_CONTACT_ID_SELF
+    }
+    
+    var hasFile: Bool {
+        if let file = self.file {
+            if !file.isEmpty {
+                return true
+            }
+        }
+        return false
+    }
+    
+    var showPadLock: Bool {
+        return dc_msg_get_showpadlock(messagePointer) == 1
+    }
+    
+    var isStarred: Bool {
+        return dc_msg_is_starred(messagePointer) == 1
+    }
+    
+    var setupCodeBegin: String {
+        if let cString = dc_msg_get_setupcodebegin(messagePointer) {
+            let str = String(cString: cString)
+            free(cString)
+            return str.isEmpty ? "" : str
+        }
+        return ""
+    }
+
 }

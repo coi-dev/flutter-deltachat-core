@@ -42,11 +42,21 @@
 
 import Foundation
 
-class ContactCallHandler: MethodCallHandler {
+class ContactCallHandler: MethodCallHandling {
+    
+    fileprivate let context: DcContext!
+    fileprivate let contextCallHandler: ContextCallHandler!
+    
+    // MARK: - Initialization
+    
+    init(context: DcContext, contextCallHandler: ContextCallHandler) {
+        self.context = context
+        self.contextCallHandler = contextCallHandler
+    }
 
     // MARK: - Protocol MethodCallHandling
 
-    override func handle(_ call: FlutterMethodCall, result: FlutterResult) {
+    func handle(_ call: FlutterMethodCall, result: FlutterResult) {
         switch (call.method) {
         case Method.Contact.GET_ID:
             getId(methodCall: call, result: result);
@@ -83,11 +93,6 @@ class ContactCallHandler: MethodCallHandler {
             result(FlutterMethodNotImplemented)
         }
     }
-
-    // MARK: - Public API
-    
-    public func handleContactCalls(methodCall: FlutterMethodCall, result: FlutterResult) {
-    }
     
     // MARK: - Private Helper
     
@@ -111,12 +116,10 @@ class ContactCallHandler: MethodCallHandler {
         result(contact.firstName)
     }
     
-    
     fileprivate func getAddress(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
         result(contact.email)
     }
-    
     
     fileprivate func getNameAndAddress(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
@@ -138,14 +141,17 @@ class ContactCallHandler: MethodCallHandler {
         result(contact.isBlocked)
     }
     
-    
     fileprivate func isVerified(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
         result(contact.isVerified)
     }
     
+    // MARK: - Private Helper
+    
     fileprivate func getContact(methodCall: FlutterMethodCall, result: FlutterResult) -> DcContact {
         let id = methodCall.intValue(for: Argument.ID, result: result)
-        return DcContact(id: Int(id))
+        let contact = contextCallHandler.loadAndCacheContact(with: id)
+        
+        return contact
     }
 }

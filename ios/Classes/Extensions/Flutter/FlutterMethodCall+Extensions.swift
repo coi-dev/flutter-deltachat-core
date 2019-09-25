@@ -19,7 +19,7 @@ extension FlutterMethodCall {
     
     var parameters: MethodCallParameters {
         guard let arguments: MethodCallParameters = arguments as? MethodCallParameters else {
-            return [:]
+            fatalError("No arguments found for method: \(method)")
         }
         return arguments
     }
@@ -41,27 +41,25 @@ extension FlutterMethodCall {
 
     // MARK: - Parameter Values
     
-    func intValue(for key: String, result: FlutterResult) -> Int {
-        guard let arguments: MethodCallParameters = arguments as? MethodCallParameters else {
-            fatalError("No arguments found for method: \(method)")
-        }
-        
+    func intValue(for key: String, defaultValue: Int = 0, result: FlutterResult) -> Int {
         if !contains(keys: [key]) {
-            Method.Error.missingArgument(result: result)
-            fatalError()
+            return defaultValue
         }
         
-        guard let value: Int = arguments[key] as? Int else {
-            Method.Error.noInt(for: key, result: result)
-            fatalError()
+        guard let value: Int = parameters[key] as? Int else {
+            return defaultValue
         }
         
         return value
     }
+
+    func stringValue(for key: String, result: FlutterResult) -> String? {
+        return value(for: key, result: result) as? String
+    }
     
     func value(for key: String, result: FlutterResult) -> Any? {
         if contains(keys: [key]) {
-            return parameters[key]
+            return parameters[key] as Any?
         }
 
         Method.Error.missingArgument(result: result);

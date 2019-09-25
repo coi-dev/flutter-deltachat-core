@@ -42,11 +42,21 @@
 
 import Foundation
 
-class MessageCallHandler: MethodCallHandler {
+class MessageCallHandler: MethodCallHandling {
+    
+    fileprivate let context: DcContext!
+    fileprivate let contextCallHandler: ContextCallHandler!
+    
+    // MARK: - Initialization
+    
+    init(context: DcContext, contextCallHandler: ContextCallHandler) {
+        self.context = context
+        self.contextCallHandler = contextCallHandler
+    }
 
     // MARK: - Protocol MethodCallHandling
 
-    override func handle(_ call: FlutterMethodCall, result: FlutterResult) {
+    func handle(_ call: FlutterMethodCall, result: FlutterResult) {
         switch (call.method) {
         case Method.Message.GET_ID:
             getId(methodCall: call, result: result);
@@ -106,115 +116,114 @@ class MessageCallHandler: MethodCallHandler {
             break
         default:
             log.error("Context: Failing for \(call.method)")
-            _ = FlutterMethodNotImplemented
+            result(FlutterMethodNotImplemented)
         }
     }
     
     
     private func isOutgoing(methodCall: FlutterMethodCall, result: FlutterResult) {
-        //    DcMsg message = getMessage(methodCall, result);
-        //    if (message == null) {
-        //    resultErrorGeneric(methodCall, result);
-        //    return;
-        //    }
-        //    result.success(message.isOutgoing());
+        let msg = getMessage(methodCall: methodCall, result: result)
+        result(NSNumber(value: msg.isOutgoing))
     }
     
     private func hasFile(methodCall: FlutterMethodCall, result: FlutterResult) {
-        //    DcMsg message = getMessage(methodCall, result);
-        //    if (message == null) {
-        //    resultErrorGeneric(methodCall, result);
-        //    return;
-        //    }
-        //    result.success(message.hasFile());
+        let msg = getMessage(methodCall: methodCall, result: result)
+        result(NSNumber(value: msg.hasFile))
     }
     
     private func getType(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_msg_get_viewtype(getMessage(methodCall: methodCall, result: result)))
+        let msg = getMessage(methodCall: methodCall, result: result)
+        result(NSNumber(value: msg.type))
     }
     
     private func getFile(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_msg_get_file(getMessage(methodCall: methodCall, result: result)))
+        let msg = getMessage(methodCall: methodCall, result: result)
+        result(msg.file ?? NSNull())
     }
     
     private func getFileBytes(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_msg_get_filebytes(getMessage(methodCall: methodCall, result: result)))
+        let msg = getMessage(methodCall: methodCall, result: result)
+        result(NSNumber(value: msg.filesize))
     }
     
     private func getFileName(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_msg_get_filename(getMessage(methodCall: methodCall, result: result)))
+        let msg = getMessage(methodCall: methodCall, result: result)
+        result(msg.filename)
     }
     
     private func getFileMime(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_msg_get_filemime(getMessage(methodCall: methodCall, result: result)))
+        let msg = getMessage(methodCall: methodCall, result: result)
+        result(msg.filemime)
     }
     
     private func getFromId(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_msg_get_from_id(getMessage(methodCall: methodCall, result: result)))
+        let msg = getMessage(methodCall: methodCall, result: result)
+        result(NSNumber(value: msg.fromContactId))
     }
     
     private func getChatId(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_msg_get_chat_id(getMessage(methodCall: methodCall, result: result)))
+        let msg = getMessage(methodCall: methodCall, result: result)
+        result(NSNumber(value: msg.chatId))
     }
     
     private func getTimestamp(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_msg_get_timestamp(getMessage(methodCall: methodCall, result: result)))
+        let msg = getMessage(methodCall: methodCall, result: result)
+        result(NSNumber(value: msg.timestamp))
     }
     
     private func getText(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_msg_get_text(getMessage(methodCall: methodCall, result: result)))
+        let msg = getMessage(methodCall: methodCall, result: result)
+        result(msg.text ?? NSNull())
     }
     
     private func getId(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_msg_get_id(getMessage(methodCall: methodCall, result: result)))
+        let msg = getMessage(methodCall: methodCall, result: result)
+        result(NSNumber(value: msg.id))
     }
     
     private func getSummaryText(methodCall: FlutterMethodCall, result: FlutterResult) {
-        //    DcMsg message = getMessage(methodCall, result);
-        //    if (message == null) {
-        //    resultErrorGeneric(methodCall, result);
-        //    return;
-        //    }
-        //    if (!hasArgumentKeys(methodCall, ARGUMENT_COUNT)) {
-        //    resultErrorArgumentMissing(result);
-        //    return;
-        //    }
-        //    Integer characterCount = methodCall.argument(ARGUMENT_COUNT);
-        //    if (characterCount == null) {
-        //    resultErrorArgumentMissingValue(result);
-        //    return;
-        //    }
-        //    result.success(message.getSummarytext(characterCount));
+        let msg = getMessage(methodCall: methodCall, result: result)
+        let characterCount = methodCall.intValue(for: Argument.COUNT, result: result)
+        result(msg.summary(chars: characterCount) ?? NSNull())
     }
     
     private func isSetupMessage(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_msg_is_setupmessage(getMessage(methodCall: methodCall, result: result)))
+        let msg = getMessage(methodCall: methodCall, result: result)
+        result(NSNumber(value: msg.isSetupMessage))
     }
     
     private func isInfo(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_msg_is_info(getMessage(methodCall: methodCall, result: result)))
+        let msg = getMessage(methodCall: methodCall, result: result)
+        result(NSNumber(value: msg.isInfoMessage))
     }
     
     private func getSetupCodeBegin(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_msg_get_setupcodebegin(getMessage(methodCall: methodCall, result: result)))
+        let msg = getMessage(methodCall: methodCall, result: result)
+        result(msg.setupCodeBegin)
     }
     
     private func getState(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_msg_get_state(getMessage(methodCall: methodCall, result: result)))
+        let msg = getMessage(methodCall: methodCall, result: result)
+        result(NSNumber(value: msg.state))
     }
     
     
     private func showPadlock(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_msg_get_showpadlock(getMessage(methodCall: methodCall, result: result)))
+        let msg = getMessage(methodCall: methodCall, result: result)
+        result(NSNumber(value: msg.showPadLock))
     }
     
     private func isStarred(methodCall: FlutterMethodCall, result: FlutterResult) {
-        result(dc_msg_is_starred(getMessage(methodCall: methodCall, result: result)))
+        let msg = getMessage(methodCall: methodCall, result: result)
+        result(NSNumber(value: msg.isStarred))
     }
     
-    private func getMessage(methodCall: FlutterMethodCall, result: FlutterResult) -> OpaquePointer? {
+    // MARK: - Private Helper
+    
+    private func getMessage(methodCall: FlutterMethodCall, result: FlutterResult) -> DcMsg {
         let id = methodCall.intValue(for: Argument.ID, result: result)
-        guard let message = dc_get_contact(DcContext.contextPointer, UInt32(id)) else { return nil }
+        let message = contextCallHandler.loadAndCacheChatMessage(with: id)
+
         return message;
     }
 

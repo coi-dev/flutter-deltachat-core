@@ -53,6 +53,10 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
     fileprivate let dcContext: DcContext!
     fileprivate let dcEventHandler: DCEventHandler!
 
+    fileprivate let chatCache: Cache<DcChat> = Cache()
+    fileprivate let contactCache: Cache<DcContact> = Cache()
+    fileprivate let messageCache: Cache<DcMsg> = Cache()
+
     fileprivate let baseCallHandler: BaseCallHandler!
     fileprivate let chatCallHandler: ChatCallHandler!
     fileprivate let chatListCallHandler: ChatListCallHandler!
@@ -70,13 +74,14 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         self.dcEventHandler = DCEventHandler()
         self.dcEventHandler.start()
 
+        self.contextCallHandler  = ContextCallHandler(context: self.dcContext, contactCache: self.contactCache, messageCache: self.messageCache, chatCache: self.chatCache)
+        self.chatListCallHandler = ChatListCallHandler(context: self.dcContext, chatCache: self.chatCache)
+        self.chatCallHandler     = ChatCallHandler(contextCalHandler: self.contextCallHandler)
+        self.contactCallHandler  = ContactCallHandler(context: self.dcContext, contextCallHandler: self.contextCallHandler)
+        self.messageCallHandler  = MessageCallHandler(context: self.dcContext, contextCallHandler: self.contextCallHandler)
+
         self.eventChannelHandler = EventChannelHandler(messenger: registrar.messenger())
-        self.baseCallHandler = BaseCallHandler(context: dcContext, eventChannelHandler: self.eventChannelHandler)
-        self.chatCallHandler = ChatCallHandler(context: dcContext, eventChannelHandler: self.eventChannelHandler)
-        self.chatListCallHandler = ChatListCallHandler(context: dcContext, eventChannelHandler: self.eventChannelHandler)
-        self.contactCallHandler = ContactCallHandler(context: dcContext, eventChannelHandler: self.eventChannelHandler)
-        self.contextCallHandler = ContextCallHandler(context: dcContext, eventChannelHandler: self.eventChannelHandler)
-        self.messageCallHandler = MessageCallHandler(context: dcContext, eventChannelHandler: self.eventChannelHandler)
+        self.baseCallHandler     = BaseCallHandler(context: dcContext, eventChannelHandler: self.eventChannelHandler)
     }
     
     // This is out entry point

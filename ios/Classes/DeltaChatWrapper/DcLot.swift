@@ -83,6 +83,18 @@ class DcLot {
     var id: Int {
         return Int(dc_lot_get_id(dcLotPointer))
     }
+    
+    var propertyArray: [Any] {
+        return [
+            NSNumber(value: id),
+            text1 ?? NSNull(),
+            text1Meaning,
+            text2 ?? NSNull(),
+            NSNumber(value: timestamp),
+            NSNumber(value: state)
+        ]
+    }
+    
 }
 
 enum MessageViewType: Int {

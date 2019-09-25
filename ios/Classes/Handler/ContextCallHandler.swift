@@ -42,11 +42,27 @@
 
 import Foundation
 
-class ContextCallHandler: MethodCallHandler {
+class ContextCallHandler: MethodCallHandling {
+    
+    fileprivate var args: MethodCallParameters = [:]
+
+    fileprivate let context: DcContext!
+    fileprivate let contactCache: Cache<DcContact>!
+    fileprivate let messageCache: Cache<DcMsg>!
+    fileprivate let chatCache: Cache<DcChat>!
+    
+    init(context: DcContext, contactCache: Cache<DcContact>, messageCache: Cache<DcMsg>, chatCache: Cache<DcChat>) {
+        self.context = context
+        self.contactCache = contactCache
+        self.messageCache = messageCache
+        self.chatCache = chatCache
+    }
 
     // MARK: - Protocol MethodCallHandling
 
-    override func handle(_ call: FlutterMethodCall, result: FlutterResult) {
+    func handle(_ call: FlutterMethodCall, result: FlutterResult) {
+        self.args = call.parameters
+
         switch (call.method) {
         case Method.Context.CONFIG_SET:
             setConfig(methodCall: call, result: result)
@@ -533,17 +549,10 @@ class ContextCallHandler: MethodCallHandler {
     }
     
     private func getChatMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments as? [String: Any],
-            let chatId = args[Argument.CHAT_ID] as? Int else {
-                
-            Method.Error.missingArgument(result: result)
-            return
-        }
+        let chatId = methodCall.intValue(for: Argument.CHAT_ID, result: result)
+        let flags = methodCall.intValue(for: Argument.FLAGS, result: result)
         
-        var flags = args[Argument.FLAGS] as? Int
-        if nil == flags {
-            flags = 0
-        }
+        context.getc
         
         let chat = DcChat(id: chatId)
         var messageIds = chat.messageIds
@@ -988,4 +997,34 @@ class ContextCallHandler: MethodCallHandler {
         }
         
     }
+    
+    // MARK: - Cache Handling
+    
+    func loadAndCacheChat(with id: Int) -> DcChat {
+        guard let chat = chatCache.value(for: id) else {
+            let chat = self.context.getChat(with: id)
+            _ = self.chatCache.add(object: chat)
+            return chat
+        }
+        return chat
+    }
+    
+    func loadAndCacheContact(with id: Int) -> DcContact {
+        guard let contact = contactCache.value(for: id) else {
+            let contact = self.context.getContact(with: id)
+            _ = self.contactCache.add(object: contact)
+            return contact
+        }
+        return contact
+    }
+    
+    func loadAndCacheChatMessage(with id: Int) -> DcMsg {
+        guard let msg = messageCache.value(for: id) else {
+            let msg = self.context.getMsg(with: id)
+            _ = self.messageCache.add(object: msg)
+            return msg
+        }
+        return msg
+    }
+
 }

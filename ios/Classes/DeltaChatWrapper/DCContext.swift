@@ -74,6 +74,21 @@ class DcContext {
         return chatlist
     }
     
+    func getChat(with id: Int) -> DcChat {
+        let chat = DcChat(id: id)
+        return chat
+    }
+    
+    func getContact(with id: Int) -> DcContact {
+        let contact  = DcContact(id: id)
+        return contact
+    }
+    
+    func getMsg(with id: Int) -> DcMsg {
+        let msg = DcMsg(id: id)
+        return msg
+    }
+    
     func deleteChat(chatId: Int) {
         dc_delete_chat(DcContext.contextPointer, UInt32(chatId))
     }

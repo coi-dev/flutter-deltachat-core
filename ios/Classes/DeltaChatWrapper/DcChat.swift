@@ -76,6 +76,10 @@ class DcChat {
         return ChatType(rawValue: type) ?? .group // group as fallback - shouldn't get here
     }
     
+    var isGroup: Bool {
+        return (chatType == .group || chatType == .verifiedGroup)
+    }
+    
     var isVerified: Bool {
         return dc_chat_is_verified(chatPointer) > 0
     }
@@ -96,25 +100,22 @@ class DcChat {
         let messageIds = dc_get_chat_msgs(DcContext.contextPointer, UInt32(id), 0, 0)
         let ids = Utils.copyAndFreeArray(inputArray: messageIds)
         return ids
+
     }
     
-    lazy var profileImage: UIImage? = { [unowned self] in
-        guard let cString = dc_chat_get_profile_image(chatPointer) else { return nil }
-        let filename = String(cString: cString)
+    lazy var profileImageFilePath: String = {
+        guard let cString = dc_chat_get_profile_image(chatPointer) else { return "" }
+        let filePath = String(cString: cString)
         free(cString)
-        let path: URL = URL(fileURLWithPath: filename, isDirectory: false)
+        
+        let path: URL = URL(fileURLWithPath: filePath, isDirectory: false)
+        
         if path.isFileURL {
-            do {
-                let data = try Data(contentsOf: path)
-                let image = UIImage(data: data)
-                return image
-            } catch {
-                log.warning("failed to load image: \(filename), \(error)")
-                return nil
-            }
+            return path.absoluteString
         }
-        return nil
-        }()
+        
+        return ""
+    }()
     
     var subtitle: String? {
         if let cString = dc_chat_get_subtitle(chatPointer) {
@@ -132,6 +133,7 @@ class DcChat {
     var color: UInt32 {
         return dc_chat_get_color(chatPointer)
     }
+    
 }
 
 enum ChatType: Int {
