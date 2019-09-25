@@ -284,8 +284,8 @@ class DcMsg: MessageType {
         return false
     }
     
-    var showPadLock: Bool {
-        return dc_msg_get_showpadlock(messagePointer) == 1
+    var showPadLock: Int32 {
+        return dc_msg_get_showpadlock(messagePointer)
     }
     
     var isStarred: Bool {

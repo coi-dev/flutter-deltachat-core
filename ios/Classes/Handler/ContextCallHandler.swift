@@ -741,23 +741,10 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     private func markSeenMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        if !methodCall.contains(keys: [Argument.MESSAGE_IDS]) {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        if let myArgs = args as? [String: Any], let msgIdArray = myArgs[Argument.MESSAGE_IDS] {
-            result(dc_markseen_msgs(DcContext.contextPointer, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count)))
-        }
-        else {
-            Method.Error.missingArgument(result: result);
-        }
-        
+        var msgIds = methodCall.value(for: Argument.MESSAGE_IDS, result: result) as! [UInt32]
+//        var markIds = msgIds.map { UInt32($0) }
+        dc_markseen_msgs(DcContext.contextPointer, &msgIds, Int32(msgIds.count))
+        result(FlutterStandardTypedData(int32: Data(bytes: &msgIds, count: MemoryLayout.size(ofValue: msgIds))))
     }
     
     private func initiateKeyTransfer(result: FlutterResult) {

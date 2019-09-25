@@ -148,12 +148,12 @@ class MessageCallHandler: MethodCallHandling {
     
     private func getFileName(methodCall: FlutterMethodCall, result: FlutterResult) {
         let msg = getMessage(methodCall: methodCall, result: result)
-        result(msg.filename)
+        result(msg.filename ?? NSNull())
     }
     
     private func getFileMime(methodCall: FlutterMethodCall, result: FlutterResult) {
         let msg = getMessage(methodCall: methodCall, result: result)
-        result(msg.filemime)
+        result(msg.filemime ?? NSNull())
     }
     
     private func getFromId(methodCall: FlutterMethodCall, result: FlutterResult) {
