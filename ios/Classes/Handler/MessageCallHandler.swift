@@ -222,7 +222,7 @@ class MessageCallHandler: MethodCallHandling {
     
     private func getMessage(methodCall: FlutterMethodCall, result: FlutterResult) -> DcMsg {
         let id = methodCall.intValue(for: Argument.ID, result: result)
-        let message = contextCallHandler.loadAndCacheChatMessage(with: id)
+        let message = contextCallHandler.loadAndCacheChatMessage(with: UInt32(id))
 
         return message;
     }

@@ -58,19 +58,19 @@ class DcChatlist {
         return dc_chatlist_get_cnt(chatListPointer)
     }
     
-    func getChatId(index: Int) -> Int {
-        return Int(dc_chatlist_get_chat_id(chatListPointer, index))
+    func getChatId(index: UInt32) -> UInt32 {
+        return dc_chatlist_get_chat_id(chatListPointer, Int(index))
     }
     
-    func getChat(for chatId: Int) -> DcChat {
+    func getChat(for chatId: UInt32) -> DcChat {
         return DcChat(id: chatId)
     }
     
-    func getMsgId(index: Int) -> Int {
-        return Int(dc_chatlist_get_msg_id(chatListPointer, index))
+    func getMsgId(index: UInt32) -> UInt32 {
+        return dc_chatlist_get_msg_id(chatListPointer, Int(index))
     }
     
-    func getMsg(index: Int) -> DcMsg {
+    func getMsg(index: UInt32) -> DcMsg {
         return DcMsg(id: index)
     }
     

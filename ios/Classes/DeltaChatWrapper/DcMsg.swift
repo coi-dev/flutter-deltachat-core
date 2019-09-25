@@ -46,8 +46,8 @@ import MessageKit
 class DcMsg: MessageType {
     private var messagePointer: OpaquePointer?
 
-    init(id: Int) {
-        messagePointer = dc_get_msg(DcContext.contextPointer, UInt32(id))
+    init(id: UInt32) {
+        messagePointer = dc_get_msg(DcContext.contextPointer, id)
     }
 
     deinit {
@@ -110,20 +110,20 @@ class DcMsg: MessageType {
         return localDateFormatter.string(from: sentDate)
     }
 
-    var id: Int {
-        return Int(dc_msg_get_id(messagePointer))
+    var id: UInt32 {
+        return dc_msg_get_id(messagePointer)
     }
 
-    var fromContactId: Int {
-        return Int(dc_msg_get_from_id(messagePointer))
+    var fromContactId: UInt32 {
+        return dc_msg_get_from_id(messagePointer)
     }
 
     lazy var fromContact: DcContact = {
         DcContact(id: fromContactId)
     }()
 
-    var chatId: Int {
-        return Int(dc_msg_get_chat_id(messagePointer))
+    var chatId: UInt32 {
+        return dc_msg_get_chat_id(messagePointer)
     }
 
     var text: String? {
@@ -210,18 +210,18 @@ class DcMsg: MessageType {
         return nil
     }
 
-    var filesize: Int {
-        return Int(dc_msg_get_filebytes(messagePointer))
+    var filesize: UInt64 {
+        return dc_msg_get_filebytes(messagePointer)
     }
 
     // DC_MSG_*
-    var type: Int {
-        return Int(dc_msg_get_viewtype(messagePointer))
+    var type: Int32 {
+        return dc_msg_get_viewtype(messagePointer)
     }
 
     // DC_STATE_*
-    var state: Int {
-        return Int(dc_msg_get_state(messagePointer))
+    var state: Int32 {
+        return dc_msg_get_state(messagePointer)
     }
 
     func stateDescription() -> String {
@@ -251,8 +251,8 @@ class DcMsg: MessageType {
         return Int64(dc_msg_get_timestamp(messagePointer))
     }
 
-    func summary(chars: Int) -> String? {
-        guard let cString = dc_msg_get_summarytext(messagePointer, Int32(chars)) else { return nil }
+    func summary(chars: Int32) -> String? {
+        guard let cString = dc_msg_get_summarytext(messagePointer, chars) else { return nil }
         let swiftString = String(cString: cString)
         free(cString)
         return swiftString
@@ -260,7 +260,7 @@ class DcMsg: MessageType {
 
     func createChat() -> DcChat {
         let chatId = dc_create_chat_by_msg_id(DcContext.contextPointer, UInt32(id))
-        return DcChat(id: Int(chatId))
+        return DcChat(id: chatId)
     }
     
     var isSetupMessage: Bool {

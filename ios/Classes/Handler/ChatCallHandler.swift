@@ -147,7 +147,7 @@ class ChatCallHandler: MethodCallHandling {
     
     private func getChat(methodCall: FlutterMethodCall, result: FlutterResult) -> DcChat {
         let id = methodCall.intValue(for: Argument.ID, result: result)
-        let chat = contextCalHandler.loadAndCacheChat(with: id)
+        let chat = contextCalHandler.loadAndCacheChat(with: UInt32(id))
         return chat;
     }
 }

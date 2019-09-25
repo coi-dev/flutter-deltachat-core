@@ -74,17 +74,31 @@ class DcContext {
         return chatlist
     }
     
-    func getChat(with id: Int) -> DcChat {
+    func getChat(with id: UInt32) -> DcChat {
         let chat = DcChat(id: id)
         return chat
     }
     
-    func getContact(with id: Int) -> DcContact {
+    func getChatContacts(for chatId: Int32) -> [UInt32] {
+        let dcContacts = dc_get_chat_contacts(DcContext.contextPointer, UInt32(chatId))
+        let contactIds = Utils.copyAndFreeArray(inputArray: dcContacts)
+        
+        return contactIds
+    }
+    
+    func getContact(with id: UInt32) -> DcContact {
         let contact  = DcContact(id: id)
         return contact
     }
     
-    func getMsg(with id: Int) -> DcMsg {
+    func getContacts(flags: Int32, query: String?) -> [UInt32] {
+        let dcContacts = dc_get_contacts(DcContext.contextPointer, UInt32(flags), query)
+        let contacts = Utils.copyAndFreeArray(inputArray: dcContacts)
+        
+        return contacts
+    }
+    
+    func getMsg(with id: UInt32) -> DcMsg {
         let msg = DcMsg(id: id)
         return msg
     }
@@ -97,7 +111,7 @@ class DcContext {
         dc_archive_chat(DcContext.contextPointer, UInt32(chatId), Int32(archive ? 1 : 0))
     }
     
-    func getSecurejoinQr (chatId: Int) -> String? {
+    func getSecurejoinQr(chatId: Int) -> String? {
         if let cString = dc_get_securejoin_qr(DcContext.contextPointer, UInt32(chatId)) {
             let swiftString = String(cString: cString)
             free(cString)
@@ -127,4 +141,11 @@ class DcContext {
         return "ErrGetMsgInfo"
     }
     
+    func getMessageIds(for chatId: UInt32, flags: UInt32, marker1before: UInt32) -> [UInt32] {
+        let messageIds = dc_get_chat_msgs(DcContext.contextPointer, chatId, flags, marker1before)
+        let ids = Utils.copyAndFreeArray(inputArray: messageIds)
+        return ids
+
+    }
+
 }

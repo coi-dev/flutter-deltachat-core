@@ -41,12 +41,12 @@ extension FlutterMethodCall {
 
     // MARK: - Parameter Values
     
-    func intValue(for key: String, defaultValue: Int = 0, result: FlutterResult) -> Int {
+    func intValue(for key: String, defaultValue: Int32 = 0, result: FlutterResult) -> Int32 {
         if !contains(keys: [key]) {
             return defaultValue
         }
         
-        guard let value: Int = parameters[key] as? Int else {
+        guard let value: Int32 = parameters[key] as? Int32 else {
             return defaultValue
         }
         

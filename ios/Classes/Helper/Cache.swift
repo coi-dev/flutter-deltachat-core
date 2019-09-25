@@ -44,12 +44,12 @@ import Foundation
 
 class Cache<T> {
     
-    fileprivate var items: [Int: T] = [:]
-    private(set) var lastKey: Int = 0
+    fileprivate var items: [UInt32: T] = [:]
+    private(set) var lastKey: UInt32 = 0
     
     // MARK: - Public API
     
-    func add(object: T) -> Int {
+    func add(object: T) -> UInt32 {
         let usedKey = lastKey
         
         items[lastKey] = object
@@ -58,7 +58,7 @@ class Cache<T> {
         return usedKey
     }
     
-    func set(value: T?, for key: Int) {
+    func set(value: T?, for key: UInt32) {
         if nil == value {
             _ = items.removeValue(forKey: key)
             return
@@ -66,15 +66,15 @@ class Cache<T> {
         items[key] = value
     }
     
-    func value(for key: Int) -> T? {
+    func value(for key: UInt32) -> T? {
         return items[key]
     }
     
-    func removeValue(for key: Int) {
+    func removeValue(for key: UInt32) {
         _ = items.removeValue(forKey: key)
     }
     
-    func contains(key: Int) -> Bool {
+    func contains(key: UInt32) -> Bool {
         return items.keys.contains(key)
     }
     

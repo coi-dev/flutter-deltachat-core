@@ -43,8 +43,6 @@
 import Foundation
 
 class ContextCallHandler: MethodCallHandling {
-    
-    fileprivate var args: MethodCallParameters = [:]
 
     fileprivate let context: DcContext!
     fileprivate let contactCache: Cache<DcContact>!
@@ -61,8 +59,6 @@ class ContextCallHandler: MethodCallHandling {
     // MARK: - Protocol MethodCallHandling
 
     func handle(_ call: FlutterMethodCall, result: FlutterResult) {
-        self.args = call.parameters
-
         switch (call.method) {
         case Method.Context.CONFIG_SET:
             setConfig(methodCall: call, result: result)
@@ -475,56 +471,20 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     private func getContacts(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments as? [String: Any] else {
-            fatalError()
-        }
-        
-        if let flags = args[Argument.FLAGS] as? UInt32 {
-            let query = args[Argument.QUERY]  as? String
+        let flags = methodCall.intValue(for: Argument.FLAGS, result: result)
+        let query = methodCall.stringValue(for: Argument.QUERY, result: result)
 
-            let contactIds = dc_get_contacts(DcContext.contextPointer, flags, query)
+        let contactIds = context.getContacts(flags: Int32(flags), query: query)
+        let buffer = contactIds.withUnsafeBufferPointer { Data(buffer: $0) }
 
-            let count = dc_array_get_cnt(contactIds)
-            var ids: [UInt32] = [UInt32](repeating: 0, count: count)
-            for idx in 0 ..< count {
-                let id = UInt32(dc_array_get_id(contactIds, idx))
-                ids[idx] = id
-            }
-            
-            let buffer = ids.withUnsafeBufferPointer { Data(buffer: $0) }
-            result(FlutterStandardTypedData(int32: buffer))
-            
-            dc_array_unref(contactIds)
-    
-            return
-        }
-        
-        Method.Error.missingArgument(result: result)
+        result(FlutterStandardTypedData(int32: buffer))
     }
     
     private func getChatContacts(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            fatalError()
-        }
-        
-        if !methodCall.contains(keys: [Argument.CHAT_ID]) {
-            Method.Error.missingArgument(result: result)
-            return
-        }
-        
-        if let myArgs = args as? [String: Any] {
-            let id = myArgs[Argument.CHAT_ID] as? UInt32
-            
-            if id == nil {
-                Method.Error.missingArgument(result: result)
-                return
-            }
-            
-            var contactIds = dc_get_chat_contacts(DcContext.contextPointer, id!)
-            
-            result(FlutterStandardTypedData(int32: Data(bytes: &contactIds, count: MemoryLayout.size(ofValue: contactIds))))
-        }
-        
+        let chatId = methodCall.intValue(for: Argument.CHAT_ID, result: result)
+        var contactIds = context.getChatContacts(for: chatId)
+
+        result(FlutterStandardTypedData(int32: Data(bytes: &contactIds, count: MemoryLayout.size(ofValue: contactIds))))
     }
     
     private func getChat(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -552,10 +512,7 @@ class ContextCallHandler: MethodCallHandling {
         let chatId = methodCall.intValue(for: Argument.CHAT_ID, result: result)
         let flags = methodCall.intValue(for: Argument.FLAGS, result: result)
         
-        context.getc
-        
-        let chat = DcChat(id: chatId)
-        var messageIds = chat.messageIds
+        var messageIds = context.getMessageIds(for: UInt32(chatId), flags: UInt32(flags), marker1before: 0)
         result(FlutterStandardTypedData(bytes: Data(bytes: &messageIds, count: MemoryLayout.size(ofValue: messageIds))))
 
         //        Integer id = methodCall.argument(ARGUMENT_CHAT_ID);
@@ -1000,7 +957,7 @@ class ContextCallHandler: MethodCallHandling {
     
     // MARK: - Cache Handling
     
-    func loadAndCacheChat(with id: Int) -> DcChat {
+    func loadAndCacheChat(with id: UInt32) -> DcChat {
         guard let chat = chatCache.value(for: id) else {
             let chat = self.context.getChat(with: id)
             _ = self.chatCache.add(object: chat)
@@ -1009,7 +966,7 @@ class ContextCallHandler: MethodCallHandling {
         return chat
     }
     
-    func loadAndCacheContact(with id: Int) -> DcContact {
+    func loadAndCacheContact(with id: UInt32) -> DcContact {
         guard let contact = contactCache.value(for: id) else {
             let contact = self.context.getContact(with: id)
             _ = self.contactCache.add(object: contact)
@@ -1018,7 +975,7 @@ class ContextCallHandler: MethodCallHandling {
         return contact
     }
     
-    func loadAndCacheChatMessage(with id: Int) -> DcMsg {
+    func loadAndCacheChatMessage(with id: UInt32) -> DcMsg {
         guard let msg = messageCache.value(for: id) else {
             let msg = self.context.getMsg(with: id)
             _ = self.messageCache.add(object: msg)

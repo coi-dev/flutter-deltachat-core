@@ -66,7 +66,7 @@ class ChatListCallHandler: MethodCallHandling {
 
         if call.method != Method.ChatList.INTERNAL_SETUP {
             let cacheId = call.intValue(for: Argument.CACHE_ID, result: result)
-            guard let chatList = chatListCache.value(for: cacheId) else {
+            guard let chatList = chatListCache.value(for: UInt32(cacheId)) else {
                 Method.Error.generic(methodCall: call, result: result)
                 return
             }
@@ -110,7 +110,7 @@ class ChatListCallHandler: MethodCallHandling {
 
     
     fileprivate func setup(methodCall: FlutterMethodCall, result: FlutterResult) {
-        let flags = Int32(methodCall.intValue(for: Argument.TYPE, result: result))
+        let flags = methodCall.intValue(for: Argument.TYPE, result: result)
         let query = methodCall.stringValue(for: Argument.QUERY, result: result)
         let dcChatList = context.getChatlist(flags: flags, queryString: query, queryId: 0)
         let cacheId = chatListCache.add(object: dcChatList)
@@ -119,19 +119,14 @@ class ChatListCallHandler: MethodCallHandling {
     }
     
     fileprivate func tearDown(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments as? [String: Any],
-            let cacheId = args[Argument.CACHE_ID] as? Int else {
-            Method.Error.missingArgument(result: result)
-            return
-        }
-
-        chatListCache.removeValue(for: cacheId)
+        let cacheId = methodCall.intValue(for: Argument.CACHE_ID, result: result)
+        chatListCache.removeValue(for: UInt32(cacheId))
         result(nil)
     }
     
     private func getChatId(chatList: DcChatlist, methodCall: FlutterMethodCall, result: FlutterResult) {
         let index = methodCall.intValue(for: Argument.INDEX, result: result)
-        let id = chatList.getChatId(index: index)
+        let id = chatList.getChatId(index: UInt32(index))
         
         result(id)
     }
@@ -142,7 +137,7 @@ class ChatListCallHandler: MethodCallHandling {
     
     private func getChat(chatList: DcChatlist, methodCall: FlutterMethodCall, result: FlutterResult) {
         let index = methodCall.intValue(for: Argument.INDEX, result: result)
-        let chatId = chatList.getChatId(index: index)
+        let chatId = chatList.getChatId(index: UInt32(index))
         
         if let chat = chatCache.value(for: chatId) {
             result(chat.id)
@@ -156,21 +151,21 @@ class ChatListCallHandler: MethodCallHandling {
     
     private func getChatMsgId(chatList: DcChatlist, methodCall: FlutterMethodCall, result: FlutterResult) {
         let index = methodCall.intValue(for: Argument.INDEX, result: result)
-        let id = chatList.getMsgId(index: index)
+        let id = chatList.getMsgId(index: UInt32(index))
         
         result(id)
     }
     
     private func getChatMsg(chatList: DcChatlist, methodCall: FlutterMethodCall, result: FlutterResult) {
         let index = methodCall.intValue(for: Argument.INDEX, result: result)
-        let msg = chatList.getMsg(index: index)
+        let msg = chatList.getMsg(index: UInt32(index))
         
         result([msg])
     }
     
     private func getChatSummary(chatList: DcChatlist, methodCall: FlutterMethodCall, result: FlutterResult) {
         let index = methodCall.intValue(for: Argument.INDEX, result: result)
-        let summary = chatList.getSummary(index: index)
+        let summary = chatList.getSummary(index: Int(index))
         
         result(summary.propertyArray)
     }

@@ -150,7 +150,7 @@ class ContactCallHandler: MethodCallHandling {
     
     fileprivate func getContact(methodCall: FlutterMethodCall, result: FlutterResult) -> DcContact {
         let id = methodCall.intValue(for: Argument.ID, result: result)
-        let contact = contextCallHandler.loadAndCacheContact(with: id)
+        let contact = contextCallHandler.loadAndCacheContact(with: UInt32(id))
         
         return contact
     }

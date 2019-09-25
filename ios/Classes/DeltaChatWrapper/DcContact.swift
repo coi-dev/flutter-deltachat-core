@@ -45,8 +45,8 @@ import Foundation
 class DcContact {
     private var contactPointer: OpaquePointer?
     
-    init(id: Int) {
-        contactPointer = dc_get_contact(DcContext.contextPointer, UInt32(id))
+    init(id: UInt32) {
+        contactPointer = dc_get_contact(DcContext.contextPointer, id)
     }
     
     deinit {

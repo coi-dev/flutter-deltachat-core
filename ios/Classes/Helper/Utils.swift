@@ -44,12 +44,12 @@ import UIKit
 
 struct Utils {
 
-    static func copyAndFreeArray(inputArray: OpaquePointer?) -> [Int] {
-        var acc: [Int] = []
+    static func copyAndFreeArray(inputArray: OpaquePointer?) -> [UInt32] {
+        var acc: [UInt32] = []
         let len = dc_array_get_cnt(inputArray)
         for i in 0 ..< len {
             let e = dc_array_get_id(inputArray, i)
-            acc.append(Int(e))
+            acc.append(UInt32(e))
         }
         dc_array_unref(inputArray)
         
