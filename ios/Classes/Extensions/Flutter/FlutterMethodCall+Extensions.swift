@@ -52,6 +52,18 @@ extension FlutterMethodCall {
         
         return value
     }
+    
+    func boolValue(for key: String, defaultValue: Bool = false, result: FlutterResult) -> Bool {
+        if !contains(keys: [key]) {
+            return defaultValue
+        }
+        
+        guard let value: Int = parameters[key] as? Int else {
+            return defaultValue
+        }
+        
+        return value == 0 ? false : true
+    }
 
     func stringValue(for key: String, result: FlutterResult) -> String? {
         return value(for: key, result: result) as? String

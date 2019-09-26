@@ -115,7 +115,7 @@ class ChatListCallHandler: MethodCallHandling {
         let dcChatList = context.getChatlist(flags: flags, queryString: query, queryId: 0)
         let cacheId = chatListCache.add(object: dcChatList)
 
-        result(cacheId)
+        result(NSNumber(value: cacheId))
     }
     
     fileprivate func tearDown(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -128,7 +128,7 @@ class ChatListCallHandler: MethodCallHandling {
         let index = methodCall.intValue(for: Argument.INDEX, result: result)
         let id = chatList.getChatId(index: UInt32(index))
         
-        result(id)
+        result(NSNumber(value: id))
     }
     
     private func getChatCnt(chatList: DcChatlist, result: FlutterResult) {
@@ -146,14 +146,14 @@ class ChatListCallHandler: MethodCallHandling {
         
         let chat = chatList.getChat(for: chatId)
         
-        result(chat.id)
+        result(NSNumber(value: chat.id))
     }
     
     private func getChatMsgId(chatList: DcChatlist, methodCall: FlutterMethodCall, result: FlutterResult) {
         let index = methodCall.intValue(for: Argument.INDEX, result: result)
         let id = chatList.getMsgId(index: UInt32(index))
         
-        result(id)
+        result(NSNumber(value: id))
     }
     
     private func getChatMsg(chatList: DcChatlist, methodCall: FlutterMethodCall, result: FlutterResult) {

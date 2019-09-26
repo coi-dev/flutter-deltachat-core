@@ -53,6 +53,12 @@ class DcMsg: MessageType {
     deinit {
         dc_msg_unref(messagePointer)
     }
+    
+    // MARK: - Debugging
+    
+    func debugDescription() -> String {
+        return "[id: \(id)] '\(String(describing: text))'"
+    }
 
     // MARK: - MessageType Protocol
 

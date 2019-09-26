@@ -371,20 +371,10 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     private func createChatByMessageId(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            return
-        }
+        let messageId = UInt32(methodCall.intValue(for: Argument.ID, result: result))
+        let chat = context.createChatByMessageId(messageId: messageId)
         
-        if let myArgs = args as? [String: Any],
-            let messageId = myArgs[Argument.ID] as? UInt32 {
-            
-            let chatId = dc_create_chat_by_msg_id(DcContext.contextPointer, messageId)
-            result(Int(chatId))
-        }
-        else {
-            Method.Error.missingArgument(result: result)
-        }
-        
+        result(NSNumber(value: chat.id))
     }
     
     private func createGroupChat(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -482,103 +472,48 @@ class ContextCallHandler: MethodCallHandling {
     
     private func getChatContacts(methodCall: FlutterMethodCall, result: FlutterResult) {
         let chatId = methodCall.intValue(for: Argument.CHAT_ID, result: result)
-        var contactIds = context.getChatContacts(for: chatId)
+        let contactIds = context.getChatContacts(for: chatId)
+        let buffer = contactIds.withUnsafeBufferPointer { Data(buffer: $0) }
 
-        result(FlutterStandardTypedData(int32: Data(bytes: &contactIds, count: MemoryLayout.size(ofValue: contactIds))))
+        result(FlutterStandardTypedData(int32: buffer))
     }
     
     private func getChat(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            Method.Error.missingArgument(result: result)
-            return
-        }
+        let id = UInt32(methodCall.intValue(for: Argument.ID, result: result))
+        let chat = context.getChat(with: id)
         
-        if !methodCall.contains(keys: [Argument.ID]) {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        if let myArgs = args as? [String: Any],
-            let id = myArgs[Argument.ID] as? UInt32 {
-            
-            result(dc_get_chat(DcContext.contextPointer, id))
-        }
-        else {
-            Method.Error.missingArgument(result: result);
-        }
+        result(NSNumber(value: chat.id))
     }
     
     private func getChatMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
         let chatId = methodCall.intValue(for: Argument.CHAT_ID, result: result)
         let flags = methodCall.intValue(for: Argument.FLAGS, result: result)
         
-        var messageIds = context.getMessageIds(for: UInt32(chatId), flags: UInt32(flags), marker1before: 0)
-        result(FlutterStandardTypedData(bytes: Data(bytes: &messageIds, count: MemoryLayout.size(ofValue: messageIds))))
+        let messageIds = context.getMessageIds(for: UInt32(chatId), flags: UInt32(flags), marker1before: 0).map { Int32($0) }
+        let buffer = messageIds.withUnsafeBufferPointer { Data(buffer: $0) }
 
-        //        Integer id = methodCall.argument(ARGUMENT_CHAT_ID);
-        //        if (id == null) {
-        //        resultErrorArgumentMissingValue(result);
-        //        return;
-        //        }
-        //        Integer flags = methodCall.argument(ARGUMENT_FLAGS);
-        //        if (flags == null) {
-        //        flags = 0;
-        //        }
-        //
-        //        int[] messageIds = dcContext.getChatMsgs(id, flags, 0);
-        //        for (int messageId : messageIds) {
-        //        if (messageId != DcMsg.DC_MSG_ID_MARKER1 && messageId != DcMsg.DC_MSG_ID_DAYMARKER) {
-        //        DcMsg message = messageCache.get(messageId);
-        //        if (message == null) {
-        //        messageCache.put(messageId, dcContext.getMsg(messageId));
-        //        }
-        //        }
-        //        }
-        //        result.success(messageIds);
+        for id: Int32 in messageIds {
+            if id != DC_MSG_ID_MARKER1 && id != DC_MSG_ID_DAYMARKER {
+                guard nil != messageCache.value(for: UInt32(id)) else {
+                    let message = context.getMsg(with: UInt32(id))
+                    messageCache.set(value: message, for: UInt32(id))
+                    continue
+                }
+            }
+        }
+
+        result(FlutterStandardTypedData(int32: buffer))
     }
     
     private func createChatMessage(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments as? [String: Any] else {
-            Method.Error.missingArgument(result: result)
-            return
-        }
-        
-        if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.TEXT]) {
+        let chatId = UInt32(methodCall.intValue(for: Argument.CHAT_ID, result: result))
+        guard let text = methodCall.stringValue(for: Argument.TEXT, result: result) else {
             Method.Error.missingArgument(result: result);
             return
         }
-        
-        guard let chatId = args[Argument.CHAT_ID] as? UInt32 else {
-                Method.Error.missingArgument(result: result)
-                return
-        }
-        
-        let text = args[Argument.TEXT] as? String ?? ""
-        let draft = dc_msg_new(DcContext.contextPointer, DC_MSG_TEXT)
-        dc_msg_set_text(draft, text.cString(using: .utf8))
-        let messageId = dc_send_msg(DcContext.contextPointer, chatId, draft)
+        let messageId = context.sendChatMessage(forChatId: chatId, withText: text)
         
         result(NSNumber(value: messageId))
-//        let newMessage = DcMsg(id: chatId)
-//        newMessage.text = text
-//            
-//        }
-//        else {
-//            Method.Error.missingArgument(result: result);
-//        }
-        
-        //    Integer id = methodCall.argument(ARGUMENT_CHAT_ID);
-        //    if (id == null) {
-        //    resultErrorArgumentMissingValue(result);
-        //    return;
-        //    }
-        //
-        //    String text = methodCall.argument(ARGUMENT_TEXT);
-        //
-        //    DcMsg newMsg = new DcMsg(dcContext, DcMsg.DC_MSG_TEXT);
-        //    newMsg.setText(text);
-        //    int messageId = dcContext.sendMsg(id, newMsg);
-        //    result.success(messageId);
     }
     
     private func createChatAttachmentMessage(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -622,28 +557,10 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     private func getFreshMessageCount(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            fatalError()
-        }
-        
-        if !methodCall.contains(keys: [Argument.CHAT_ID]) {
-            Method.Error.missingArgument(result: result)
-            return
-        }
-        
-        if let myArgs = args as? [String: Any] {
-            let chatId = myArgs[Argument.CHAT_ID] as? UInt32
-            
-            if chatId == nil {
-                Method.Error.missingArgument(result: result)
-                return
-            }
-            
-            let freshMessageCount = dc_get_fresh_msg_cnt(DcContext.contextPointer, chatId!)
-            
-            result(freshMessageCount)
-        }
-        
+        let chatId = methodCall.intValue(for: Argument.CHAT_ID, result: result)
+        let messageCount = context.getFreshMessageCount(for: UInt32(chatId))
+
+        result(NSNumber(value: messageCount))
     }
     
     private func markNoticedChat(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -715,8 +632,10 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     private func getFreshMessages(result: FlutterResult) {
-        let freshMessages = dc_get_fresh_msgs(DcContext.contextPointer)
-        result(freshMessages)
+        let freshMessages = context.getFreshMessageIds()
+        let buffer = freshMessages.withUnsafeBufferPointer { Data(buffer: $0) }
+
+        result(FlutterStandardTypedData(int32: buffer))
     }
     
     private func forwardMessages(methodCall: FlutterMethodCall, result: FlutterResult){
@@ -742,9 +661,11 @@ class ContextCallHandler: MethodCallHandling {
     
     private func markSeenMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
         var msgIds = methodCall.value(for: Argument.MESSAGE_IDS, result: result) as! [UInt32]
-//        var markIds = msgIds.map { UInt32($0) }
+        let buffer = msgIds.withUnsafeBufferPointer { Data(buffer: $0) }
+
         dc_markseen_msgs(DcContext.contextPointer, &msgIds, Int32(msgIds.count))
-        result(FlutterStandardTypedData(int32: Data(bytes: &msgIds, count: MemoryLayout.size(ofValue: msgIds))))
+
+        result(FlutterStandardTypedData(int32: buffer))
     }
     
     private func initiateKeyTransfer(result: FlutterResult) {

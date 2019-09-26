@@ -58,6 +58,8 @@ class DcContext {
         dc_context_unref(DcContext.contextPointer)
     }
     
+    // MARK: - User Database
+    
     func openUserDataBase() -> Bool {
         let result = NSNumber(value: dc_open(DcContext.contextPointer, userDatabasePath, nil))
         return Bool(truncating: result)
@@ -67,6 +69,8 @@ class DcContext {
         dc_close(DcContext.contextPointer)
         DcContext.contextPointer = nil
     }
+    
+    // MARK: - Chats
     
     func getChatlist(flags: Int32, queryString: String?, queryId: Int) -> DcChatlist {
         let chatlistPointer = dc_get_chatlist(DcContext.contextPointer, flags, queryString, UInt32(queryId))
@@ -79,6 +83,21 @@ class DcContext {
         return chat
     }
     
+    func deleteChat(chatId: Int) {
+        dc_delete_chat(DcContext.contextPointer, UInt32(chatId))
+    }
+    
+    func archiveChat(chatId: Int, archive: Bool) {
+        dc_archive_chat(DcContext.contextPointer, UInt32(chatId), Int32(archive ? 1 : 0))
+    }
+    
+    func createChatByMessageId(messageId: UInt32) -> DcChat {
+        let chatId = dc_create_chat_by_msg_id(DcContext.contextPointer, messageId)
+        return DcChat(id: chatId)
+    }
+
+    // MARK: - Contacts
+
     func getChatContacts(for chatId: Int32) -> [UInt32] {
         let dcContacts = dc_get_chat_contacts(DcContext.contextPointer, UInt32(chatId))
         let contactIds = Utils.copyAndFreeArray(inputArray: dcContacts)
@@ -98,18 +117,50 @@ class DcContext {
         return contacts
     }
     
+    // MARK: - Messages
+    
     func getMsg(with id: UInt32) -> DcMsg {
         let msg = DcMsg(id: id)
         return msg
     }
     
-    func deleteChat(chatId: Int) {
-        dc_delete_chat(DcContext.contextPointer, UInt32(chatId))
+    func getMsgInfo(msgId: Int) -> String {
+        if let cString = dc_get_msg_info(DcContext.contextPointer, UInt32(msgId)) {
+            let swiftString = String(cString: cString)
+            free(cString)
+            return swiftString
+        }
+        return "ErrGetMsgInfo"
     }
     
-    func archiveChat(chatId: Int, archive: Bool) {
-        dc_archive_chat(DcContext.contextPointer, UInt32(chatId), Int32(archive ? 1 : 0))
+    func getMessageIds(for chatId: UInt32, flags: UInt32, marker1before: UInt32) -> [UInt32] {
+        let messageIds = dc_get_chat_msgs(DcContext.contextPointer, chatId, flags, marker1before)
+        let ids = Utils.copyAndFreeArray(inputArray: messageIds)
+        
+        return ids
     }
+    
+    func getFreshMessageCount(for chatId: UInt32) -> Int32 {
+        let count = dc_get_fresh_msg_cnt(DcContext.contextPointer, chatId)
+        return count
+    }
+    
+    func sendChatMessage(forChatId chatId: UInt32, withText text: String) -> UInt32 {
+        let draft = dc_msg_new(DcContext.contextPointer, DC_MSG_TEXT)
+        dc_msg_set_text(draft, text.cString(using: .utf8))
+        let messageId = dc_send_msg(DcContext.contextPointer, chatId, draft)
+        
+        return messageId
+    }
+    
+    func getFreshMessageIds() -> [UInt32] {
+        let messageIds = dc_get_fresh_msgs(DcContext.contextPointer)
+        let ids = Utils.copyAndFreeArray(inputArray: messageIds)
+        
+        return ids
+    }
+
+    // MARK: - General
     
     func getSecurejoinQr(chatId: Int) -> String? {
         if let cString = dc_get_securejoin_qr(DcContext.contextPointer, UInt32(chatId)) {
@@ -130,22 +181,6 @@ class DcContext {
     
     func stopOngoingProcess() {
         dc_stop_ongoing_process(DcContext.contextPointer)
-    }
-    
-    func getMsgInfo(msgId: Int) -> String {
-        if let cString = dc_get_msg_info(DcContext.contextPointer, UInt32(msgId)) {
-            let swiftString = String(cString: cString)
-            free(cString)
-            return swiftString
-        }
-        return "ErrGetMsgInfo"
-    }
-    
-    func getMessageIds(for chatId: UInt32, flags: UInt32, marker1before: UInt32) -> [UInt32] {
-        let messageIds = dc_get_chat_msgs(DcContext.contextPointer, chatId, flags, marker1before)
-        let ids = Utils.copyAndFreeArray(inputArray: messageIds)
-        return ids
-
     }
 
 }

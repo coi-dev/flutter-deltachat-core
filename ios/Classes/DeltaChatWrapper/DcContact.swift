@@ -112,7 +112,21 @@ class DcContact {
         }
         return nil
         }()
-    
+  
+    lazy var profileImageFilePath: String? = {
+        guard let cString = dc_contact_get_profile_image(contactPointer) else { return nil }
+        let filePath = String(cString: cString)
+        free(cString)
+        
+        let path: URL = URL(fileURLWithPath: filePath, isDirectory: false)
+        
+        if path.isFileURL {
+            return path.absoluteString
+        }
+        
+        return nil
+    }()
+
     var color: Int {
         return Int(dc_contact_get_color(contactPointer))
     }

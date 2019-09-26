@@ -43,20 +43,3 @@
 protocol MethodCallHandling {
     func handle(_ call: FlutterMethodCall, result: FlutterResult)
 }
-
-class MethodCallHandler: MethodCallHandling {
-    
-    let dcContext: DcContext!
-    let eventChannelHandler: EventChannelHandler!
-
-    // MARK: - Initialization
-    
-    init(context: DcContext, eventChannelHandler: EventChannelHandler) {
-        self.dcContext = context
-        self.eventChannelHandler = eventChannelHandler
-    }
-
-    // MARK: - MethodCallHandling
-    
-    func handle(_ call: FlutterMethodCall, result: FlutterResult) {}
-}

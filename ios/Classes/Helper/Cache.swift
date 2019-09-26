@@ -82,5 +82,13 @@ class Cache<T> {
         items.removeAll()
         lastKey = 0
     }
+    
+    var numberOfObjects: Int {
+        return items.keys.count
+    }
+    
+    var allObjects: [T] {
+        return items.values.map { $0 }
+    }
 
 }

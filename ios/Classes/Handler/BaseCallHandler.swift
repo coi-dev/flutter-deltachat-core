@@ -42,11 +42,23 @@
 
 import Foundation
 
-class BaseCallHandler: MethodCallHandler {
+class BaseCallHandler: MethodCallHandling {
+    
+    fileprivate let context: DcContext!
+    fileprivate let contextCallHandler: ContextCallHandler!
+    fileprivate let eventChannelHandler: EventChannelHandler!
+
+    // MARK: - Initialization
+    
+    init(context: DcContext, contextCallHandler: ContextCallHandler, eventChannelHandler: EventChannelHandler) {
+        self.context = context
+        self.contextCallHandler = contextCallHandler
+        self.eventChannelHandler = eventChannelHandler
+    }
 
     // MARK: - Protocol MethodCallHandling
 
-    override func handle(_ call: FlutterMethodCall, result: FlutterResult) {
+    func handle(_ call: FlutterMethodCall, result: FlutterResult) {
         switch (call.method) {
         case Method.Base.INIT:
             baseInit(result: result)
@@ -69,11 +81,11 @@ class BaseCallHandler: MethodCallHandler {
     // MARK: - Private Helper
     
     fileprivate func baseInit(result: FlutterResult) {
-        if dcContext.openUserDataBase() {
-            result(dcContext.userDatabasePath)
+        if context.openUserDataBase() {
+            result(context.userDatabasePath)
             return
         }
-        log.error("Couldn't open user database at path: \(dcContext.userDatabasePath)")
+        log.error("Couldn't open user database at path: \(context.userDatabasePath)")
         result(DCPluginError.couldNotOpenDataBase())
     }
     
@@ -82,25 +94,20 @@ class BaseCallHandler: MethodCallHandler {
     }
     
     fileprivate func coreListener(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let add: Bool = methodCall.value(for: Argument.ADD, result: result) as? Bool,
-            let eventId: Int = methodCall.value(for: Argument.EVENT_ID, result: result) as? Int else {
-                result(nil)
-                return
-        }
+        let eventId = methodCall.intValue(for: Argument.EVENT_ID, result: result)
+        let add = methodCall.boolValue(for: Argument.ADD, result: result)
         
         // Add a new Listener
         if true == add {
-            let listenerId = eventChannelHandler.addListener(eventId: eventId)
+            let listenerId = eventChannelHandler.addListener(eventId: Int(eventId))
             result(listenerId)
             return
         }
 
         // Remove a given Listener
-        guard let listenerId: Int = methodCall.value(for: Argument.LISTENER_ID, result: result) as? Int else {
-            return
-        }
+        let listenerId = methodCall.intValue(for: Argument.EVENT_ID, result: result)
+        eventChannelHandler.remove(listener: Int(listenerId))
         
-        eventChannelHandler.remove(listener: listenerId)
         result(nil)
     }
     

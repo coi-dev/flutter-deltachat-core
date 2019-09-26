@@ -74,17 +74,16 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         self.dcEventHandler = DCEventHandler()
         self.dcEventHandler.start()
 
+        self.eventChannelHandler = EventChannelHandler(messenger: registrar.messenger())
         self.contextCallHandler  = ContextCallHandler(context: self.dcContext, contactCache: self.contactCache, messageCache: self.messageCache, chatCache: self.chatCache)
-        self.chatListCallHandler = ChatListCallHandler(context: self.dcContext, chatCache: self.chatCache)
+        self.baseCallHandler     = BaseCallHandler(context: self.dcContext, contextCallHandler: self.contextCallHandler, eventChannelHandler: self.eventChannelHandler)
         self.chatCallHandler     = ChatCallHandler(contextCalHandler: self.contextCallHandler)
+        self.chatListCallHandler = ChatListCallHandler(context: self.dcContext, chatCache: self.chatCache)
         self.contactCallHandler  = ContactCallHandler(context: self.dcContext, contextCallHandler: self.contextCallHandler)
         self.messageCallHandler  = MessageCallHandler(context: self.dcContext, contextCallHandler: self.contextCallHandler)
-
-        self.eventChannelHandler = EventChannelHandler(messenger: registrar.messenger())
-        self.baseCallHandler     = BaseCallHandler(context: dcContext, eventChannelHandler: self.eventChannelHandler)
     }
     
-    // This is out entry point
+    // This is our entry point
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "deltaChatCore", binaryMessenger: registrar.messenger())
         let delegate = SwiftDeltaChatCorePlugin(registrar: registrar)
@@ -94,9 +93,12 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
     // MARK: - FlutterPlugin
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        log.debug("MethodCall: \(call.method)")
+        log.debug("Dart MethodCall: \(call.method)")
 
         switch (call.methodPrefix) {
+        case Method.Prefix.CONTEXT:
+            contextCallHandler.handle(call, result: result);
+
         case Method.Prefix.BASE:
             baseCallHandler.handle(call, result: result);
 
@@ -108,9 +110,6 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
 
         case Method.Prefix.CONTACT:
             contactCallHandler.handle(call, result: result);
-
-        case Method.Prefix.CONTEXT:
-            contextCallHandler.handle(call, result: result);
 
         case Method.Prefix.MSG:
             messageCallHandler.handle(call, result: result);

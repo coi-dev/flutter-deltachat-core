@@ -42,12 +42,15 @@
 
 import Foundation
 
+public func isData2AString(for event: CInt) -> Bool {
+    return (event >= 100 && event <= 499)
+}
+
 @_silgen_name("handleDeltaChatEvent")
 public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsignedLong, data1String: UnsafePointer<Int8>, data2String: UnsafePointer<Int8>) -> UnsafePointer<Int8>? {
     let logMessage = "Received DCC event [\(event)]"
-    let eventMessage: UnsafePointer<Int8>? = data2String
     
-    if nil != eventMessage {
+    if isData2AString(for: event) {
         log.debug("\(logMessage): \(String(cString: data2String))")
     } else {
         log.debug(logMessage)
