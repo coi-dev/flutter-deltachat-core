@@ -169,6 +169,15 @@ extension Method {
         static let SET_CHAT_NAME                  = "context_setChatName"
         static let SET_CHAT_PROFILE_IMAGE         = "context_setChatProfileImage"
         static let GET_SHARED_DATA                = "context_getSharedData"
+        static let IS_COI_SUPPORTED               = "context_isCoiSupported"
+        static let IS_COI_ENABLED                 = "context_isCoiEnabled"
+        static let IS_WEB_PUSH_SUPPORTED          = "context_isWebPushSupported"
+        static let GET_WEB_PUSH_VAPID_KEY         = "context_getWebPushVapidKey"
+        static let SUBSCRIBE_WEB_PUSH             = "context_subscribeWebPush"
+        static let VALIDATE_WEB_PUSH              = "context_validateWebPush"
+        static let GET_WEB_PUSH_SUBSCRIPTION      = "context_getWebPushSubscription"
+        static let SET_COI_ENABLED                = "context_setCoiEnabled"
+        static let SET_COI_MESSAGE_FILTER         = "context_setCoiMessageFilter"
     }
 
 }

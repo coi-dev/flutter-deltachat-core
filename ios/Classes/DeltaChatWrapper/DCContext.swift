@@ -83,17 +83,24 @@ class DcContext {
         return chat
     }
     
-    func deleteChat(chatId: Int) {
+    func deleteChat(chatId: UInt32) {
         dc_delete_chat(DcContext.contextPointer, UInt32(chatId))
     }
     
-    func archiveChat(chatId: Int, archive: Bool) {
+    func archiveChat(chatId: UInt32, archive: Bool) {
         dc_archive_chat(DcContext.contextPointer, UInt32(chatId), Int32(archive ? 1 : 0))
     }
     
     func createChatByMessageId(messageId: UInt32) -> DcChat {
         let chatId = dc_create_chat_by_msg_id(DcContext.contextPointer, messageId)
         return DcChat(id: chatId)
+    }
+    
+    func createChatByContactId(contactId: UInt32) -> DcChat {
+        let chatId = dc_create_chat_by_contact_id(DcContext.contextPointer, contactId)
+        let chat = DcChat(id: chatId)
+        
+        return chat
     }
 
     // MARK: - Contacts

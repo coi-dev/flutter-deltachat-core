@@ -185,6 +185,33 @@ class ContextCallHandler: MethodCallHandling {
         case Method.Context.SET_CHAT_PROFILE_IMAGE:
             setChatProfileImage(methodCall: call, result: result)
             break
+        case Method.Context.IS_COI_SUPPORTED:
+//            isCoiSupported(result)
+            break
+        case Method.Context.IS_COI_ENABLED:
+//            isCoiEnabled(result)
+            break
+        case Method.Context.IS_WEB_PUSH_SUPPORTED:
+//            isWebPushSupported(result)
+            break
+        case Method.Context.GET_WEB_PUSH_VAPID_KEY:
+//            getWebPushVapidKey(result)
+            break
+        case Method.Context.SUBSCRIBE_WEB_PUSH:
+//            subscribeWebPush(methodCall, result)
+            break
+        case Method.Context.GET_WEB_PUSH_SUBSCRIPTION:
+//            getWebPushSubscription(methodCall, result)
+            break
+        case Method.Context.SET_COI_ENABLED:
+//            setCoiEnabled(methodCall, result)
+            break
+        case Method.Context.SET_COI_MESSAGE_FILTER:
+//            setCoiMessageFilter(methodCall, result)
+            break
+        case Method.Context.VALIDATE_WEB_PUSH:
+//            validateWebPush(methodCall, result)
+            break
         default:
             log.error("Context: Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
@@ -355,19 +382,10 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     private func createChatByContactId(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            return
-        }
+        let contactId = UInt32(methodCall.intValue(for: Argument.ID, result: result))
+        let chat = context.createChatByContactId(contactId: contactId)
         
-        if let myArgs = args as? [String: Any],
-            let contactId = myArgs[Argument.ID] as? UInt32 {
-            
-            let chatId = dc_create_chat_by_contact_id(DcContext.contextPointer, contactId)
-            result(NSNumber(value: chatId))
-        }
-        else {
-            Method.Error.missingArgument(result: result)
-        }
+        result(NSNumber(value: chat.id))
     }
     
     private func createChatByMessageId(methodCall: FlutterMethodCall, result: FlutterResult) {
