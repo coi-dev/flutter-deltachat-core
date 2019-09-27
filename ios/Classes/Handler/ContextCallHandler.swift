@@ -269,7 +269,8 @@ class ContextCallHandler: MethodCallHandling {
     
     fileprivate func configure(result: FlutterResult) {
         dc_configure(DcContext.contextPointer)
-        result(nil);
+
+        result(nil)
     }
     
     fileprivate func addAddressBook(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -292,42 +293,21 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     fileprivate func createContact(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            return
+        guard let name = methodCall.stringValue(for: Argument.NAME, result: result),
+            let emailAddress = methodCall.stringValue(for: Argument.ADDRESS, result: result) else {
+                Method.Error.missingArgument(result: result)
+                return
         }
-        if let myArgs = args as? [String: Any],
-            let address = myArgs["address"] as? String {
-            
-            let name = myArgs["name"] as? String
-            let contactId = dc_create_contact(DcContext.contextPointer, name, address)
-            result(Int(contactId))
-        }
-        else {
-            Method.Error.missingArgument(result: result)
-        }
+        let contactId = context.createContact(name: name, emailAddress: emailAddress)
+        
+        result(NSNumber(value: contactId))
     }
     
     fileprivate func deleteContact(methodCall: FlutterMethodCall, result: FlutterResult) {
-        if !methodCall.contains(keys: [Argument.ID]) {
-            Method.Error.missingArgument(result: result);
-            return
-        }
+        let contactId = UInt32(methodCall.intValue(for: Argument.ID, result: result))
+        let deleted = context.deleteContact(contactId: contactId)
         
-        guard let args = methodCall.arguments else {
-            return
-        }
-        
-        if let myArgs = args as? [String: Any],
-            let contactId = myArgs[Argument.ID] as? UInt32 {
-            
-            let deleted = dc_delete_contact(DcContext.contextPointer, contactId)
-            result(deleted)
-        }
-        else {
-            Method.Error.missingArgumentValue(result: result)
-            return
-        }
-        
+        result(NSNumber(value: deleted))
     }
     
     fileprivate func blockContact(methodCall: FlutterMethodCall, result: FlutterResult) {

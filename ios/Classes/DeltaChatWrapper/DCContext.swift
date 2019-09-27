@@ -147,6 +147,16 @@ class DcContext {
         let blockedIds = dc_get_blocked_contacts(DcContext.contextPointer)
         return Utils.copyAndFreeArray(inputArray: blockedIds)
     }
+    
+    func deleteContact(contactId: UInt32) -> Bool {
+        let deleted = dc_delete_contact(DcContext.contextPointer, contactId)
+        return 1 == deleted
+    }
+    
+    func createContact(name: String, emailAddress: String) -> UInt32 {
+        let contactId = dc_create_contact(DcContext.contextPointer, name, emailAddress)
+        return contactId
+    }
 
     // MARK: - Messages
     
