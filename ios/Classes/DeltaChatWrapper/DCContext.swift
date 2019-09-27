@@ -62,6 +62,7 @@ class DcContext {
     
     func openUserDataBase() -> Bool {
         let result = NSNumber(value: dc_open(DcContext.contextPointer, userDatabasePath, nil))
+
         return Bool(truncating: result)
     }
     
@@ -75,12 +76,25 @@ class DcContext {
     func getChatlist(flags: Int32, queryString: String?, queryId: Int) -> DcChatlist {
         let chatlistPointer = dc_get_chatlist(DcContext.contextPointer, flags, queryString, UInt32(queryId))
         let chatlist = DcChatlist(chatListPointer: chatlistPointer)
+
         return chatlist
     }
     
     func getChat(with id: UInt32) -> DcChat {
         let chat = DcChat(id: id)
+
         return chat
+    }
+    
+    func getChatByContactId(contactId: UInt32) -> DcChat? {
+        let chatId = dc_get_chat_id_by_contact_id(DcContext.contextPointer, contactId)
+        
+        if chatId > 0 {
+            let chat = DcChat(id: chatId)
+            return chat
+        }
+        
+        return nil
     }
     
     func deleteChat(chatId: UInt32) {
@@ -93,6 +107,7 @@ class DcContext {
     
     func createChatByMessageId(messageId: UInt32) -> DcChat {
         let chatId = dc_create_chat_by_msg_id(DcContext.contextPointer, messageId)
+
         return DcChat(id: chatId)
     }
     
@@ -124,10 +139,20 @@ class DcContext {
         return contacts
     }
     
+    func blockContact(contactId: UInt32, block: Bool) {
+        dc_block_contact(DcContext.contextPointer, contactId, (block ? 1 : 0))
+    }
+    
+    func getBlockedContacts() -> [UInt32] {
+        let blockedIds = dc_get_blocked_contacts(DcContext.contextPointer)
+        return Utils.copyAndFreeArray(inputArray: blockedIds)
+    }
+
     // MARK: - Messages
     
     func getMsg(with id: UInt32) -> DcMsg {
         let msg = DcMsg(id: id)
+
         return msg
     }
     
@@ -137,6 +162,7 @@ class DcContext {
             free(cString)
             return swiftString
         }
+
         return "ErrGetMsgInfo"
     }
     
@@ -149,6 +175,7 @@ class DcContext {
     
     func getFreshMessageCount(for chatId: UInt32) -> Int32 {
         let count = dc_get_fresh_msg_cnt(DcContext.contextPointer, chatId)
+
         return count
     }
     
@@ -175,6 +202,7 @@ class DcContext {
             free(cString)
             return swiftString
         }
+
         return nil
     }
     

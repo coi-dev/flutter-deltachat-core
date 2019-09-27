@@ -93,7 +93,8 @@ class DcChat {
     }
     
     var contactIds: [UInt32] {
-        return Utils.copyAndFreeArray(inputArray: dc_get_chat_contacts(DcContext.contextPointer, UInt32(id)))
+        let chatContacts = dc_get_chat_contacts(DcContext.contextPointer, UInt32(id))
+        return Utils.copyAndFreeArray(inputArray: chatContacts)
     }
     
     lazy var profileImageFilePath: String = {

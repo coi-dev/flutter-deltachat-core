@@ -218,7 +218,7 @@ class ContextCallHandler: MethodCallHandling {
         }
     }
     
-    private func setConfig(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func setConfig(methodCall: FlutterMethodCall, result: FlutterResult) {
         let parameters = methodCall.parameters
         
         if let key = parameters["key"] as? String,
@@ -233,7 +233,7 @@ class ContextCallHandler: MethodCallHandling {
         }
     }
     
-    private func getConfig(methodCall: FlutterMethodCall, result: FlutterResult, type: String) {
+    fileprivate func getConfig(methodCall: FlutterMethodCall, result: FlutterResult, type: String) {
         let parameters = methodCall.parameters
         
         if let key = parameters["key"] as? String {
@@ -267,12 +267,12 @@ class ContextCallHandler: MethodCallHandling {
         }
     }
     
-    private func configure(result: FlutterResult) {
+    fileprivate func configure(result: FlutterResult) {
         dc_configure(DcContext.contextPointer)
         result(nil);
     }
     
-    private func addAddressBook(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func addAddressBook(methodCall: FlutterMethodCall, result: FlutterResult) {
         if !methodCall.contains(keys: [Argument.ADDRESS_BOOK]) {
             Method.Error.missingArgument(result: result);
             return
@@ -291,7 +291,7 @@ class ContextCallHandler: MethodCallHandling {
         
     }
     
-    private func createContact(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func createContact(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
             return
         }
@@ -307,7 +307,7 @@ class ContextCallHandler: MethodCallHandling {
         }
     }
     
-    private func deleteContact(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func deleteContact(methodCall: FlutterMethodCall, result: FlutterResult) {
         if !methodCall.contains(keys: [Argument.ID]) {
             Method.Error.missingArgument(result: result);
             return
@@ -330,71 +330,42 @@ class ContextCallHandler: MethodCallHandling {
         
     }
     
-    private func blockContact(methodCall: FlutterMethodCall, result: FlutterResult) {
-        if !methodCall.contains(keys: [Argument.ID]) {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        guard let args = methodCall.arguments else {
-            return
-        }
-        
-        if let myArgs = args as? [String: Any],
-            let contactId = myArgs[Argument.ID] as? UInt32 {
-            
-            dc_block_contact(DcContext.contextPointer, contactId, 1)
-            result(nil)
-        }
-        else {
-            Method.Error.missingArgumentValue(result: result)
-            return
-        }
-        
+    fileprivate func blockContact(methodCall: FlutterMethodCall, result: FlutterResult) {
+        let contactId = UInt32(methodCall.intValue(for: Argument.ID, result: result))
+        context.blockContact(contactId: contactId, block: true)
+
+        result(nil)
     }
     
-    private func getBlockedContacts(result: FlutterResult) {
-        let blockedIds = dc_get_blocked_contacts(DcContext.contextPointer)
-        result(blockedIds)
+    fileprivate func unblockContact(methodCall: FlutterMethodCall, result: FlutterResult) {
+        let contactId = UInt32(methodCall.intValue(for: Argument.ID, result: result))
+        context.blockContact(contactId: contactId, block: false)
+
+        result(nil)
+    }
+
+    fileprivate func getBlockedContacts(result: FlutterResult) {
+        let blockedIds = context.getBlockedContacts()
+        let buffer = blockedIds.withUnsafeBufferPointer { Data(buffer: $0) }
         
+        result(FlutterStandardTypedData(int32: buffer))
     }
     
-    private func unblockContact(methodCall: FlutterMethodCall, result: FlutterResult) {
-        if !methodCall.contains(keys: [Argument.ID]) {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        guard let args = methodCall.arguments else {
-            return
-        }
-        
-        if let myArgs = args as? [String: Any], let contactId = myArgs[Argument.ID] as? UInt32 {
-            dc_block_contact(DcContext.contextPointer, contactId, 0)
-            result(nil)
-        }
-        else {
-            Method.Error.missingArgumentValue(result: result)
-            return
-        }
-        
-    }
-    
-    private func createChatByContactId(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func createChatByContactId(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contactId = UInt32(methodCall.intValue(for: Argument.ID, result: result))
         let chat = context.createChatByContactId(contactId: contactId)
         
         result(NSNumber(value: chat.id))
     }
     
-    private func createChatByMessageId(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func createChatByMessageId(methodCall: FlutterMethodCall, result: FlutterResult) {
         let messageId = UInt32(methodCall.intValue(for: Argument.ID, result: result))
         let chat = context.createChatByMessageId(messageId: messageId)
         
         result(NSNumber(value: chat.id))
     }
     
-    private func createGroupChat(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func createGroupChat(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
             fatalError()
         }
@@ -418,7 +389,7 @@ class ContextCallHandler: MethodCallHandling {
         }
     }
     
-    private func addContactToChat(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func addContactToChat(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
             fatalError()
         }
@@ -444,29 +415,16 @@ class ContextCallHandler: MethodCallHandling {
         
     }
     
-    private func getChatByContactId(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            fatalError()
-        }
-        
-        if !methodCall.contains(keys: [Argument.CONTACT_ID]) {
-            Method.Error.missingArgument(result: result);
+    fileprivate func getChatByContactId(methodCall: FlutterMethodCall, result: FlutterResult) {
+        let contactId = UInt32(methodCall.intValue(for: Argument.CONTACT_ID, result: result))
+        guard let chat = context.getChatByContactId(contactId: contactId) else {
+            result(NSNull())
             return
         }
-        
-        if let myArgs = args as? [String: Any],
-            let contactId = myArgs[Argument.CONTACT_ID] as? UInt32 {
-            let chatId = dc_get_chat_id_by_contact_id(DcContext.contextPointer, contactId)
-            result(chatId)
-        }
-        else {
-            Method.Error.missingArgumentValue(result: result);
-            return
-        }
-        
+        result(NSNumber(value: chat.id))
     }
     
-    private func getContact(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func getContact(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
             Method.Error.missingArgument(result: result)
             return
@@ -477,7 +435,7 @@ class ContextCallHandler: MethodCallHandling {
         
     }
     
-    private func getContacts(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func getContacts(methodCall: FlutterMethodCall, result: FlutterResult) {
         let flags = methodCall.intValue(for: Argument.FLAGS, result: result)
         let query = methodCall.stringValue(for: Argument.QUERY, result: result)
 
@@ -487,7 +445,7 @@ class ContextCallHandler: MethodCallHandling {
         result(FlutterStandardTypedData(int32: buffer))
     }
     
-    private func getChatContacts(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func getChatContacts(methodCall: FlutterMethodCall, result: FlutterResult) {
         let chatId = methodCall.intValue(for: Argument.CHAT_ID, result: result)
         let contactIds = context.getChatContacts(for: chatId)
         let buffer = contactIds.withUnsafeBufferPointer { Data(buffer: $0) }
@@ -495,14 +453,14 @@ class ContextCallHandler: MethodCallHandling {
         result(FlutterStandardTypedData(int32: buffer))
     }
     
-    private func getChat(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func getChat(methodCall: FlutterMethodCall, result: FlutterResult) {
         let id = UInt32(methodCall.intValue(for: Argument.ID, result: result))
         let chat = context.getChat(with: id)
         
         result(NSNumber(value: chat.id))
     }
     
-    private func getChatMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func getChatMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
         let chatId = methodCall.intValue(for: Argument.CHAT_ID, result: result)
         let flags = methodCall.intValue(for: Argument.FLAGS, result: result)
         
@@ -522,7 +480,7 @@ class ContextCallHandler: MethodCallHandling {
         result(FlutterStandardTypedData(int32: buffer))
     }
     
-    private func createChatMessage(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func createChatMessage(methodCall: FlutterMethodCall, result: FlutterResult) {
         let chatId = UInt32(methodCall.intValue(for: Argument.CHAT_ID, result: result))
         guard let text = methodCall.stringValue(for: Argument.TEXT, result: result) else {
             Method.Error.missingArgument(result: result);
@@ -533,7 +491,7 @@ class ContextCallHandler: MethodCallHandling {
         result(NSNumber(value: messageId))
     }
     
-    private func createChatAttachmentMessage(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func createChatAttachmentMessage(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
             Method.Error.missingArgument(result: result)
             return
@@ -573,14 +531,14 @@ class ContextCallHandler: MethodCallHandling {
         //    result.success(messageId);
     }
     
-    private func getFreshMessageCount(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func getFreshMessageCount(methodCall: FlutterMethodCall, result: FlutterResult) {
         let chatId = methodCall.intValue(for: Argument.CHAT_ID, result: result)
         let messageCount = context.getFreshMessageCount(for: UInt32(chatId))
 
         result(NSNumber(value: messageCount))
     }
     
-    private func markNoticedChat(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func markNoticedChat(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
             fatalError()
         }
@@ -604,7 +562,7 @@ class ContextCallHandler: MethodCallHandling {
         
     }
     
-    private func deleteChat(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func deleteChat(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
             fatalError()
         }
@@ -628,7 +586,7 @@ class ContextCallHandler: MethodCallHandling {
         
     }
     
-    private func removeContactFromChat(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func removeContactFromChat(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
             Method.Error.missingArgument(result: result);
             return
@@ -648,14 +606,14 @@ class ContextCallHandler: MethodCallHandling {
         
     }
     
-    private func getFreshMessages(result: FlutterResult) {
+    fileprivate func getFreshMessages(result: FlutterResult) {
         let freshMessages = context.getFreshMessageIds()
         let buffer = freshMessages.withUnsafeBufferPointer { Data(buffer: $0) }
 
         result(FlutterStandardTypedData(int32: buffer))
     }
     
-    private func forwardMessages(methodCall: FlutterMethodCall, result: FlutterResult){
+    fileprivate func forwardMessages(methodCall: FlutterMethodCall, result: FlutterResult){
         guard let args = methodCall.arguments else {
             Method.Error.missingArgument(result: result);
             return
@@ -676,7 +634,7 @@ class ContextCallHandler: MethodCallHandling {
         
     }
     
-    private func markSeenMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func markSeenMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
         var msgIds = methodCall.value(for: Argument.MESSAGE_IDS, result: result) as! [UInt32]
         let buffer = msgIds.withUnsafeBufferPointer { Data(buffer: $0) }
 
@@ -685,7 +643,7 @@ class ContextCallHandler: MethodCallHandling {
         result(FlutterStandardTypedData(int32: buffer))
     }
     
-    private func initiateKeyTransfer(result: FlutterResult) {
+    fileprivate func initiateKeyTransfer(result: FlutterResult) {
         //    new Thread(() -> {
         //    String setupKey = dcContext.initiateKeyTransfer();
         //    getUiThreadHandler().post(() -> {
@@ -694,7 +652,7 @@ class ContextCallHandler: MethodCallHandling {
         //    }).start();
     }
     
-    private func continueKeyTransfer(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func continueKeyTransfer(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
             Method.Error.missingArgument(result: result);
             return
@@ -717,7 +675,7 @@ class ContextCallHandler: MethodCallHandling {
         
     }
     
-    private func getSecurejoinQr(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func getSecurejoinQr(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
             Method.Error.missingArgument(result: result);
             return
@@ -738,7 +696,7 @@ class ContextCallHandler: MethodCallHandling {
         
     }
     
-    private func  joinSecurejoin(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func  joinSecurejoin(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
             Method.Error.missingArgument(result: result);
             return
@@ -764,7 +722,7 @@ class ContextCallHandler: MethodCallHandling {
         
     }
     
-    private func checkQr(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func checkQr(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
             Method.Error.missingArgument(result: result);
             return
@@ -786,7 +744,7 @@ class ContextCallHandler: MethodCallHandling {
         
     }
     
-    private func deleteMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func deleteMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
             Method.Error.missingArgument(result: result);
             return
@@ -807,7 +765,7 @@ class ContextCallHandler: MethodCallHandling {
         
     }
     
-    private func starMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func starMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let arguments: [String: Any] = methodCall.arguments as? [String: Any] else {
             Method.Error.missingArgument(result: result);
             return
@@ -830,7 +788,7 @@ class ContextCallHandler: MethodCallHandling {
         
     }
     
-    private func setChatProfileImage(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func setChatProfileImage(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
             Method.Error.missingArgument(result: result);
             return
@@ -855,7 +813,7 @@ class ContextCallHandler: MethodCallHandling {
         
     }
     
-    private func setChatName(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func setChatName(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
             Method.Error.missingArgument(result: result);
             return
