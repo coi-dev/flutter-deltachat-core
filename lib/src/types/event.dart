@@ -56,6 +56,8 @@ class Event {
   static const int imexFileWrite = 2052;
   static const int secureJoinInviterProgress = 2060;
   static const int secureJoinJoinerProgress = 2061;
+  static const int setMetaDataDone = 2070;
+  static const int webPushSubscription = 2071;
   static const int isOffline = 2081;
   static const int getString = 2091;
   static const int getQuantityString = 2092;

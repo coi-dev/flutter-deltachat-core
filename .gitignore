@@ -74,4 +74,7 @@ build/
 # Delta chat core
 android/libs/
 android/obj/
+android/jni/arm64-v8a
+android/jni/armeabi-v7a
+android/jni/x86
 /example/ios/Flutter/flutter_export_environment.sh

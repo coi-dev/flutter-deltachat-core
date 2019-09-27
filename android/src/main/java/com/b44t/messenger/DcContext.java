@@ -21,6 +21,7 @@ public class DcContext {
     public final static int DC_EVENT_MSG_READ                    = 2015;
     public final static int DC_EVENT_CHAT_MODIFIED               = 2020;
     public final static int DC_EVENT_CONTACTS_CHANGED            = 2030;
+    public final static int DC_EVENT_LOCATION_CHANGED            = 2035;
     public final static int DC_EVENT_CONFIGURE_PROGRESS          = 2041;
     public final static int DC_EVENT_IMEX_PROGRESS               = 2051;
     public final static int DC_EVENT_IMEX_FILE_WRITTEN           = 2052;
@@ -104,7 +105,6 @@ public class DcContext {
     public native boolean      continueKeyTransfer  (int msg_id, String setup_code);
     public native void         imex                 (int what, String dir);
     public native String       imexHasBackup        (String dir);
-    public native int          checkPassword        (String pw);
     public native boolean      mayBeValidAddr       (String addr);
     public native int          lookupContactIdByAddr(String addr);
     public native int[]        getContacts          (int flags, String query);
@@ -146,6 +146,7 @@ public class DcContext {
     public native int          getFreshMsgCount     (int chat_id);
     public native void         deleteMsgs           (int msg_ids[]);
     public native void         forwardMsgs          (int msg_ids[], int chat_id);
+    public native int          prepareMsg           (int chat_id, DcMsg msg);
     public native int          sendMsg              (int chat_id, DcMsg msg);
     public native int          sendTextMsg          (int chat_id, String text);
     public native void         starMsgs             (int msg_ids[], int star);
@@ -153,6 +154,24 @@ public class DcContext {
     public @NonNull DcLot      checkQr              (String qr) { return new DcLot(checkQrCPtr(qr)); }
     public native String       getSecurejoinQr      (int chat_id);
     public native int          joinSecurejoin       (String qr);
+    public native void         sendLocationsToChat  (int chat_id, int seconds);
+    public native boolean      isSendingLocationsToChat(int chat_id);
+    public @NonNull DcArray    getLocations         (int chat_id, int contact_id, long timestamp_start, long timestamp_end) { return new DcArray(getLocationsCPtr(chat_id, contact_id, timestamp_start, timestamp_end)); }
+    public native void         deleteAllLocations   ();
+    public native int          isCoiSupported       ();
+    public native int          isCoiEnabled         ();
+    public native int          isWebPushSupported   ();
+    public native String       getWebPushVapidKey   ();
+    public native void         subscribeWebPush     (String uid, String json, int id);
+    public native void         getWebPushSubscription (String uid, int id);
+    public native void         setCoiEnabled        (int enable, int id);
+    public native void         setCoiMessageFilter  (int mode, int id);
+    public native void         validateWebPush      (String uid, String msg, int id);
+
+    /**
+     * @return true if at least one chat has location streaming enabled
+     */
+    public native boolean      setLocation          (float latitude, float longitude, float accuracy);
 
     // event handling - you should @Override this function in derived classes
     public long handleEvent(int event, long data1, long data2) {
@@ -174,4 +193,5 @@ public class DcContext {
     private native long getMsgCPtr       (int id);
     private native long getDraftCPtr    (int id);
     private native long getContactCPtr   (int id);
+    private native long getLocationsCPtr (int chat_id, int contact_id, long timestamp_start, long timestamp_end);
 }

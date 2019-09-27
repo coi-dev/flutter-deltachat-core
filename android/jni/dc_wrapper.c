@@ -24,7 +24,7 @@
 
 
 #include <jni.h>
-#include "messenger-backend/src/deltachat.h"
+#include "deltachat-core-rust/deltachat-ffi/deltachat.h"
 
 
 static dc_msg_t* get_dc_msg(JNIEnv *env, jobject obj);
@@ -82,8 +82,8 @@ static jintArray dc_array2jintArray_n_unref(JNIEnv *env, dc_array_t* ca)
 
 	if (ca) {
 		if (icnt) {
-			uintptr_t* ca_data = dc_array_get_raw(ca);
-			if (sizeof(uintptr_t)==sizeof(jint)) {
+			uint32_t* ca_data = dc_array_get_raw(ca);
+			if (sizeof(uint32_t)==sizeof(jint)) {
 				(*env)->SetIntArrayRegion(env, ret, 0, icnt, (jint*)ca_data);
 			}
 			else {
@@ -578,13 +578,18 @@ JNIEXPORT void Java_com_b44t_messenger_DcContext_forwardMsgs(JNIEnv *env, jobjec
 	free(msg_ids_ptr);
 }
 
-
 JNIEXPORT void Java_com_b44t_messenger_DcContext_starMsgs(JNIEnv *env, jobject obj, jintArray msg_ids, jint star)
 {
     int msg_ids_cnt = 0;
     const uint32_t* msg_ids_ptr = jintArray2uint32Pointer(env, msg_ids, &msg_ids_cnt);
     dc_star_msgs(get_dc_context(env, obj), msg_ids_ptr, msg_ids_cnt, star);
     free(msg_ids_ptr);
+}
+
+
+JNIEXPORT jint Java_com_b44t_messenger_DcContext_prepareMsg(JNIEnv *env, jobject obj, jint chat_id, jobject msg)
+{
+	return dc_prepare_msg(get_dc_context(env, obj), chat_id, get_dc_msg(env, msg));
 }
 
 
@@ -718,15 +723,6 @@ JNIEXPORT void Java_com_b44t_messenger_DcContext_imex(JNIEnv *env, jobject obj, 
 }
 
 
-JNIEXPORT jint Java_com_b44t_messenger_DcContext_checkPassword(JNIEnv *env, jobject obj, jstring pw)
-{
-	CHAR_REF(pw);
-		jint r = dc_check_password(get_dc_context(env, obj),  pwPtr);
-	CHAR_UNREF(pw);
-	return r;
-}
-
-
 JNIEXPORT jstring Java_com_b44t_messenger_DcContext_imexHasBackup(JNIEnv *env, jobject obj, jstring dir)
 {
 	CHAR_REF(dir);
@@ -779,6 +775,65 @@ JNIEXPORT void Java_com_b44t_messenger_DcContext_deleteAllLocations(JNIEnv *env,
 	dc_delete_all_locations(get_dc_context(env, obj));
 }
 
+/* DcContext - COI */
+
+JNIEXPORT jint Java_com_b44t_messenger_DcContext_isCoiSupported(JNIEnv *env, jobject obj)
+{
+	return (jint)dc_is_coi_supported(get_dc_context(env, obj));
+}
+
+JNIEXPORT jint Java_com_b44t_messenger_DcContext_isCoiEnabled(JNIEnv *env, jobject obj)
+{
+	return (jint)dc_is_coi_enabled(get_dc_context(env, obj));
+}
+
+JNIEXPORT jint Java_com_b44t_messenger_DcContext_isWebPushSupported(JNIEnv *env, jobject obj)
+{
+	return (jint)dc_is_webpush_supported(get_dc_context(env, obj));
+}
+
+JNIEXPORT jstring Java_com_b44t_messenger_DcContext_getWebPushVapidKey(JNIEnv *env, jobject obj)
+{
+	char* temp = dc_get_webpush_vapid_key(get_dc_context(env, obj));
+		jstring ret = JSTRING_NEW(temp);
+	free(temp);
+	return ret;
+}
+
+JNIEXPORT void Java_com_b44t_messenger_DcContext_subscribeWebPush(JNIEnv *env, jobject obj, jstring uid, jstring json, jint id)
+{
+	CHAR_REF(uid);
+	CHAR_REF(json);
+		dc_subscribe_webpush(get_dc_context(env, obj), uidPtr, jsonPtr, id);
+	CHAR_UNREF(uid);
+	CHAR_UNREF(json);
+}
+
+JNIEXPORT void Java_com_b44t_messenger_DcContext_validateWebPush(JNIEnv *env, jobject obj, jstring uid, jstring msg, jint id)
+{
+	CHAR_REF(uid);
+	CHAR_REF(msg);
+		dc_validate_webpush(get_dc_context(env, obj), uidPtr, msgPtr, id);
+	CHAR_UNREF(uid);
+	CHAR_UNREF(msg);
+}
+
+JNIEXPORT void Java_com_b44t_messenger_DcContext_getWebPushSubscription(JNIEnv *env, jobject obj, jstring uid, jint id)
+{
+	CHAR_REF(uid);
+	    dc_get_webpush_subscription(get_dc_context(env, obj), uidPtr, id);
+	CHAR_UNREF(uid);
+}
+
+JNIEXPORT void Java_com_b44t_messenger_DcContext_setCoiEnabled(JNIEnv *env, jobject obj, jint enable, jint id)
+{
+	    dc_set_coi_enabled(get_dc_context(env, obj), enable, id);
+}
+
+JNIEXPORT void Java_com_b44t_messenger_DcContext_setCoiMessageFilter(JNIEnv *env, jobject obj, jint mode, jint id)
+{
+	    dc_set_coi_message_filter(get_dc_context(env, obj), mode, id);
+}
 
 /*******************************************************************************
  * DcArray
@@ -844,6 +899,24 @@ JNIEXPORT jint Java_com_b44t_messenger_DcArray_getMsgId(JNIEnv *env, jobject obj
 JNIEXPORT jint Java_com_b44t_messenger_DcArray_getLocationId(JNIEnv *env, jobject obj, jint index)
 {
 	return dc_array_get_id(get_dc_array(env, obj), index);
+}
+
+
+JNIEXPORT jstring Java_com_b44t_messenger_DcArray_getMarker(JNIEnv *env, jobject obj, jint index)
+{
+	char* temp = dc_array_get_marker(get_dc_array(env, obj), index);
+		jstring ret = NULL;
+		if (temp) {
+			ret = JSTRING_NEW(temp);
+		}
+	free(temp);
+	return ret;
+}
+
+
+JNIEXPORT jboolean Java_com_b44t_messenger_DcArray_isIndependent(JNIEnv *env, jobject obj, jint index)
+{
+	return (dc_array_is_independent(get_dc_array(env, obj), index)!=0);
 }
 
 
@@ -1005,6 +1078,12 @@ JNIEXPORT jboolean Java_com_b44t_messenger_DcChat_isVerified(JNIEnv *env, jobjec
 }
 
 
+JNIEXPORT jboolean Java_com_b44t_messenger_DcChat_isSendingLocations(JNIEnv *env, jobject obj)
+{
+	return dc_chat_is_sending_locations(get_dc_chat(env, obj))!=0;
+}
+
+
 JNIEXPORT jintArray Java_com_b44t_messenger_DcContext_getChatMedia(JNIEnv *env, jobject obj, jint chat_id, jint type1, jint type2, jint type3)
 {
 	dc_array_t* ca = dc_get_chat_media(get_dc_context(env, obj), chat_id, type1, type2, type3);
@@ -1105,6 +1184,12 @@ JNIEXPORT jlong Java_com_b44t_messenger_DcMsg_getSortTimestamp(JNIEnv *env, jobj
 JNIEXPORT jboolean Java_com_b44t_messenger_DcMsg_hasDeviatingTimestamp(JNIEnv *env, jobject obj)
 {
 	return dc_msg_has_deviating_timestamp(get_dc_msg(env, obj))!=0;
+}
+
+
+JNIEXPORT jboolean Java_com_b44t_messenger_DcMsg_hasLocation(JNIEnv *env, jobject obj)
+{
+	return dc_msg_has_location(get_dc_msg(env, obj))!=0;
 }
 
 
@@ -1278,6 +1363,12 @@ JNIEXPORT jboolean Java_com_b44t_messenger_DcMsg_isStarred(JNIEnv *env, jobject 
 {
     return dc_msg_is_starred(get_dc_msg(env, obj))!=0;
 }
+
+JNIEXPORT void Java_com_b44t_messenger_DcMsg_setLocation(JNIEnv *env, jobject obj, jfloat latitude, jfloat longitude)
+{
+    dc_msg_set_location(get_dc_msg(env, obj), latitude, longitude);
+}
+
 
 
 /*******************************************************************************
@@ -1488,6 +1579,3 @@ JNIEXPORT jlong Java_com_b44t_messenger_DcContext_stringToData(JNIEnv *env, jcla
     }
     return (jlong)cstring; // the return value of stringToData() will be passed to c-land and free()'d there
 }
-
-
-

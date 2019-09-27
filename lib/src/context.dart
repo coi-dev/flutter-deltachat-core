@@ -91,6 +91,15 @@ class Context {
   static const String methodSetChatProfileImage = "context_setChatProfileImage";
   static const String methodPerformImap = "context_performImap";
   static const String methodClose = "context_close";
+  static const String methodIsCoiSupported = "context_isCoiSupported";
+  static const String methodIsCoiEnabled = "context_isCoiEnabled";
+  static const String methodIsWebPushSupported = "context_isWebPushSupported";
+  static const String methodGetWebPushVapidKey = "context_getWebPushVapidKey";
+  static const String methodSubscribeWebPush = "context_subscribeWebPush";
+  static const String methodValidateWebPush = "context_validateWebPush";
+  static const String methodGetWebPushSubscription = "context_getWebPushSubscription";
+  static const String methodSetCoiEnabled = "context_setCoiEnabled";
+  static const String methodSetCoiMessageFilter = "context_setCoiMessageFilter";
 
   static const String configAddress = "addr";
   static const String configMailServer = "mail_server";
@@ -274,6 +283,9 @@ class Context {
   }
 
   Future<void> markSeenMessages(List<int> msgIds) async {
+    if (msgIds.isEmpty) {
+      return null;
+    }
     return await core.invokeMethod(methodMarkSeenMessages, getMessageIdsArguments(msgIds));
   }
 
@@ -320,6 +332,42 @@ class Context {
 
   Future<void> close() async {
     return await core.invokeMethod(methodClose);
+  }
+
+  Future<int> isCoiSupported() async {
+    return await core.invokeMethod(methodIsCoiSupported);
+  }
+
+  Future<int> isCoiEnabled() async {
+    return await core.invokeMethod(methodIsCoiEnabled);
+  }
+
+  Future<int> isWebPushSupported() async {
+    return await core.invokeMethod(methodIsWebPushSupported);
+  }
+
+  Future<String> getWebPushVapidKey() async {
+    return await core.invokeMethod(methodGetWebPushVapidKey);
+  }
+
+  Future<void> subscribeWebPush(String uid, String json, int id) async {
+    return await core.invokeMethod(methodSubscribeWebPush, getWebPushSubscribeArguments(uid, json, id));
+  }
+
+  Future<void> validateWebPush(String uid, String message, int id) async {
+    return await core.invokeMethod(methodValidateWebPush, getWebPushValidateArguments(uid, message, id));
+  }
+
+  Future<void> getWebPushSubscription(String uid, int id) async {
+    return await core.invokeMethod(methodGetWebPushSubscription, getWebPushGetSubscriptionArguments(uid, id));
+  }
+  
+  Future<void> setCoiEnabled(int enable, int id) async {
+    return await core.invokeMethod(methodSetCoiEnabled, getSetCoiEnabledArguments(enable, id));
+  }
+
+  Future<void> setCoiMessageFilter(int mode, int id) async {
+    return await core.invokeMethod(methodSetCoiMessageFilter, getSetCoiMessageFilter(mode, id));
   }
 
   Map<String, dynamic> getKeyArguments(String key) => <String, dynamic>{Base.argumentKey: key};
@@ -373,4 +421,14 @@ class Context {
   Map<String, dynamic> getStarMessagesArguments(List<int> msgIds, int star) => <String, dynamic>{Base.argumentMessageIds: msgIds, Base.argumentValue: star};
 
   Map<String, dynamic> getSetNameOrImageArguments(int chatId, String newValue) => <String, dynamic>{Base.argumentChatId: chatId, Base.argumentValue: newValue};
+
+  Map<String, dynamic> getWebPushSubscribeArguments(String uid, String json, int id) => <String, dynamic>{Base.argumentUid: uid, Base.argumentJson: json, Base.argumentId: id};
+  
+  Map<String, dynamic> getWebPushValidateArguments(String uid, String message, int id) => <String, dynamic>{Base.argumentUid: uid, Base.argumentMessage: message, Base.argumentId: id};
+
+  Map<String, dynamic> getWebPushGetSubscriptionArguments(String uid, int id) => <String, dynamic>{Base.argumentUid: uid, Base.argumentId: id};
+
+  Map<String, dynamic> getSetCoiEnabledArguments(int enable, int id) => <String, dynamic>{Base.argumentEnable: enable, Base.argumentId: id};
+
+  Map<String, dynamic> getSetCoiMessageFilter(int mode, int id) => <String, dynamic>{Base.argumentMode: mode, Base.argumentId: id};
 }
