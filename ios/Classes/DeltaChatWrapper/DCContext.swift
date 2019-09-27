@@ -189,5 +189,48 @@ class DcContext {
     func stopOngoingProcess() {
         dc_stop_ongoing_process(DcContext.contextPointer)
     }
+    
+    // MARK: - COI related Stuff
+    
+    func isCoiSupported() -> Int32 {
+        return Int32(dc_is_coi_supported(DcContext.contextPointer))
+    }
+    
+    func isCoiEnabled() -> Int32 {
+        return Int32(dc_is_coi_enabled(DcContext.contextPointer))
+    }
+    
+    func isWebPushSupported() -> Int32 {
+        return Int32(dc_is_webpush_supported(DcContext.contextPointer))
+    }
+    
+    func getWebPushVapidKey() -> String? {
+        if let cString = dc_get_webpush_vapid_key(DcContext.contextPointer) {
+            let swiftString = String(cString: cString)
+            free(cString)
+            return swiftString
+        }
+        return nil
+    }
+    
+    func subscribeWebPush(uid: String, json: String, id: Int32) {
+        dc_subscribe_webpush(DcContext.contextPointer, uid, json, id)
+    }
+    
+    func getWebPushSubscription(uid: String, id: Int32) {
+        dc_get_webpush_subscription(DcContext.contextPointer, uid, id)
+    }
+    
+    func setCoiEnabled(enable: Int32, id: Int32) {
+        dc_set_coi_enabled(DcContext.contextPointer, enable, id)
+    }
+    
+    func setCoiMessageFilter(mode: Int32, id: Int32) {
+        dc_set_coi_message_filter(DcContext.contextPointer, mode, id)
+    }
+    
+    func validateWebPush(uid: String, message: String, id: Int32) {
+        dc_validate_webpush(DcContext.contextPointer, uid, message, id)
+    }
 
 }

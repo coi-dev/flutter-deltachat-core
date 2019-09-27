@@ -30,12 +30,16 @@ struct Argument {
     static let MESSAGE_IDS       = "messageIds"
     static let SETUP_CODE        = "setupCode"
     static let QR_TEXT           = "qrText"
-
     static let ADD               = "add"
     static let EVENT_ID          = "eventId"
     static let LISTENER_ID       = "listenerId"
     static let DB_NAME           = "dbName"
-    
+    static let UID               = "uid"
+    static let JSON              = "json"
+    static let ENABLE            = "enable"
+    static let MODE              = "mode"
+    static let MESSAGE           = "message"
+
     struct Error {
         static let MISSING       = "1"
         static let TYPE_MISMATCH = "2"

@@ -186,38 +186,37 @@ class ContextCallHandler: MethodCallHandling {
             setChatProfileImage(methodCall: call, result: result)
             break
         case Method.Context.IS_COI_SUPPORTED:
-//            isCoiSupported(result)
+            isCoiSupported(result: result)
             break
         case Method.Context.IS_COI_ENABLED:
-//            isCoiEnabled(result)
+            isCoiEnabled(result: result)
             break
         case Method.Context.IS_WEB_PUSH_SUPPORTED:
-//            isWebPushSupported(result)
+            isWebPushSupported(result: result)
             break
         case Method.Context.GET_WEB_PUSH_VAPID_KEY:
-//            getWebPushVapidKey(result)
+            getWebPushVapidKey(result: result)
             break
         case Method.Context.SUBSCRIBE_WEB_PUSH:
-//            subscribeWebPush(methodCall, result)
+            subscribeWebPush(methodCall: call, result: result)
             break
         case Method.Context.GET_WEB_PUSH_SUBSCRIPTION:
-//            getWebPushSubscription(methodCall, result)
+            getWebPushSubscription(methodCall: call, result: result)
             break
         case Method.Context.SET_COI_ENABLED:
-//            setCoiEnabled(methodCall, result)
+            setCoiEnabled(methodCall: call, result: result)
             break
         case Method.Context.SET_COI_MESSAGE_FILTER:
-//            setCoiMessageFilter(methodCall, result)
+            setCoiMessageFilter(methodCall: call, result: result)
             break
         case Method.Context.VALIDATE_WEB_PUSH:
-//            validateWebPush(methodCall, result)
+            validateWebPush(methodCall: call, result: result)
             break
         default:
             log.error("Context: Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
         }
     }
-    
     
     private func setConfig(methodCall: FlutterMethodCall, result: FlutterResult) {
         let parameters = methodCall.parameters
@@ -908,6 +907,91 @@ class ContextCallHandler: MethodCallHandling {
             return msg
         }
         return msg
+    }
+    
+    fileprivate func isCoiSupported(result: FlutterResult) {
+        result(NSNumber(value: context.isCoiSupported()))
+    }
+    
+    fileprivate func isCoiEnabled(result: FlutterResult) {
+        result(NSNumber(value: context.isCoiEnabled()))
+    }
+    
+    fileprivate func isWebPushSupported(result: FlutterResult) {
+        result(NSNumber(value: context.isWebPushSupported()))
+    }
+    
+    fileprivate func getWebPushVapidKey(result: FlutterResult) {
+        result(context.getWebPushVapidKey() ?? NSNull())
+    }
+    
+    fileprivate func subscribeWebPush(methodCall: FlutterMethodCall, result: FlutterResult) {
+        let id = methodCall.intValue(for: Argument.ID, result: result)
+        
+        guard let uid = methodCall.stringValue(for: Argument.UID, result: result),
+            let json = methodCall.stringValue(for: Argument.JSON, result: result) else {
+                Method.Error.missingArgument(result: result)
+                return
+        }
+        
+        if uid.isEmpty || json.isEmpty {
+            Method.Error.missingArgumentValue(result: result)
+            return
+        }
+        
+        context.subscribeWebPush(uid: uid, json: json, id: id)
+        result(nil)
+    }
+    
+    fileprivate func getWebPushSubscription(methodCall: FlutterMethodCall, result: FlutterResult) {
+        let id = methodCall.intValue(for: Argument.ID, result: result)
+        
+        guard let uid = methodCall.stringValue(for: Argument.UID, result: result) else {
+                Method.Error.missingArgument(result: result)
+                return
+        }
+        
+        if uid.isEmpty {
+            Method.Error.missingArgumentValue(result: result)
+            return
+        }
+        
+        context.getWebPushSubscription(uid: uid, id: id)
+        result(nil)
+    }
+    
+    fileprivate func setCoiEnabled(methodCall: FlutterMethodCall, result: FlutterResult) {
+        let id = methodCall.intValue(for: Argument.ID, result: result)
+        let enable = methodCall.intValue(for: Argument.ENABLE, result: result)
+        
+        context.setCoiEnabled(enable: enable, id: id)
+        result(nil)
+    }
+    
+    fileprivate func setCoiMessageFilter(methodCall: FlutterMethodCall, result: FlutterResult) {
+        let id = methodCall.intValue(for: Argument.ID, result: result)
+        let mode = methodCall.intValue(for: Argument.MODE, result: result)
+        
+        context.setCoiMessageFilter(mode: mode, id: id)
+        result(nil)
+    }
+    
+    fileprivate func validateWebPush(methodCall: FlutterMethodCall, result: FlutterResult) {
+        let id = methodCall.intValue(for: Argument.ID, result: result)
+        
+        guard let uid = methodCall.stringValue(for: Argument.UID, result: result),
+            let message = methodCall.stringValue(for: Argument.MESSAGE, result: result) else {
+            Method.Error.missingArgument(result: result)
+            return
+        }
+        
+        if uid.isEmpty || message.isEmpty {
+            Method.Error.missingArgumentValue(result: result)
+            return
+        }
+        
+        context.validateWebPush(uid: uid, message: message, id: id)
+        result(nil)
     }
 
 }
