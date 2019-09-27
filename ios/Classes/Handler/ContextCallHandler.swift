@@ -543,27 +543,10 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     fileprivate func deleteChat(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            fatalError()
-        }
+        let chatId = UInt32(methodCall.intValue(for: Argument.CHAT_ID, result: result))
+        context.deleteChat(chatId: chatId)
         
-        if !methodCall.contains(keys: [Argument.CHAT_ID]) {
-            Method.Error.missingArgument(result: result)
-            return
-        }
-        
-        if let myArgs = args as? [String: Any] {
-            let chatId = myArgs[Argument.CHAT_ID] as? UInt32
-            
-            if chatId == nil {
-                Method.Error.missingArgument(result: result)
-                return
-            }
-            
-            dc_delete_chat(DcContext.contextPointer, chatId!)
-            result(nil)
-        }
-        
+        result(nil)
     }
     
     fileprivate func removeContactFromChat(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -615,10 +598,13 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     fileprivate func markSeenMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
-        var msgIds = methodCall.value(for: Argument.MESSAGE_IDS, result: result) as! [UInt32]
-        let buffer = msgIds.withUnsafeBufferPointer { Data(buffer: $0) }
+        guard let msgIds = methodCall.value(for: Argument.MESSAGE_IDS, result: result) as? [UInt32] else {
+            Method.Error.generic(methodCall: methodCall, result: result)
+            return
+        }
 
-        dc_markseen_msgs(DcContext.contextPointer, &msgIds, Int32(msgIds.count))
+        let buffer = msgIds.withUnsafeBufferPointer { Data(buffer: $0) }
+        context.markSeenMessages(messageIds: msgIds)
 
         result(FlutterStandardTypedData(int32: buffer))
     }

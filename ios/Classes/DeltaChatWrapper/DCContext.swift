@@ -203,6 +203,10 @@ class DcContext {
         
         return ids
     }
+    
+    func markSeenMessages(messageIds: [UInt32]) {
+        dc_markseen_msgs(DcContext.contextPointer, UnsafePointer(messageIds), Int32(messageIds.count))
+    }
 
     // MARK: - General
     
