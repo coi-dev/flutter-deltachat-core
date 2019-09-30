@@ -218,6 +218,8 @@ class ContextCallHandler: MethodCallHandling {
         }
     }
     
+    // MARK: - Configuration
+    
     fileprivate func setConfig(methodCall: FlutterMethodCall, result: FlutterResult) {
         let parameters = methodCall.parameters
         
@@ -272,6 +274,8 @@ class ContextCallHandler: MethodCallHandling {
 
         result(nil)
     }
+    
+    // MARK: - Addressbook & Contacts
     
     fileprivate func addAddressBook(methodCall: FlutterMethodCall, result: FlutterResult) {
         if !methodCall.contains(keys: [Argument.ADDRESS_BOOK]) {
@@ -330,6 +334,37 @@ class ContextCallHandler: MethodCallHandling {
         
         result(FlutterStandardTypedData(int32: buffer))
     }
+    
+    fileprivate func getContact(methodCall: FlutterMethodCall, result: FlutterResult) {
+        guard let args = methodCall.arguments else {
+            Method.Error.missingArgument(result: result)
+            return
+        }
+        if let myArgs = args as? [String: Any], let id = myArgs[Argument.ID] as? UInt32 {
+            result(dc_array_get_contact_id(DcContext.contextPointer, Int(id)))
+        }
+        
+    }
+    
+    fileprivate func getContacts(methodCall: FlutterMethodCall, result: FlutterResult) {
+        let flags = methodCall.intValue(for: Argument.FLAGS, result: result)
+        let query = methodCall.stringValue(for: Argument.QUERY, result: result)
+
+        let contactIds = context.getContacts(flags: Int32(flags), query: query)
+        let buffer = contactIds.withUnsafeBufferPointer { Data(buffer: $0) }
+
+        result(FlutterStandardTypedData(int32: buffer))
+    }
+    
+    fileprivate func getChatContacts(methodCall: FlutterMethodCall, result: FlutterResult) {
+        let chatId = methodCall.intValue(for: Argument.CHAT_ID, result: result)
+        let contactIds = context.getChatContacts(for: chatId)
+        let buffer = contactIds.withUnsafeBufferPointer { Data(buffer: $0) }
+
+        result(FlutterStandardTypedData(int32: buffer))
+    }
+
+    // MARK: - Chat Related
     
     fileprivate func createChatByContactId(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contactId = UInt32(methodCall.intValue(for: Argument.ID, result: result))
@@ -402,35 +437,6 @@ class ContextCallHandler: MethodCallHandling {
             return
         }
         result(NSNumber(value: chat.id))
-    }
-    
-    fileprivate func getContact(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            Method.Error.missingArgument(result: result)
-            return
-        }
-        if let myArgs = args as? [String: Any], let id = myArgs[Argument.ID] as? UInt32 {
-            result(dc_array_get_contact_id(DcContext.contextPointer, Int(id)))
-        }
-        
-    }
-    
-    fileprivate func getContacts(methodCall: FlutterMethodCall, result: FlutterResult) {
-        let flags = methodCall.intValue(for: Argument.FLAGS, result: result)
-        let query = methodCall.stringValue(for: Argument.QUERY, result: result)
-
-        let contactIds = context.getContacts(flags: Int32(flags), query: query)
-        let buffer = contactIds.withUnsafeBufferPointer { Data(buffer: $0) }
-
-        result(FlutterStandardTypedData(int32: buffer))
-    }
-    
-    fileprivate func getChatContacts(methodCall: FlutterMethodCall, result: FlutterResult) {
-        let chatId = methodCall.intValue(for: Argument.CHAT_ID, result: result)
-        let contactIds = context.getChatContacts(for: chatId)
-        let buffer = contactIds.withUnsafeBufferPointer { Data(buffer: $0) }
-
-        result(FlutterStandardTypedData(int32: buffer))
     }
     
     fileprivate func getChat(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -511,13 +517,6 @@ class ContextCallHandler: MethodCallHandling {
         //    result.success(messageId);
     }
     
-    fileprivate func getFreshMessageCount(methodCall: FlutterMethodCall, result: FlutterResult) {
-        let chatId = methodCall.intValue(for: Argument.CHAT_ID, result: result)
-        let messageCount = context.getFreshMessageCount(for: UInt32(chatId))
-
-        result(NSNumber(value: messageCount))
-    }
-    
     fileprivate func markNoticedChat(methodCall: FlutterMethodCall, result: FlutterResult) {
         guard let args = methodCall.arguments else {
             fatalError()
@@ -569,6 +568,65 @@ class ContextCallHandler: MethodCallHandling {
         
     }
     
+    fileprivate func setChatProfileImage(methodCall: FlutterMethodCall, result: FlutterResult) {
+        guard let args = methodCall.arguments else {
+            Method.Error.missingArgument(result: result);
+            return
+        }
+        
+        if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.VALUE]) {
+            Method.Error.missingArgument(result: result);
+            return
+        }
+        
+        if let myArgs = args as? [String: Any],
+            let chatId = myArgs[Argument.CHAT_ID],
+            let value = myArgs[Argument.VALUE] {
+            
+            dc_set_chat_profile_image(DcContext.contextPointer, chatId as! UInt32, value as? UnsafePointer<Int8>)
+            result(nil)
+        }
+        else {
+            Method.Error.missingArgument(result: result)
+            return
+        }
+        
+    }
+    
+    fileprivate func setChatName(methodCall: FlutterMethodCall, result: FlutterResult) {
+        guard let args = methodCall.arguments else {
+            Method.Error.missingArgument(result: result);
+            return
+        }
+        
+        if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.VALUE]) {
+            Method.Error.missingArgument(result: result);
+            return
+        }
+        
+        if let myArgs = args as? [String: Any],
+            let chatId = myArgs[Argument.CHAT_ID],
+            let value = myArgs[Argument.VALUE] {
+            
+            dc_set_chat_name(DcContext.contextPointer, chatId as! UInt32, value as? UnsafePointer<Int8>)
+            result(nil)
+        }
+        else {
+            Method.Error.missingArgument(result: result)
+            return
+        }
+        
+    }
+
+    // MARK: - Message Related
+    
+    fileprivate func getFreshMessageCount(methodCall: FlutterMethodCall, result: FlutterResult) {
+        let chatId = methodCall.intValue(for: Argument.CHAT_ID, result: result)
+        let messageCount = context.getFreshMessageCount(for: UInt32(chatId))
+
+        result(NSNumber(value: messageCount))
+    }
+    
     fileprivate func getFreshMessages(result: FlutterResult) {
         let freshMessages = context.getFreshMessageIds()
         let buffer = freshMessages.withUnsafeBufferPointer { Data(buffer: $0) }
@@ -608,6 +666,52 @@ class ContextCallHandler: MethodCallHandling {
 
         result(FlutterStandardTypedData(int32: buffer))
     }
+    
+    fileprivate func deleteMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
+        guard let args = methodCall.arguments else {
+            Method.Error.missingArgument(result: result);
+            return
+        }
+        
+        if !methodCall.contains(keys: [Argument.MESSAGE_IDS]) {
+            Method.Error.missingArgument(result: result);
+            return
+        }
+        
+        if let myArgs = args as? [String: Any],
+            let msgIdArray = myArgs[Argument.MESSAGE_IDS] {
+            result(dc_delete_msgs(DcContext.contextPointer, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count)))
+        }
+        else {
+            Method.Error.missingArgument(result: result);
+        }
+        
+    }
+    
+    fileprivate func starMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
+        guard let arguments: [String: Any] = methodCall.arguments as? [String: Any] else {
+            Method.Error.missingArgument(result: result);
+            return
+        }
+        
+        if !methodCall.contains(keys: [Argument.MESSAGE_IDS, Argument.VALUE]) {
+            Method.Error.missingArgument(result: result);
+            return
+        }
+        
+        if let msgIds = arguments[Argument.MESSAGE_IDS] {
+            let star = methodCall.intValue(for: Argument.VALUE, result: result)
+            
+            dc_star_msgs(DcContext.contextPointer, msgIds as? UnsafePointer<UInt32>, Int32((msgIds as AnyObject).count), Int32(star))
+            result(nil)
+        }
+        else {
+            Method.Error.missingArgument(result: result);
+        }
+        
+    }
+
+    // MARK: - Secure Stuff
     
     fileprivate func initiateKeyTransfer(result: FlutterResult) {
         //    new Thread(() -> {
@@ -710,100 +814,6 @@ class ContextCallHandler: MethodCallHandling {
         
     }
     
-    fileprivate func deleteMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        if !methodCall.contains(keys: [Argument.MESSAGE_IDS]) {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        if let myArgs = args as? [String: Any],
-            let msgIdArray = myArgs[Argument.MESSAGE_IDS] {
-            result(dc_delete_msgs(DcContext.contextPointer, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count)))
-        }
-        else {
-            Method.Error.missingArgument(result: result);
-        }
-        
-    }
-    
-    fileprivate func starMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let arguments: [String: Any] = methodCall.arguments as? [String: Any] else {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        if !methodCall.contains(keys: [Argument.MESSAGE_IDS, Argument.VALUE]) {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        if let msgIds = arguments[Argument.MESSAGE_IDS] {
-            let star = methodCall.intValue(for: Argument.VALUE, result: result)
-            
-            dc_star_msgs(DcContext.contextPointer, msgIds as? UnsafePointer<UInt32>, Int32((msgIds as AnyObject).count), Int32(star))
-            result(nil)
-        }
-        else {
-            Method.Error.missingArgument(result: result);
-        }
-        
-    }
-    
-    fileprivate func setChatProfileImage(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.VALUE]) {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        if let myArgs = args as? [String: Any],
-            let chatId = myArgs[Argument.CHAT_ID],
-            let value = myArgs[Argument.VALUE] {
-            
-            dc_set_chat_profile_image(DcContext.contextPointer, chatId as! UInt32, value as? UnsafePointer<Int8>)
-            result(nil)
-        }
-        else {
-            Method.Error.missingArgument(result: result)
-            return
-        }
-        
-    }
-    
-    fileprivate func setChatName(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.VALUE]) {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        if let myArgs = args as? [String: Any],
-            let chatId = myArgs[Argument.CHAT_ID],
-            let value = myArgs[Argument.VALUE] {
-            
-            dc_set_chat_name(DcContext.contextPointer, chatId as! UInt32, value as? UnsafePointer<Int8>)
-            result(nil)
-        }
-        else {
-            Method.Error.missingArgument(result: result)
-            return
-        }
-        
-    }
-    
     // MARK: - Cache Handling
     
     func loadAndCacheChat(with id: UInt32) -> DcChat {
@@ -833,6 +843,8 @@ class ContextCallHandler: MethodCallHandling {
         return msg
     }
     
+    // MARK: - Coi Related
+    
     fileprivate func isCoiSupported(result: FlutterResult) {
         result(NSNumber(value: context.isCoiSupported()))
     }
@@ -840,6 +852,24 @@ class ContextCallHandler: MethodCallHandling {
     fileprivate func isCoiEnabled(result: FlutterResult) {
         result(NSNumber(value: context.isCoiEnabled()))
     }
+    
+    fileprivate func setCoiEnabled(methodCall: FlutterMethodCall, result: FlutterResult) {
+        let id = methodCall.intValue(for: Argument.ID, result: result)
+        let enable = methodCall.intValue(for: Argument.ENABLE, result: result)
+        
+        context.setCoiEnabled(enable: enable, id: id)
+        result(nil)
+    }
+    
+    fileprivate func setCoiMessageFilter(methodCall: FlutterMethodCall, result: FlutterResult) {
+        let id = methodCall.intValue(for: Argument.ID, result: result)
+        let mode = methodCall.intValue(for: Argument.MODE, result: result)
+        
+        context.setCoiMessageFilter(mode: mode, id: id)
+        result(nil)
+    }
+
+    // MARK: - Webpush Related
     
     fileprivate func isWebPushSupported(result: FlutterResult) {
         result(NSNumber(value: context.isWebPushSupported()))
@@ -881,22 +911,6 @@ class ContextCallHandler: MethodCallHandling {
         }
         
         context.getWebPushSubscription(uid: uid, id: id)
-        result(nil)
-    }
-    
-    fileprivate func setCoiEnabled(methodCall: FlutterMethodCall, result: FlutterResult) {
-        let id = methodCall.intValue(for: Argument.ID, result: result)
-        let enable = methodCall.intValue(for: Argument.ENABLE, result: result)
-        
-        context.setCoiEnabled(enable: enable, id: id)
-        result(nil)
-    }
-    
-    fileprivate func setCoiMessageFilter(methodCall: FlutterMethodCall, result: FlutterResult) {
-        let id = methodCall.intValue(for: Argument.ID, result: result)
-        let mode = methodCall.intValue(for: Argument.MODE, result: result)
-        
-        context.setCoiMessageFilter(mode: mode, id: id)
         result(nil)
     }
     
