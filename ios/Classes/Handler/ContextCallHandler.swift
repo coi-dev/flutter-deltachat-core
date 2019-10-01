@@ -290,7 +290,7 @@ class ContextCallHandler: MethodCallHandling {
             result(dc_result)
         }
         else {
-            Method.Error.missingArgumentValue(result: result)
+            Method.Error.missingArgumentValue(for: Argument.ADDRESS_BOOK, result: result)
             return
         }
         
@@ -472,49 +472,32 @@ class ContextCallHandler: MethodCallHandling {
             Method.Error.missingArgument(result: result);
             return
         }
-        let messageId = context.sendChatMessage(forChatId: chatId, withText: text)
+        let messageId = context.sendText(text, forChatId: chatId)
         
         result(NSNumber(value: messageId))
     }
     
     fileprivate func createChatAttachmentMessage(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            Method.Error.missingArgument(result: result)
+        let chatId = methodCall.intValue(for: Argument.CHAT_ID, result: result)
+        let type = methodCall.intValue(for: Argument.TYPE, result: result)
+        let text = methodCall.stringValue(for: Argument.TEXT, result: result)
+
+        guard let path = methodCall.stringValue(for: Argument.PATH, result: result) else {
+            Method.Error.missingArgumentValue(for: Argument.PATH, result: result)
             return
         }
-        
-        if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.TYPE, Argument.PATH, Argument.TEXT]) {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        if let myArgs = args as? [String: Any],
-            let chatId = myArgs[Argument.CHAT_ID] as? UInt32,
-            let path = myArgs[Argument.PATH],
-            let type = myArgs[Argument.TYPE] {
+
+        do {
+            let messageId = try context.sendImage(atPath: path, withType: type, text: text, forChatId: UInt32(chatId))
+            result(NSNumber(value: messageId))
             
-            let text = myArgs[Argument.TEXT]
-            
+        } catch DcContextError.ErrorKind.missingImageAtPath(let path) {
+            log.error("Can't find image at given path: \(path)")
+        } catch DcContextError.ErrorKind.wrongImageType(let type) {
+            log.error("Wrong image type given: \(type)! Must be either \(DC_MSG_IMAGE) [DC_MSG_IMAGE] or \(DC_MSG_GIF) [DC_MSG_GIF].")
+        } catch {
+            log.error("Unhandled error: \(error)")
         }
-        else {
-            Method.Error.missingArgument(result: result);
-        }
-        
-        //    Integer chatId = methodCall.argument(ARGUMENT_CHAT_ID);
-        //    String path = methodCall.argument(ARGUMENT_PATH);
-        //    Integer type = methodCall.argument(ARGUMENT_TYPE);
-        //    if (chatId == null || path == null || type == null) {
-        //    resultErrorArgumentMissingValue(result);
-        //    return;
-        //    }
-        //
-        //    String text = methodCall.argument(ARGUMENT_TEXT);
-        //
-        //    DcMsg newMsg = new DcMsg(dcContext, type);
-        //    newMsg.setFile(path, null);
-        //    newMsg.setText(text);
-        //    int messageId = dcContext.sendMsg(chatId, newMsg);
-        //    result.success(messageId);
     }
     
     fileprivate func markNoticedChat(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -889,7 +872,7 @@ class ContextCallHandler: MethodCallHandling {
         }
         
         if uid.isEmpty || json.isEmpty {
-            Method.Error.missingArgumentValue(result: result)
+            Method.Error.missingArgumentValue(for: "[\(Argument.UID), \(Argument.JSON)]", result: result)
             return
         }
         
@@ -906,7 +889,7 @@ class ContextCallHandler: MethodCallHandling {
         }
         
         if uid.isEmpty {
-            Method.Error.missingArgumentValue(result: result)
+            Method.Error.missingArgumentValue(for: Argument.UID, result: result)
             return
         }
         
@@ -924,7 +907,7 @@ class ContextCallHandler: MethodCallHandling {
         }
         
         if uid.isEmpty || message.isEmpty {
-            Method.Error.missingArgumentValue(result: result)
+            Method.Error.missingArgumentValue(for: "[\(Argument.UID), \(Argument.MESSAGE)]", result: result)
             return
         }
         

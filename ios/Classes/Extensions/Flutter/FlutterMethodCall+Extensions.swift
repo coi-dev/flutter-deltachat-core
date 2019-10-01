@@ -47,6 +47,7 @@ extension FlutterMethodCall {
         }
         
         guard let value: Int32 = parameters[key] as? Int32 else {
+            Method.Error.noInt(for: key, result: result)
             return defaultValue
         }
         
@@ -58,15 +59,24 @@ extension FlutterMethodCall {
             return defaultValue
         }
         
-        guard let value: Int = parameters[key] as? Int else {
+        guard let value: Bool = parameters[key] as? Bool else {
+            Method.Error.noBool(for: key, result: result)
             return defaultValue
         }
         
-        return value == 0 ? false : true
+        return value
     }
 
     func stringValue(for key: String, result: FlutterResult) -> String? {
-        return value(for: key, result: result) as? String
+        if !contains(keys: [key]) {
+            return nil
+        }
+        
+        guard let value: String = parameters[key] as? String else {
+            return nil
+        }
+
+        return value
     }
     
     func value(for key: String, result: FlutterResult) -> Any? {

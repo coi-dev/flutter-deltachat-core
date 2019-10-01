@@ -189,11 +189,38 @@ class DcContext {
         return count
     }
     
-    func sendChatMessage(forChatId chatId: UInt32, withText text: String) -> UInt32 {
-        let draft = dc_msg_new(DcContext.contextPointer, DC_MSG_TEXT)
-        dc_msg_set_text(draft, text.cString(using: .utf8))
-        let messageId = dc_send_msg(DcContext.contextPointer, chatId, draft)
+    func sendText(_ text: String, forChatId chatId: UInt32) -> UInt32 {
+        let msg = dc_msg_new(DcContext.contextPointer, DC_MSG_TEXT)
+        dc_msg_set_text(msg, text.cString(using: .utf8))
+        let messageId = dc_send_msg(DcContext.contextPointer, chatId, msg)
+        dc_msg_unref(msg)
         
+        return messageId
+    }
+    
+    func sendImage(atPath path: String, withType type: Int32, text: String?, forChatId chatId: UInt32) throws -> UInt32 {
+        guard let image = UIImage(contentsOfFile: path) else {
+            throw DcContextError(kind: .missingImageAtPath(path))
+        }
+        
+        guard (DC_MSG_IMAGE == type || DC_MSG_GIF == type) else {
+            throw DcContextError(kind: .wrongImageType(type))
+        }
+        
+        let pixelSize = image.sizeInPixel
+        let width = Int32(exactly: pixelSize.width)!
+        let height =  Int32(exactly: pixelSize.height)!
+
+        let msg = dc_msg_new(DcContext.contextPointer, type)
+        dc_msg_set_file(msg, path, "image/jpeg")
+        dc_msg_set_dimension(msg, width, height)
+        if let text = text {
+            dc_msg_set_text(msg, text.cString(using: .utf8))
+        }
+        
+        let messageId = dc_send_msg(DcContext.contextPointer, chatId, msg)
+        dc_msg_unref(msg)
+
         return messageId
     }
     

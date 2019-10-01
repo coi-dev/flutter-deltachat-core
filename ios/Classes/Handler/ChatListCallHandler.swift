@@ -81,22 +81,22 @@ class ChatListCallHandler: MethodCallHandling {
                 tearDown(methodCall: call, result: result)
                 break
             case Method.ChatList.GET_ID:
-                getChatId(chatList: self.chatList, methodCall: call, result: result)
+                getChatId(chatList: chatList, methodCall: call, result: result)
                 break
             case Method.ChatList.GET_CNT:
-                getChatCnt(chatList: self.chatList, result: result)
+                getChatCnt(chatList: chatList, result: result)
                 break
             case Method.ChatList.GET_CHAT:
-                getChat(chatList: self.chatList, methodCall: call, result: result)
+                getChat(chatList: chatList, methodCall: call, result: result)
                 break
             case Method.ChatList.GET_MSG_ID:
-                getChatMsgId(chatList: self.chatList, methodCall: call, result: result)
+                getChatMsgId(chatList: chatList, methodCall: call, result: result)
                 break
             case Method.ChatList.GET_MSG:
-                getChatMsg(chatList: self.chatList, methodCall: call, result: result)
+                getChatMsg(chatList: chatList, methodCall: call, result: result)
                 break
             case Method.ChatList.GET_SUMMARY:
-                getChatSummary(chatList: self.chatList, methodCall: call, result: result)
+                getChatSummary(chatList: chatList, methodCall: call, result: result)
                 break
             case Method.ChatList.INTERNAL_TEAR_DOWN:
                 tearDown(methodCall: call, result: result)

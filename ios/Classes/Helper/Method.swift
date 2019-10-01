@@ -189,8 +189,8 @@ extension Method {
             result(FlutterError(code: Argument.Error.MISSING, message: "Argument is missing", details: nil))
         }
         
-        static func missingArgumentValue(result: FlutterResult) {
-            result(FlutterError(code: Argument.Error.MISSING_VALUE, message: "Argument value is missing or null", details: nil))
+        static func missingArgumentValue(for argument: String, result: FlutterResult) {
+            result(FlutterError(code: Argument.Error.MISSING_VALUE, message: "Argument value for key: '\(argument)' is missing or null", details: nil))
         }
 
         static func typeMismatch(for argument: String, result: FlutterResult) {
@@ -201,6 +201,10 @@ extension Method {
             result(FlutterError(code: Argument.Error.NO_INT, message: "Argument is no integer: " + argument, details: nil))
         }
         
+        static func noBool(for argument: String, result: FlutterResult) {
+            result(FlutterError(code: Argument.Error.NO_INT, message: "Argument is no boolean: " + argument, details: nil))
+        }
+
         static func generic(methodCall: FlutterMethodCall, result: FlutterResult) {
             result(FlutterError(code: methodCall.method, message: nil, details: nil));
         }

@@ -45,6 +45,7 @@ struct Argument {
         static let TYPE_MISMATCH = "2"
         static let MISSING_VALUE = "3"
         static let NO_INT        = "4"
+        static let NO_BOOL       = "5"
     }
     
 }
