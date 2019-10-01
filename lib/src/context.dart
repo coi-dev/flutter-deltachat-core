@@ -118,6 +118,7 @@ class Context {
   static const String configQrOverlayLogo = "qr_overlay_logo";
   static const String configShowEmails = "show_emails";
   static const String configMdnsEnabled = "mdns_enabled";
+  static const String configRfc724MsgIdPrefix = "rfc724_msg_id_prefix";
 
   static const int contactListFlagVerifiedOnly = 1;
   static const int contactListFlagAddSelf = 2;
@@ -147,6 +148,9 @@ class Context {
 
   static const int starMessage = 1;
   static const int unstarMessage = 0;
+
+  static const int enableChatPrefix = 1;
+  static const int disableChatPrefix = 0;
 
   final DeltaChatCore core = DeltaChatCore();
 
