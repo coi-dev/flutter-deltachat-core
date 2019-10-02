@@ -158,6 +158,12 @@ class DcContext {
         let contactId = dc_create_contact(DcContext.contextPointer, name, emailAddress)
         return contactId
     }
+    
+    // MARK: - Addressbook
+    
+    func addAddressBook(addressBook: String) -> Int32 {
+        return dc_add_address_book(DcContext.contextPointer, addressBook)
+    }
 
     // MARK: - Messages
     
@@ -283,8 +289,15 @@ class DcContext {
         return Int(dc_join_securejoin(DcContext.contextPointer, qrCode))
     }
     
-    func checkQR(qrCode: String) -> DcLot {
-        return DcLot(dc_check_qr(DcContext.contextPointer, qrCode))
+    func checkQR(qrCode: String) -> DcLot? {
+        guard let lotPointer = dc_check_qr(DcContext.contextPointer, qrCode) else {
+            return nil
+        }
+        
+        let lot = DcLot(lotPointer)
+        dc_lot_unref(lotPointer)
+        
+        return lot
     }
     
     func stopOngoingProcess() {

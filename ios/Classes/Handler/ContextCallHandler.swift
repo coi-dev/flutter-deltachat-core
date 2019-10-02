@@ -274,22 +274,13 @@ class ContextCallHandler: MethodCallHandling {
     // MARK: - Addressbook & Contacts
     
     fileprivate func addAddressBook(methodCall: FlutterMethodCall, result: FlutterResult) {
-        if !methodCall.contains(keys: [Argument.ADDRESS_BOOK]) {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        let parameters = methodCall.parameters
-        
-        if let addressBook = parameters[Argument.ADDRESS_BOOK] as? String {
-            let dc_result = dc_add_address_book(DcContext.contextPointer, addressBook)
-            result(dc_result)
-        }
-        else {
+        guard let addressBook = methodCall.stringValue(for: Argument.ADDRESS_BOOK, result: result) else {
             Method.Error.missingArgumentValue(for: Argument.ADDRESS_BOOK, result: result)
             return
         }
         
+        let numberOfContacts = context.addAddressBook(addressBook: addressBook)
+        result(NSNumber(value: numberOfContacts))
     }
     
     fileprivate func createContact(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -727,25 +718,17 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     fileprivate func checkQr(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            Method.Error.missingArgument(result: result);
+        guard let qrCode = methodCall.stringValue(for: Argument.QR_TEXT, result: result) else {
+            Method.Error.missingArgument(result: result)
             return
         }
         
-        if !methodCall.contains(keys: [Argument.QR_TEXT]) {
-            Method.Error.missingArgument(result: result);
+        guard let lot = context.checkQR(qrCode: qrCode) else {
+            result(nil)
             return
         }
         
-        if let myArgs = args as? [String: Any],
-            let qrText = myArgs[Argument.QR_TEXT] {
-            //            DcLot qrCode = dcContext.checkQr(qrText);
-            //            result.success(mapLotToList(qrCode));
-        }
-        else {
-            Method.Error.missingArgument(result: result);
-        }
-        
+        result(lot.propertyArray)
     }
     
     // MARK: - Cache Handling

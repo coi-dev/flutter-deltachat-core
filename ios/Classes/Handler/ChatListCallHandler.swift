@@ -119,7 +119,7 @@ class ChatListCallHandler: MethodCallHandling {
     
     fileprivate func tearDown(methodCall: FlutterMethodCall, result: FlutterResult) {
         let cacheId = methodCall.intValue(for: Argument.CACHE_ID, result: result)
-        chatListCache.removeValue(for: UInt32(cacheId))
+        _ = chatListCache.removeValue(for: UInt32(cacheId))
         result(nil)
     }
     
