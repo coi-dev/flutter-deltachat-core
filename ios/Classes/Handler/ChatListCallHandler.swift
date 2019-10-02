@@ -107,7 +107,6 @@ class ChatListCallHandler: MethodCallHandling {
             
         }
     }
-
     
     fileprivate func setup(methodCall: FlutterMethodCall, result: FlutterResult) {
         let flags = methodCall.intValue(for: Argument.TYPE, result: result)

@@ -308,3 +308,18 @@ class DcMsg: MessageType {
     }
 
 }
+
+// MARK: - Attachment Type
+
+extension Int {
+    
+    var isValidAttachmentType: Bool {
+        return DC_MSG_IMAGE == self
+            || DC_MSG_GIF   == self
+            || DC_MSG_AUDIO == self
+            || DC_MSG_VOICE == self
+            || DC_MSG_VIDEO == self
+            || DC_MSG_FILE  == self
+    }
+    
+}

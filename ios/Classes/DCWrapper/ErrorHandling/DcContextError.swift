@@ -46,7 +46,7 @@ struct DcContextError: Error {
 
     enum ErrorKind {
         case missingImageAtPath(String)
-        case wrongImageType(Int32)
+        case wrongAttachmentType(Int32)
     }
     
     let kind: ErrorKind

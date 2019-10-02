@@ -488,13 +488,13 @@ class ContextCallHandler: MethodCallHandling {
         }
 
         do {
-            let messageId = try context.sendImage(atPath: path, withType: type, text: text, forChatId: UInt32(chatId))
+            let messageId = try context.sendAttachment(fromPath: path, withType: type, text: text, forChatId: UInt32(chatId))
             result(NSNumber(value: messageId))
             
         } catch DcContextError.ErrorKind.missingImageAtPath(let path) {
             log.error("Can't find image at given path: \(path)")
-        } catch DcContextError.ErrorKind.wrongImageType(let type) {
-            log.error("Wrong image type given: \(type)! Must be either \(DC_MSG_IMAGE) [DC_MSG_IMAGE] or \(DC_MSG_GIF) [DC_MSG_GIF].")
+        } catch DcContextError.ErrorKind.wrongAttachmentType(let type) {
+            log.error("Wrong attachment type given: \(type)!")
         } catch {
             log.error("Unhandled error: \(error)")
         }
