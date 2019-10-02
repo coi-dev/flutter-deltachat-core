@@ -254,11 +254,19 @@ class DcContext {
     func markSeenMessages(messageIds: [UInt32]) {
         dc_markseen_msgs(DcContext.contextPointer, UnsafePointer(messageIds), Int32(messageIds.count))
     }
+    
+    func starMessages(messageIds: [UInt32], star: Int32) {
+        dc_star_msgs(DcContext.contextPointer, UnsafePointer(messageIds), Int32(messageIds.count), star)
+    }
+    
+    func deleteMessages(messageIds: [UInt32]) {
+        dc_delete_msgs(DcContext.contextPointer, UnsafePointer(messageIds), Int32(messageIds.count))
+    }
 
     // MARK: - General
     
-    func getSecurejoinQr(chatId: Int) -> String? {
-        if let cString = dc_get_securejoin_qr(DcContext.contextPointer, UInt32(chatId)) {
+    func getSecurejoinQr(chatId: UInt32) -> String? {
+        if let cString = dc_get_securejoin_qr(DcContext.contextPointer, chatId) {
             let swiftString = String(cString: cString)
             free(cString)
             return swiftString

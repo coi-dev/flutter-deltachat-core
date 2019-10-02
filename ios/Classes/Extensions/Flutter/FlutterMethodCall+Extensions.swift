@@ -43,6 +43,7 @@ extension FlutterMethodCall {
     
     func intValue(for key: String, defaultValue: Int32 = 0, result: FlutterResult) -> Int32 {
         if !contains(keys: [key]) {
+            Method.Error.missingArgument(result: result)
             return defaultValue
         }
         
@@ -56,6 +57,7 @@ extension FlutterMethodCall {
     
     func boolValue(for key: String, defaultValue: Bool = false, result: FlutterResult) -> Bool {
         if !contains(keys: [key]) {
+            Method.Error.missingArgument(result: result)
             return defaultValue
         }
         
@@ -69,10 +71,25 @@ extension FlutterMethodCall {
 
     func stringValue(for key: String, result: FlutterResult) -> String? {
         if !contains(keys: [key]) {
+            Method.Error.missingArgument(result: result)
             return nil
         }
         
         guard let value: String = parameters[key] as? String else {
+            return nil
+        }
+
+        return value
+    }
+    
+    func intArrayValue(for key: String, result: FlutterResult) -> [UInt32]? {
+        if !contains(keys: [key]) {
+            Method.Error.missingArgument(result: result)
+            return nil
+        }
+        
+        guard let value: [UInt32] = parameters[key] as? [UInt32] else {
+            Method.Error.noInt(for: key, result: result)
             return nil
         }
 

@@ -651,47 +651,25 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     fileprivate func deleteMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            Method.Error.missingArgument(result: result);
+        guard let msgIds = methodCall.intArrayValue(for: Argument.MESSAGE_IDS, result: result) else {
+            result(nil)
             return
         }
         
-        if !methodCall.contains(keys: [Argument.MESSAGE_IDS]) {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        if let myArgs = args as? [String: Any],
-            let msgIdArray = myArgs[Argument.MESSAGE_IDS] {
-            result(dc_delete_msgs(DcContext.contextPointer, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count)))
-        }
-        else {
-            Method.Error.missingArgument(result: result);
-        }
-        
+        context.deleteMessages(messageIds: msgIds)
+        result(nil)
     }
     
     fileprivate func starMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let arguments: [String: Any] = methodCall.arguments as? [String: Any] else {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        if !methodCall.contains(keys: [Argument.MESSAGE_IDS, Argument.VALUE]) {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        if let msgIds = arguments[Argument.MESSAGE_IDS] {
-            let star = methodCall.intValue(for: Argument.VALUE, result: result)
-            
-            dc_star_msgs(DcContext.contextPointer, msgIds as? UnsafePointer<UInt32>, Int32((msgIds as AnyObject).count), Int32(star))
+        guard let msgIds = methodCall.intArrayValue(for: Argument.MESSAGE_IDS, result: result) else {
             result(nil)
-        }
-        else {
-            Method.Error.missingArgument(result: result);
+            return
         }
         
+        let star = methodCall.intValue(for: Argument.VALUE, result: result)
+        context.starMessages(messageIds: msgIds, star: star)
+        
+        result(nil)
     }
 
     // MARK: - Secure Stuff
@@ -729,24 +707,9 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     fileprivate func getSecurejoinQr(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            Method.Error.missingArgument(result: result);
-            return
-        }
+        let chatId = UInt32(methodCall.intValue(for: Argument.CHAT_ID, result: result))
         
-        if !methodCall.contains(keys: [Argument.CHAT_ID]) {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        if let myArgs = args as? [String: Any],
-            let chatId = myArgs[Argument.CHAT_ID] {
-            result(dc_get_securejoin_qr(DcContext.contextPointer, chatId as! UInt32))
-        }
-        else {
-            Method.Error.missingArgument(result: result);
-        }
-        
+        result(context.getSecurejoinQr(chatId: chatId))
     }
     
     fileprivate func  joinSecurejoin(methodCall: FlutterMethodCall, result: FlutterResult) {
