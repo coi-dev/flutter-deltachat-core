@@ -117,6 +117,7 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
     private static final String METHOD_RETRY_SENDING_PENDING_MESSAGES = "context_retrySendingPendingMessages";
     private static final String METHOD_GET_CONTACT_ID_BY_ADDRESS = "context_getContactIdByAddress";
     private static final String METHOD_GET_NEXT_MEDIA = "context_getNextMedia";
+    private static final String METHOD_DECRYPT_IN_MEMORY = "context_decryptInMemory";
 
     private static final String TYPE_INT = "int";
     private static final String TYPE_STRING = "String";
@@ -296,6 +297,9 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
                 break;
             case METHOD_VALIDATE_WEB_PUSH:
                 validateWebPush(methodCall, result);
+                break;
+            case METHOD_DECRYPT_IN_MEMORY:
+                decryptMessageInMemory(methodCall, result);
                 break;
             case METHOD_GET_MESSAGE_INFO:
                 getMessageInfo(methodCall, result);
@@ -1193,5 +1197,29 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
     private void retrySendingPendingMessages(MethodChannel.Result result) {
         dcContext.maybeNetwork();
         result.success(null);
+    }
+
+    private void decryptMessageInMemory(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_CONTENT_TYPE, ARGUMENT_CONTENT, ARGUMENT_ADDRESS)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        String contentType = methodCall.argument(ARGUMENT_CONTENT_TYPE);
+        if (contentType == null || contentType.isEmpty()) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        String content = methodCall.argument(ARGUMENT_CONTENT);
+        if (content == null || content.isEmpty()) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        String senderAddress = methodCall.argument(ARGUMENT_ADDRESS);
+        if (senderAddress == null || senderAddress.isEmpty()) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        String plainText = dcContext.decryptMessageInMemory(contentType, content, senderAddress);
+        result.success(plainText);
     }
 }

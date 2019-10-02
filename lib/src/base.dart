@@ -72,6 +72,8 @@ abstract class Base {
   static const String argumentUid = "uid";
   static const String argumentMode = "mode";
   static const String argumentEnable = "enable";
+  static const String argumentContentType = "contentType";
+  static const String argumentContent = "content";
   static const String argumentMimeType = "mimeType";
   static const String argumentDuration = "duration";
   static const String argumentDir = "dir";

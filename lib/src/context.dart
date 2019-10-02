@@ -105,6 +105,7 @@ class Context {
   static const String methodRetrySendingPendingMessages = "context_retrySendingPendingMessages";
   static const String methodGetContactIdByAddress = "context_getContactIdByAddress";
   static const String methodGetNextMedia = "context_getNextMedia";
+  static const String methodDecryptInMemory = "context_decryptInMemory";
 
   static const String configAddress = "addr";
   static const String configMailServer = "mail_server";
@@ -403,6 +404,10 @@ class Context {
     return await core.invokeMethod(methodGetNextMedia, getNextMediaArguments(messageId, dir, messageTypeOne, messageTypeTwo, messageTypeThree));
   }
 
+  Future<String> decryptInMemory(String contentType, String content, String senderAddress) async {
+    return await core.invokeMethod(methodDecryptInMemory, getDecryptInMemoryArguments(contentType, content, senderAddress));
+  }
+
   Map<String, dynamic> getKeyArguments(String key) => <String, dynamic>{Base.argumentKey: key};
 
   Map<String, dynamic> getConfigArguments(String type, String key, value) =>
@@ -484,4 +489,6 @@ class Context {
         Base.argumentMessageTypeTwo: messageTypeTwo,
         Base.argumentMessageTypeThree: messageTypeThree
       };
+
+  Map<String, dynamic> getDecryptInMemoryArguments(String contentType, String content, String senderAddress) => <String, dynamic>{Base.argumentContentType: contentType, Base.argumentContent: content, Base.argumentAddress: senderAddress};
 }
