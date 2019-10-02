@@ -70,8 +70,8 @@ class Cache<T> {
         return items[key]
     }
     
-    func removeValue(for key: UInt32) {
-        _ = items.removeValue(forKey: key)
+    func removeValue(for key: UInt32) -> T? {
+        return items.removeValue(forKey: key)
     }
     
     func contains(key: UInt32) -> Bool {

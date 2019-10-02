@@ -262,6 +262,10 @@ class DcContext {
     func deleteMessages(messageIds: [UInt32]) {
         dc_delete_msgs(DcContext.contextPointer, UnsafePointer(messageIds), Int32(messageIds.count))
     }
+    
+    func forwardMessages(messageIds: [UInt32], chatId: UInt32) {
+        dc_forward_msgs(DcContext.contextPointer, UnsafePointer(messageIds), Int32(messageIds.count), chatId)
+    }
 
     // MARK: - General
     

@@ -171,8 +171,7 @@ class ContextCallHandler: MethodCallHandling {
             checkQr(methodCall: call, result: result)
             break
         case Method.Context.STOP_ONGOING_PROCESS:
-            dc_stop_ongoing_process(DcContext.contextPointer)
-            result(nil)
+            stopOngoingProcess(result: result)
             break
         case Method.Context.DELETE_MESSAGES:
             deleteMessages(methodCall: call, result: result)
@@ -236,11 +235,12 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     fileprivate func getConfig(methodCall: FlutterMethodCall, result: FlutterResult, type: String) {
-        let parameters = methodCall.parameters
+        guard let key = methodCall.stringValue(for: Argument.KEY, result: result) else {
+            Method.Error.missingArgument(result: result)
+            return
+        }
         
-        if let key = parameters["key"] as? String {
-            
-            switch (type) {
+        switch (type) {
             case ArgumentType.STRING:
                 let value = dc_get_config(DcContext.contextPointer, key)
                 if let pSafe = value {
@@ -251,7 +251,7 @@ class ContextCallHandler: MethodCallHandling {
                     result(c)
                 }
                 break
-                
+            
             case ArgumentType.INT:
                 let value = dc_get_config(DcContext.contextPointer, key)
                 if let pSafe = value {
@@ -260,12 +260,8 @@ class ContextCallHandler: MethodCallHandling {
                     result(c)
                 }
                 break
-                
-            default: break
-            }
             
-        } else {
-            result("iOS could not extract flutter arguments in method: (sendParams)")
+            default: break
         }
     }
     
@@ -617,25 +613,16 @@ class ContextCallHandler: MethodCallHandling {
         result(FlutterStandardTypedData(int32: buffer))
     }
     
-    fileprivate func forwardMessages(methodCall: FlutterMethodCall, result: FlutterResult){
-        guard let args = methodCall.arguments else {
-            Method.Error.missingArgument(result: result);
+    fileprivate func forwardMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
+        guard let msgIds = methodCall.intArrayValue(for: Argument.MESSAGE_IDS, result: result) else {
+            result(nil)
             return
         }
-        
-        if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.MESSAGE_IDS]) {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        if let myArgs = args as? [String: Any], let chatId = myArgs[Argument.CHAT_ID], let msgIdArray = myArgs[Argument.MESSAGE_IDS] {
-            
-            result(dc_forward_msgs(DcContext.contextPointer, msgIdArray as? UnsafePointer<UInt32>, Int32((msgIdArray as AnyObject).count), chatId as! UInt32))
-        }
-        else {
-            Method.Error.missingArgument(result: result);
-        }
-        
+
+        let chatId = UInt32(methodCall.intValue(for: Argument.CHAT_ID, result: result))
+        context.forwardMessages(messageIds: msgIds, chatId: chatId)
+
+        result(nil)
     }
     
     fileprivate func markSeenMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -668,6 +655,7 @@ class ContextCallHandler: MethodCallHandling {
         
         let star = methodCall.intValue(for: Argument.VALUE, result: result)
         context.starMessages(messageIds: msgIds, star: star)
+        _ = msgIds.map { loadAndCacheChatMessage(with: $0, update: true) }
         
         result(nil)
     }
@@ -762,33 +750,39 @@ class ContextCallHandler: MethodCallHandling {
     
     // MARK: - Cache Handling
     
-    func loadAndCacheChat(with id: UInt32) -> DcChat {
+    func loadAndCacheChat(with id: UInt32, update: Bool = false) -> DcChat {
         guard let chat = chatCache.value(for: id) else {
-            let chat = self.context.getChat(with: id)
-            _ = self.chatCache.add(object: chat)
+            let chat = context.getChat(with: id)
+            _ = chatCache.add(object: chat)
             return chat
         }
         return chat
     }
     
-    func loadAndCacheContact(with id: UInt32) -> DcContact {
+    func loadAndCacheContact(with id: UInt32, update: Bool = false) -> DcContact {
         guard let contact = contactCache.value(for: id) else {
-            let contact = self.context.getContact(with: id)
-            _ = self.contactCache.add(object: contact)
+            let contact = context.getContact(with: id)
+            _ = contactCache.add(object: contact)
             return contact
         }
         return contact
     }
     
-    func loadAndCacheChatMessage(with id: UInt32) -> DcMsg {
+    func loadAndCacheChatMessage(with id: UInt32, update: Bool = false) -> DcMsg {
+        if update {
+            let msg = context.getMsg(with: id)
+            messageCache.set(value: msg, for: id)
+            return msg
+        }
+        
         guard let msg = messageCache.value(for: id) else {
-            let msg = self.context.getMsg(with: id)
-            _ = self.messageCache.add(object: msg)
+            let msg = context.getMsg(with: id)
+            _ = messageCache.add(object: msg)
             return msg
         }
         return msg
     }
-    
+
     // MARK: - Coi Related
     
     fileprivate func isCoiSupported(result: FlutterResult) {
@@ -875,6 +869,13 @@ class ContextCallHandler: MethodCallHandling {
         }
         
         context.validateWebPush(uid: uid, message: message, id: id)
+        result(nil)
+    }
+    
+    // MARK: - Context
+    
+    fileprivate func stopOngoingProcess(result: FlutterResult) {
+        context.stopOngoingProcess()
         result(nil)
     }
 
