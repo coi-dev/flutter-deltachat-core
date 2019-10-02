@@ -204,7 +204,6 @@ class DcContext {
             throw DcContextError(kind: .wrongAttachmentType(type))
         }
         
-        var mime: String = ""
         let msg = dc_msg_new(DcContext.contextPointer, type)
         
         switch type {
@@ -234,8 +233,7 @@ class DcContext {
             default: break
         }
         
-        mime = path.mimeType
-        dc_msg_set_file(msg, path, mime)
+        dc_msg_set_file(msg, path, path.mimeType)
 
         if let text = text {
             dc_msg_set_text(msg, text.cString(using: .utf8))

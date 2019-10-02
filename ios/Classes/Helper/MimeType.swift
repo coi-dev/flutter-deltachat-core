@@ -86,7 +86,7 @@ fileprivate enum MimeType: String {
 
 fileprivate extension MimeType {
     
-    init(ext: String) {
+    init?(ext: String) {
         switch ext.lowercased() {
             case "jpg", "jpeg": self = .jpg
             case "png":         self = .png
@@ -123,7 +123,9 @@ fileprivate extension MimeType {
             case "pages":       self = .pages
             case "numbers":     self = .numbers
             case "keynote":     self = .keynote
-            default:            self = .bin
+            
+            default:
+                return nil
         }
     }
 
@@ -131,15 +133,15 @@ fileprivate extension MimeType {
 
 extension URL {
 
-    var mimeType: String {
-        return MimeType(ext: self.pathExtension).rawValue
+    var mimeType: String? {
+        return MimeType(ext: self.pathExtension)?.rawValue
     }
 
 }
 
 extension String {
 
-    var mimeType: String {
+    var mimeType: String? {
         return URL(fileURLWithPath: self).mimeType
     }
 
