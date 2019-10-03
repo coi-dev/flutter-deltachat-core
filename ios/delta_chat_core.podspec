@@ -3,7 +3,7 @@
 #
 Pod::Spec.new do |s|
   s.name                  = 'delta_chat_core'
-  s.version               = '0.2.0'
+  s.version               = '0.3.0'
   s.summary               = 'Flutter DeltaChat Core Plugin'
   s.homepage              = 'https://open-xchange.com'
   s.license               = { :file => '../LICENSE' }
@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
   
   s.dependency 'Flutter'
   s.dependency 'MessageKit'
-  s.dependency 'SwiftyBeaver', '~> 1.7'
+  s.dependency 'SwiftyBeaver'
 
   s.description = <<-DESC
 A Flutter plugin for COI (Chat Over IMAP) via the DeltaChat Core library.
