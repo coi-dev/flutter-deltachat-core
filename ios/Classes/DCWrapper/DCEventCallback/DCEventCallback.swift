@@ -48,85 +48,31 @@ public func isData2AString(for event: CInt) -> Bool {
 
 @_silgen_name("handleDeltaChatEvent")
 public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsignedLong, data1String: UnsafePointer<Int8>, data2String: UnsafePointer<Int8>) -> UnsafePointer<Int8>? {
-    let logMessage = "Received DCC event [\(event)]"
+    var logMessage = "Received DCC event [\(event)]"
     
     if isData2AString(for: event) {
-        log.debug("\(logMessage): \(String(cString: data2String))")
-    } else {
-        log.debug(logMessage)
+        logMessage = "\(logMessage): \(String(cString: data2String))"
     }
 
     switch Int32(event) {
     case DC_EVENT_INFO:
-        break
-        
-//    case DC_EVENT_SMTP_CONNECTED:
-//        break
-//        
-//    case DC_EVENT_IMAP_CONNECTED:
-//        break
-//        
-//    case DC_EVENT_SMTP_MESSAGE_SENT:
-//        break
+        log.info(logMessage)
 
     case DC_EVENT_WARNING:
-        break
+        log.warning(logMessage)
 
-    case DC_EVENT_ERROR:
-        break
-
-    case DC_EVENT_ERROR_NETWORK:
-        break
-
-    case DC_EVENT_ERROR_SELF_NOT_IN_GROUP:
-        break
-        
-//    case DC_EVENT_MSGS_CHANGED:
-//        break
-//
-//    case DC_EVENT_INCOMING_MSG:
-//        break
-//
-//    case DC_EVENT_MSG_DELIVERED:
-//        break
-//
-//    case DC_EVENT_MSG_FAILED:
-//        break
-//
-//    case DC_EVENT_MSG_READ:
-//        break
-//
-//    case DC_EVENT_CHAT_MODIFIED:
-//        break
-//
-//    case DC_EVENT_CONTACTS_CHANGED:
-//        break
-//
-//    case DC_EVENT_LOCATION_CHANGED:
-//        break
-//
-//    case DC_EVENT_CONFIGURE_PROGRESS:
-//        break
-//
-//    case DC_EVENT_IMEX_PROGRESS:
-//        break
-//
-//    case DC_EVENT_IMEX_FILE_WRITTEN:
-//        break
-//
-//    case DC_EVENT_SECUREJOIN_INVITER_PROGRESS:
-//        break
-//
-//    case DC_EVENT_SECUREJOIN_JOINER_PROGRESS:
-//        break
+    case DC_EVENT_ERROR,
+         DC_EVENT_ERROR_NETWORK,
+         DC_EVENT_ERROR_SELF_NOT_IN_GROUP:
+        log.error(logMessage)
         
     case DC_EVENT_GET_STRING:
+        log.info(logMessage)
         break
 
     default:
+        log.info(logMessage)
         DcEventCenter.sharedInstance.send(data1: data1, data2: data2, toObserversWith: Int(event))
-        break
-
     }
     
     return nil

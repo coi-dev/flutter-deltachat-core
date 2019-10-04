@@ -285,17 +285,13 @@ class DcContext {
         return nil
     }
     
-    func joinSecurejoin (qrCode: String) -> Int {
-        return Int(dc_join_securejoin(DcContext.contextPointer, qrCode))
+    func joinSecurejoin (qrCode: String) -> UInt32 {
+        let chatId = dc_join_securejoin(DcContext.contextPointer, qrCode)
+        return chatId
     }
     
-    func checkQR(qrCode: String) -> DcLot? {
-        guard let lotPointer = dc_check_qr(DcContext.contextPointer, qrCode) else {
-            return nil
-        }
-        
-        let lot = DcLot(lotPointer)
-        dc_lot_unref(lotPointer)
+    func checkQR(qrCode: String) -> DcLot {
+        let lot = DcLot(dc_check_qr(DcContext.contextPointer, qrCode))
         
         return lot
     }
@@ -304,18 +300,29 @@ class DcContext {
         dc_stop_ongoing_process(DcContext.contextPointer)
     }
     
+    func initiateKeyTransfer() -> String? {
+        if let cString = dc_initiate_key_transfer(DcContext.contextPointer) {
+            let swiftString = String(cString: cString)
+            log.debug("AutoCrypt setup message code: \(swiftString)")
+            free(cString)
+            return swiftString
+        }
+
+        return nil
+    }
+    
     // MARK: - COI related Stuff
     
     func isCoiSupported() -> Int32 {
-        return Int32(dc_is_coi_supported(DcContext.contextPointer))
+        return dc_is_coi_supported(DcContext.contextPointer)
     }
     
     func isCoiEnabled() -> Int32 {
-        return Int32(dc_is_coi_enabled(DcContext.contextPointer))
+        return dc_is_coi_enabled(DcContext.contextPointer)
     }
     
     func isWebPushSupported() -> Int32 {
-        return Int32(dc_is_webpush_supported(DcContext.contextPointer))
+        return dc_is_webpush_supported(DcContext.contextPointer)
     }
     
     func getWebPushVapidKey() -> String? {

@@ -646,7 +646,7 @@ class ContextCallHandler: MethodCallHandling {
         
         let star = methodCall.intValue(for: Argument.VALUE, result: result)
         context.starMessages(messageIds: msgIds, star: star)
-        _ = msgIds.map { loadAndCacheChatMessage(with: $0, update: true) }
+//        _ = msgIds.map { loadAndCacheChatMessage(with: $0, update: true) }
         
         result(nil)
     }
@@ -654,12 +654,12 @@ class ContextCallHandler: MethodCallHandling {
     // MARK: - Secure Stuff
     
     fileprivate func initiateKeyTransfer(result: FlutterResult) {
-        //    new Thread(() -> {
-        //    String setupKey = dcContext.initiateKeyTransfer();
-        //    getUiThreadHandler().post(() -> {
-        //    result.success(setupKey);
-        //    });
-        //    }).start();
+        guard let setupCode = context.initiateKeyTransfer() else {
+            result(nil)
+            return
+        }
+        
+        result(setupCode)
     }
     
     fileprivate func continueKeyTransfer(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -692,29 +692,15 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     fileprivate func  joinSecurejoin(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            Method.Error.missingArgument(result: result);
+        guard let qrText = methodCall.stringValue(for: Argument.QR_TEXT, result: result) else {
+            Method.Error.missingArgumentValue(for: Argument.QR_TEXT, result: result)
+            result(NSNumber(value: 0))
             return
         }
         
-        if !methodCall.contains(keys: [Argument.QR_TEXT]) {
-            Method.Error.missingArgument(result: result);
-            return
-        }
+        let chatId = context.joinSecurejoin(qrCode: qrText)
         
-        if let myArgs = args as? [String: Any],
-            let qrText = myArgs[Argument.QR_TEXT] {
-            //            new Thread(() -> {
-            //                int chatId = dcContext.joinSecurejoin(qrText);
-            //                getUiThreadHandler().post(() -> {
-            //                    result.success(chatId);
-            //                    });
-            //                }).start();
-        }
-        else {
-            Method.Error.missingArgument(result: result);
-        }
-        
+        result(NSNumber(value: chatId))
     }
     
     fileprivate func checkQr(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -723,10 +709,7 @@ class ContextCallHandler: MethodCallHandling {
             return
         }
         
-        guard let lot = context.checkQR(qrCode: qrCode) else {
-            result(nil)
-            return
-        }
+        let lot = context.checkQR(qrCode: qrCode)
         
         result(lot.propertyArray)
     }
