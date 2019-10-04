@@ -99,6 +99,31 @@ class DcContext {
         return nil
     }
     
+    /**
+    Delete a chat.
+
+    - Discussion:
+    Messages are deleted from the device and the chat database entry is deleted.
+    After that, the event #DC_EVENT_MSGS_CHANGED is posted.
+    
+     Things that are _not_ done implicitly:
+    
+    - Messages are **not deleted from the server**.
+    - The chat or the contact is **not blocked**, so new messages from the user/the group may appear
+      and the user may create the chat again.
+    - **Groups are not left** - this would
+      be unexpected as (1) deleting a normal chat also does not prevent new mails
+      from arriving, (2) leaving a group requires sending a message to
+      all group members - especially for groups not used for a longer time, this is
+      really unexpected when deletion results in contacting all members again,
+      (3) only leaving groups is also a valid usecase.
+    
+    To leave a chat explicitly, use dc_remove_contact_from_chat() with
+    chat_id=DC_CONTACT_ID_SELF)
+    
+    - Parameter chatId: The ID of the chat to delete.
+    - Returns: None.
+    */
     func deleteChat(chatId: UInt32) {
         dc_delete_chat(DcContext.contextPointer, UInt32(chatId))
     }
@@ -151,7 +176,10 @@ class DcContext {
     }
 
     // MARK: - Contacts
-
+    
+    /// Returns an array of contact id's belonging to a chat with the given chat id.
+    /// - Parameter chatId: The chat id whose members should be returned.
+    /// - Returns: An array of contact id's belonging to the chat with the given chat id.
     func getChatContacts(for chatId: Int32) -> [UInt32] {
         let dcContacts = dc_get_chat_contacts(DcContext.contextPointer, UInt32(chatId))
         let contactIds = Utils.copyAndFreeArray(inputArray: dcContacts)
@@ -159,11 +187,21 @@ class DcContext {
         return contactIds
     }
     
+    /// Returns a DcChat object for the given contact id
+    /// - Parameter id: The contact id whose DcContact object should be returned
+    /// - Returns: The DcChat object for the given chat id
     func getContact(with id: UInt32) -> DcContact {
         let contact  = DcContact(id: id)
         return contact
     }
     
+    /// Returns an array of all unblocked and known contact id's.
+    /// - Parameter flags: A combination of flags:
+    ///      - if the flag DC_GCL_ADD_SELF is set, SELF is added to the list unless filtered by other parameters
+    ///      - if the flag DC_GCL_VERIFIED_ONLY is set, only verified contacts are returned.
+    ///        if DC_GCL_VERIFIED_ONLY is not set, verified and unverified contacts are returned.
+    /// - Parameter query: A string to filter the list. Typically used to implement an incremental search. NULL for no filtering.
+    /// - Returns: An array containing all contact IDs.
     func getContacts(flags: Int32, query: String?) -> [UInt32] {
         let dcContacts = dc_get_contacts(DcContext.contextPointer, UInt32(flags), query)
         let contacts = Utils.copyAndFreeArray(inputArray: dcContacts)
