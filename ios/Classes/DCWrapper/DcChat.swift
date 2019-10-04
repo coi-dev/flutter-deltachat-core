@@ -57,8 +57,8 @@ class DcChat {
         dc_chat_unref(chatPointer)
     }
     
-    var id: Int {
-        return Int(dc_chat_get_id(chatPointer))
+    var id: UInt32 {
+        return dc_chat_get_id(chatPointer)
     }
     
     var name: String {
@@ -68,8 +68,8 @@ class DcChat {
         return swiftString
     }
     
-    var type: Int {
-        return Int(dc_chat_get_type(chatPointer))
+    var type: Int32 {
+        return dc_chat_get_type(chatPointer)
     }
     
     var chatType: ChatType {
@@ -130,7 +130,7 @@ class DcChat {
     
 }
 
-enum ChatType: Int {
+enum ChatType: Int32 {
     case single        = 100
     case group         = 120
     case verifiedGroup = 130

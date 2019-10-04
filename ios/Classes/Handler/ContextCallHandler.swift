@@ -357,6 +357,8 @@ class ContextCallHandler: MethodCallHandling {
         let contactId = UInt32(methodCall.intValue(for: Argument.ID, result: result))
         let chat = context.createChatByContactId(contactId: contactId)
         
+        chatCache.set(value: chat, for: chat.id)
+
         result(NSNumber(value: chat.id))
     }
     
@@ -364,57 +366,33 @@ class ContextCallHandler: MethodCallHandling {
         let messageId = UInt32(methodCall.intValue(for: Argument.ID, result: result))
         let chat = context.createChatByMessageId(messageId: messageId)
         
+        chatCache.set(value: chat, for: chat.id)
+        
         result(NSNumber(value: chat.id))
     }
     
     fileprivate func createGroupChat(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            fatalError()
-        }
-        
-        if !methodCall.contains(keys: [Argument.VERIFIED, Argument.NAME]) {
-            Method.Error.missingArgument(result: result)
+        guard let chatName = methodCall.stringValue(for: Argument.NAME, result: result) else {
+            Method.Error.missingArgumentValue(for: Argument.NAME, result: result)
+            result(nil)
             return
         }
         
-        if let myArgs = args as? [String: Any] {
-            let verified = myArgs[Argument.VERIFIED] as? Bool
-            if (verified == nil) {
-                Method.Error.missingArgument(result: result)
-                return
-            }
-            
-            let name = myArgs[Argument.NAME] as? String
-            let chatId = dc_create_group_chat(DcContext.contextPointer, Int32(truncating: verified! as NSNumber), name)
-            
-            result(chatId)
-        }
+        let isVerified = methodCall.boolValue(for: Argument.VERIFIED, result: result)
+        let chatId = context.createGroupChat(with: chatName, isVerified: isVerified)
+        
+        chatCache.set(value: context.getChat(with: chatId), for: chatId)
+        
+        result(NSNumber(value: chatId))
     }
     
     fileprivate func addContactToChat(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            fatalError()
-        }
+        let chatId = UInt32(methodCall.intValue(for: Argument.CHAT_ID, result: result))
+        let contactId = UInt32(methodCall.intValue(for: Argument.CONTACT_ID, result: result))
         
-        if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.CONTACT_ID]) {
-            Method.Error.missingArgument(result: result)
-            return
-        }
+        let added = context.addContact(with: contactId, toChat: chatId)
         
-        if let myArgs = args as? [String: Any] {
-            let chatId = myArgs[Argument.CHAT_ID] as? UInt32
-            let contactId = myArgs[Argument.CONTACT_ID] as? UInt32
-            
-            if (chatId == nil || contactId == nil) {
-                Method.Error.missingArgument(result: result)
-                return
-            }
-            
-            let successfullyAdded = dc_add_contact_to_chat(DcContext.contextPointer, chatId!, contactId!)
-            
-            result(successfullyAdded)
-        }
-        
+        result(NSNumber(value: added))
     }
     
     fileprivate func getChatByContactId(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -488,104 +466,50 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     fileprivate func markNoticedChat(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            fatalError()
-        }
+        let chatId = UInt32(methodCall.intValue(for: Argument.CHAT_ID, result: result))
+
+        context.markNoticedChat(with: chatId)
         
-        if !methodCall.contains(keys: [Argument.CHAT_ID]) {
-            Method.Error.missingArgument(result: result)
-            return
-        }
-        
-        if let myArgs = args as? [String: Any] {
-            let chatId = myArgs[Argument.CHAT_ID] as? UInt32
-            
-            if chatId == nil {
-                Method.Error.missingArgument(result: result)
-                return
-            }
-            
-            dc_marknoticed_chat(DcContext.contextPointer, chatId!)
-            result(nil)
-        }
-        
+        result(nil)
     }
     
     fileprivate func deleteChat(methodCall: FlutterMethodCall, result: FlutterResult) {
         let chatId = UInt32(methodCall.intValue(for: Argument.CHAT_ID, result: result))
         context.deleteChat(chatId: chatId)
+        _ = chatCache.removeValue(for: chatId)
         
         result(nil)
     }
     
     fileprivate func removeContactFromChat(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            Method.Error.missingArgument(result: result);
-            return
-        }
+        let chatId = UInt32(methodCall.intValue(for: Argument.CHAT_ID, result: result))
+        let contactId = UInt32(methodCall.intValue(for: Argument.CONTACT_ID, result: result))
         
-        if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.CONTACT_ID]) {
-            Method.Error.missingArgument(result: result);
-            return
-        }
+        let removed = context.removeContact(with: contactId, fromChat: chatId)
         
-        if let myArgs = args as? [String: Any], let chatId = myArgs[Argument.CHAT_ID], let contactId = myArgs[Argument.CONTACT_ID] {
-            result(dc_remove_contact_from_chat(DcContext.contextPointer, chatId as! UInt32, contactId as! UInt32))
-        }
-        else {
-            Method.Error.missingArgument(result: result);
-        }
-        
-    }
-    
-    fileprivate func setChatProfileImage(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.VALUE]) {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        if let myArgs = args as? [String: Any],
-            let chatId = myArgs[Argument.CHAT_ID],
-            let value = myArgs[Argument.VALUE] {
-            
-            dc_set_chat_profile_image(DcContext.contextPointer, chatId as! UInt32, value as? UnsafePointer<Int8>)
-            result(nil)
-        }
-        else {
-            Method.Error.missingArgument(result: result)
-            return
-        }
-        
+        result(NSNumber(value: removed))
     }
     
     fileprivate func setChatName(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            Method.Error.missingArgument(result: result);
+        let chatId = UInt32(methodCall.intValue(for: Argument.CHAT_ID, result: result))
+        guard let chatName = methodCall.stringValue(for: Argument.VALUE, result: result) else {
+            result(NSNumber(value: false))
+            return
+        }
+
+        let nameHasBeenSet = context.setChatName(chatName, forChatId: chatId)
+        result(NSNumber(value: nameHasBeenSet))
+    }
+
+    fileprivate func setChatProfileImage(methodCall: FlutterMethodCall, result: FlutterResult) {
+        let chatId = UInt32(methodCall.intValue(for: Argument.CHAT_ID, result: result))
+        guard let imagePath = methodCall.stringValue(for: Argument.VALUE, result: result) else {
+            result(NSNumber(value: false))
             return
         }
         
-        if !methodCall.contains(keys: [Argument.CHAT_ID, Argument.VALUE]) {
-            Method.Error.missingArgument(result: result);
-            return
-        }
-        
-        if let myArgs = args as? [String: Any],
-            let chatId = myArgs[Argument.CHAT_ID],
-            let value = myArgs[Argument.VALUE] {
-            
-            dc_set_chat_name(DcContext.contextPointer, chatId as! UInt32, value as? UnsafePointer<Int8>)
-            result(nil)
-        }
-        else {
-            Method.Error.missingArgument(result: result)
-            return
-        }
-        
+        let imageHasBeenSet = context.setChatProfileImage(withPath: imagePath, forChatId: chatId)
+        result(NSNumber(value: imageHasBeenSet))
     }
 
     // MARK: - Message Related
@@ -663,26 +587,15 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     fileprivate func continueKeyTransfer(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            Method.Error.missingArgument(result: result);
+        let msgId = UInt32(methodCall.intValue(for: Argument.ID, result: result))
+        guard let setupCode = methodCall.stringValue(for: Argument.SETUP_CODE, result: result) else {
+            result(NSNumber(value: false))
             return
         }
         
-        if !methodCall.contains(keys: [Argument.ID, Argument.SETUP_CODE]) {
-            Method.Error.missingArgument(result: result);
-            return
-        }
+        let setupResult = context.continueKeyTransfer(msgId: msgId, setupCode: setupCode)
         
-        if let myArgs = args as? [String: Any],
-            let messageId = myArgs[Argument.ID],
-            let setupCode = myArgs[Argument.SETUP_CODE] {
-            
-            result(dc_continue_key_transfer(DcContext.contextPointer, messageId as! UInt32, setupCode as? UnsafePointer<Int8>))
-        }
-        else {
-            Method.Error.missingArgument(result: result);
-        }
-        
+        result(NSNumber(value: setupResult))
     }
     
     fileprivate func getSecurejoinQr(methodCall: FlutterMethodCall, result: FlutterResult) {

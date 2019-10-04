@@ -46,6 +46,7 @@ import AVFoundation
 class DcContext {
     static private(set) var contextPointer: OpaquePointer?
     
+    /// Returns the file path of the DeltaChat SQLite database.
     var userDatabasePath: String {
         let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
         return "\(paths)/messenger.db"
@@ -118,6 +119,36 @@ class DcContext {
         
         return chat
     }
+    
+    func setChatName(_ chatName: String, forChatId chatId: UInt32) -> Int32 {
+        return dc_set_chat_name(DcContext.contextPointer, chatId, chatName)
+    }
+    
+    /// Sets the profile image for the chat with given chat ID
+    /// - Parameter imagePath: The full file path where to find the profile image for that chat.
+    /// - Parameter chatId: The chat ID of the chat whose image should be set.
+    func setChatProfileImage(withPath imagePath: String, forChatId chatId: UInt32) -> Int32 {
+        return dc_set_chat_profile_image(DcContext.contextPointer, chatId, imagePath)
+    }
+    
+    /// Creates a Group Chat
+    /// - Parameter chatName: The name of the chat.
+    /// - Parameter isVerified: Flag which determines whether this is a verified chat. Only secure verified members are allowed in this chat.
+    func createGroupChat(with chatName: String, isVerified: Bool) -> UInt32 {
+        return dc_create_group_chat(DcContext.contextPointer, (isVerified ? 1 : 0), chatName)
+    }
+    
+    func removeContact(with contactId: UInt32, fromChat chatId: UInt32) -> Int32 {
+        return dc_remove_contact_from_chat(DcContext.contextPointer, chatId, contactId)
+    }
+    
+    func markNoticedChat(with chatId: UInt32) {
+        dc_marknoticed_chat(DcContext.contextPointer, chatId)
+    }
+    
+    func addContact(with contactId: UInt32, toChat chatId: UInt32) -> Int32 {
+        return dc_add_contact_to_chat(DcContext.contextPointer, chatId, contactId)
+    }
 
     // MARK: - Contacts
 
@@ -150,8 +181,7 @@ class DcContext {
     }
     
     func deleteContact(contactId: UInt32) -> Bool {
-        let deleted = dc_delete_contact(DcContext.contextPointer, contactId)
-        return 1 == deleted
+        return 1 == dc_delete_contact(DcContext.contextPointer, contactId)
     }
     
     func createContact(name: String, emailAddress: String) -> UInt32 {
@@ -309,6 +339,10 @@ class DcContext {
         }
 
         return nil
+    }
+    
+    func continueKeyTransfer(msgId: UInt32, setupCode: String) -> Bool {
+        return 1 == dc_continue_key_transfer(DcContext.contextPointer, msgId, setupCode)
     }
     
     // MARK: - COI related Stuff
