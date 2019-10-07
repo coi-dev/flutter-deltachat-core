@@ -51,7 +51,7 @@ class DCEventHandler {
         case backgroundFetch
     }
 
-    fileprivate var state: ApplicationState = .stopped
+    var state: ApplicationState = .stopped
     fileprivate var backgroundTask: UIBackgroundTaskIdentifier = .invalid
 
     // MARK: - Public API
@@ -109,7 +109,12 @@ class DCEventHandler {
     }
     
     func stop() {
-        
+        state = .background
+
+        dc_interrupt_imap_idle(DcContext.contextPointer)
+        dc_interrupt_smtp_idle(DcContext.contextPointer)
+        dc_interrupt_mvbox_idle(DcContext.contextPointer)
+        dc_interrupt_sentbox_idle(DcContext.contextPointer)
     }
 
     // MARK: - BackgroundTask

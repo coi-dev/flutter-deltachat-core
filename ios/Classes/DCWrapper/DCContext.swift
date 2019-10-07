@@ -195,13 +195,15 @@ class DcContext {
         return contact
     }
     
-    /// Returns an array of all unblocked and known contact id's.
-    /// - Parameter flags: A combination of flags:
-    ///      - if the flag DC_GCL_ADD_SELF is set, SELF is added to the list unless filtered by other parameters
-    ///      - if the flag DC_GCL_VERIFIED_ONLY is set, only verified contacts are returned.
-    ///        if DC_GCL_VERIFIED_ONLY is not set, verified and unverified contacts are returned.
-    /// - Parameter query: A string to filter the list. Typically used to implement an incremental search. NULL for no filtering.
-    /// - Returns: An array containing all contact IDs.
+    /**
+    Returns an array of all unblocked and known contact id's.
+    - Parameter flags: A combination of flags:
+         - if the flag DC_GCL_ADD_SELF is set, SELF is added to the list unless filtered by other parameters
+         - if the flag DC_GCL_VERIFIED_ONLY is set, only verified contacts are returned.
+           if DC_GCL_VERIFIED_ONLY is not set, verified and unverified contacts are returned.
+    - Parameter query: A string to filter the list. Typically used to implement an incremental search. NULL for no filtering.
+    - Returns: An array containing all contact IDs.
+    */
     func getContacts(flags: Int32, query: String?) -> [UInt32] {
         let dcContacts = dc_get_contacts(DcContext.contextPointer, UInt32(flags), query)
         let contacts = Utils.copyAndFreeArray(inputArray: dcContacts)

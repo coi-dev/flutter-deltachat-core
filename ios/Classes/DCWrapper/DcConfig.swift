@@ -42,34 +42,10 @@
 
 import Foundation
 
-enum DcConfigKey: String {
-    case addr            = "addr"
-    case mailServer      = "mail_server"
-    case mailUser        = "mail_user"
-    case mailPw          = "mail_pw"
-    case mailPort        = "mail_port"
-    case sendServer      = "send_server"
-    case sendUser        = "send_user"
-    case sendPw          = "send_pw"
-    case sendPort        = "send_port"
-    case serverFlags     = "server_flags"
-    case displayname     = "displayname"
-    case selfstatus      = "selfstatus"
-    case selfavatar      = "selfavatar"
-    case e2eeEnabled     = "e2ee_enabled"
-    case mdnsEnabled     = "mdns_enabled"
-    case inboxWatch      = "inbox_watch"
-    case sentboxWatch    = "sentbox_watch"
-    case mvboxWatch      = "mvbox_watch"
-    case mvboxMove       = "mvbox_move"
-    case showEmails      = "show_emails"
-    case saveMimeHeaders = "save_mime_headers"
-}
-
 class DcConfig {
 
-    private class func getConfig(_ key: String) -> String? {
-        guard let cString = dc_get_config(DcContext.contextPointer, key) else { return nil }
+    private class func getConfig(_ key: DcConfigKey) -> String? {
+        guard let cString = dc_get_config(DcContext.contextPointer, key.rawValue) else { return nil }
         let value = String(cString: cString)
         free(cString)
         if value.isEmpty {
@@ -78,36 +54,28 @@ class DcConfig {
         return value
     }
     
-    private class func setConfig(_ key: String, _ value: String?) {
+    private class func setConfig(_ key: DcConfigKey, _ value: String?) {
         if let value = value {
-            dc_set_config(DcContext.contextPointer, key, value)
+            dc_set_config(DcContext.contextPointer, key.rawValue, value)
         } else {
-            dc_set_config(DcContext.contextPointer, key, nil)
+            dc_set_config(DcContext.contextPointer, key.rawValue, nil)
         }
     }
     
-    private class func getConfigBool(_ key: String) -> Bool {
+    private class func getConfigBool(_ key: DcConfigKey) -> Bool {
         return Utils.bool(for: getConfig(key))
     }
     
-    private class func setConfigBool(_ key: String, _ value: Bool) {
+    private class func setConfigBool(_ key: DcConfigKey, _ value: Bool) {
         let vStr = value ? "1" : "0"
         setConfig(key, vStr)
     }
     
-    private class func getConfigInt(_ key: String) -> Int {
-        let vStr = getConfig(key)
-        if vStr == nil {
-            return 0
-        }
-        let vInt = Int(vStr!)
-        if vInt == nil {
-            return 0
-        }
-        return vInt!
+    private class func getConfigInt(_ key: DcConfigKey) -> Int {
+        return Utils.int(for: getConfig(key))
     }
     
-    private class func setConfigInt(_ key: String, _ value: Int) {
+    private class func setConfigInt(_ key: DcConfigKey, _ value: Int) {
         setConfig(key, String(value))
     }
     
@@ -128,24 +96,25 @@ class DcConfig {
             mailPw = val
             val = "***"   // NOTE: this is just for hiding from logs
 
-        case .mailUser:     mailUser     = val
-        case .mailServer:   mailServer   = val
-        case .mailPort:     mailPort     = val
-        case .sendServer:   sendServer   = val
-        case .sendUser:     sendUser     = val
-        case .sendPort:     sendPort     = val
-        case .sendPw:       sendPw       = val
-        case .serverFlags:  serverFlags  = Utils.int(for: val)
-        case .displayname:  displayname  = val
-        case .selfstatus:   selfstatus   = val
-        case .showEmails:   showEmails   = Utils.int(for: val)
-        case .selfavatar:   selfavatar   = val
-        case .e2eeEnabled:  e2eeEnabled  = Utils.bool(for: val)
-        case .mdnsEnabled:  mdnsEnabled  = Utils.bool(for: val)
-        case .inboxWatch:   inboxWatch   = Utils.bool(for: val)
-        case .sentboxWatch: sentboxWatch = Utils.bool(for: val)
-        case .mvboxWatch:   mvboxWatch   = Utils.bool(for: val)
-        case .mvboxMove:    mvboxMove    = Utils.bool(for: val)
+        case .mailUser:             mailUser          = val
+        case .mailServer:           mailServer        = val
+        case .mailPort:             mailPort          = val
+        case .sendServer:           sendServer        = val
+        case .sendUser:             sendUser          = val
+        case .sendPort:             sendPort          = val
+        case .sendPw:               sendPw            = val
+        case .serverFlags:          serverFlags       = Utils.int(for: val)
+        case .displayname:          displayname       = val
+        case .selfstatus:           selfstatus        = val
+        case .showEmails:           showEmails        = Utils.int(for: val)
+        case .selfavatar:           selfavatar        = val
+        case .e2eeEnabled:          e2eeEnabled       = Utils.bool(for: val)
+        case .mdnsEnabled:          mdnsEnabled       = Utils.bool(for: val)
+        case .inboxWatch:           inboxWatch        = Utils.bool(for: val)
+        case .sentboxWatch:         sentboxWatch      = Utils.bool(for: val)
+        case .mvboxWatch:           mvboxWatch        = Utils.bool(for: val)
+        case .mvboxMove:            mvboxMove         = Utils.bool(for: val)
+        case .rfc724MsgIdPrefix:    rfc724MsgIdPrefix = val
         default:
             log.error("key not found: \(key)")
             return 0
@@ -161,72 +130,72 @@ class DcConfig {
     }
     
     class var displayname: String? {
-        set { setConfig(DcConfigKey.displayname.rawValue, newValue) }
-        get { return getConfig(DcConfigKey.displayname.rawValue) }
+        set { setConfig(.displayname, newValue) }
+        get { return getConfig(.displayname) }
     }
     
     class var selfstatus: String? {
-        set { setConfig(DcConfigKey.selfstatus.rawValue, newValue) }
-        get { return getConfig(DcConfigKey.selfstatus.rawValue) }
+        set { setConfig(.selfstatus, newValue) }
+        get { return getConfig(.selfstatus) }
     }
     
     class var selfavatar: String? {
-        set { setConfig(DcConfigKey.selfavatar.rawValue, newValue) }
-        get { return getConfig(DcConfigKey.selfavatar.rawValue) }
+        set { setConfig(.selfavatar, newValue) }
+        get { return getConfig(.selfavatar) }
     }
     
     class var addr: String? {
-        set { setConfig(DcConfigKey.addr.rawValue, newValue) }
-        get { return getConfig(DcConfigKey.addr.rawValue) }
+        set { setConfig(.addr, newValue) }
+        get { return getConfig(.addr) }
     }
     
     class var mailServer: String? {
-        set { setConfig(DcConfigKey.mailServer.rawValue, newValue) }
-        get { return getConfig(DcConfigKey.mailServer.rawValue) }
+        set { setConfig(.mailServer, newValue) }
+        get { return getConfig(.mailServer) }
     }
     
     class var mailUser: String? {
-        set { setConfig(DcConfigKey.mailUser.rawValue, newValue) }
-        get { return getConfig(DcConfigKey.mailUser.rawValue) }
+        set { setConfig(.mailUser, newValue) }
+        get { return getConfig(.mailUser) }
     }
     
     class var mailPw: String? {
-        set { setConfig(DcConfigKey.mailPw.rawValue, newValue) }
-        get { return getConfig(DcConfigKey.mailPw.rawValue) }
+        set { setConfig(.mailPw, newValue) }
+        get { return getConfig(.mailPw) }
     }
     
     class var mailPort: String? {
-        set { setConfig(DcConfigKey.mailPort.rawValue, newValue) }
-        get { return getConfig(DcConfigKey.mailPort.rawValue) }
+        set { setConfig(.mailPort, newValue) }
+        get { return getConfig(.mailPort) }
     }
     
     class var sendServer: String? {
-        set { setConfig(DcConfigKey.sendServer.rawValue, newValue) }
-        get { return getConfig(DcConfigKey.sendServer.rawValue) }
+        set { setConfig(.sendServer, newValue) }
+        get { return getConfig(.sendServer) }
     }
     
     class var sendUser: String? {
-        set { setConfig(DcConfigKey.sendUser.rawValue, newValue) }
-        get { return getConfig(DcConfigKey.sendUser.rawValue) }
+        set { setConfig(.sendUser, newValue) }
+        get { return getConfig(.sendUser) }
     }
     
     class var sendPw: String? {
-        set { setConfig(DcConfigKey.sendPw.rawValue, newValue) }
-        get { return getConfig(DcConfigKey.sendPw.rawValue) }
+        set { setConfig(.sendPw, newValue) }
+        get { return getConfig(.sendPw) }
     }
     
     class var sendPort: String? {
-        set { setConfig(DcConfigKey.sendPort.rawValue, newValue) }
-        get { return getConfig(DcConfigKey.sendPort.rawValue) }
+        set { setConfig(.sendPort, newValue) }
+        get { return getConfig(.sendPort) }
     }
     
     private class var serverFlags: Int {
         // IMAP-/SMTP-flags as a combination of DC_LP flags
         set {
-            setConfig(DcConfigKey.serverFlags.rawValue, "\(newValue)")
+            setConfig(.serverFlags, "\(newValue)")
         }
         get {
-            if let str = getConfig(DcConfigKey.serverFlags.rawValue) {
+            if let str = getConfig(.serverFlags) {
                 return Int(str) ?? 0
             } else {
                 return 0
@@ -275,84 +244,124 @@ class DcConfig {
     }
     
     class var e2eeEnabled: Bool {
-        set { setConfigBool(DcConfigKey.e2eeEnabled.rawValue, newValue) }
-        get { return getConfigBool(DcConfigKey.e2eeEnabled.rawValue) }
+        set { setConfigBool(.e2eeEnabled, newValue) }
+        get { return getConfigBool(.e2eeEnabled) }
     }
     
     class var mdnsEnabled: Bool {
-        set { setConfigBool(DcConfigKey.mdnsEnabled.rawValue, newValue) }
-        get { return getConfigBool(DcConfigKey.mdnsEnabled.rawValue) }
+        set { setConfigBool(.mdnsEnabled, newValue) }
+        get { return getConfigBool(.mdnsEnabled) }
     }
     
     class var inboxWatch: Bool {
-        set { setConfigBool(DcConfigKey.inboxWatch.rawValue, newValue) }
-        get { return getConfigBool(DcConfigKey.inboxWatch.rawValue) }
+        set { setConfigBool(.inboxWatch, newValue) }
+        get { return getConfigBool(.inboxWatch) }
     }
     
     class var sentboxWatch: Bool {
-        set { setConfigBool(DcConfigKey.sentboxWatch.rawValue, newValue) }
-        get { return getConfigBool(DcConfigKey.sentboxWatch.rawValue) }
+        set { setConfigBool(.sentboxWatch, newValue) }
+        get { return getConfigBool(.sentboxWatch) }
     }
     
     class var mvboxWatch: Bool {
-        set { setConfigBool(DcConfigKey.mvboxWatch.rawValue, newValue) }
-        get { return getConfigBool(DcConfigKey.mvboxWatch.rawValue) }
+        set { setConfigBool(.mvboxWatch, newValue) }
+        get { return getConfigBool(.mvboxWatch) }
     }
     
     class var mvboxMove: Bool {
-        set { setConfigBool(DcConfigKey.mvboxMove.rawValue, newValue) }
-        get { return getConfigBool(DcConfigKey.mvboxMove.rawValue) }
+        set { setConfigBool(.mvboxMove, newValue) }
+        get { return getConfigBool(.mvboxMove) }
     }
     
     class var showEmails: Int {
-        // one of DC_SHOW_EMAILS_*
-        set { setConfigInt(DcConfigKey.showEmails.rawValue, newValue) }
-        get { return getConfigInt(DcConfigKey.showEmails.rawValue) }
+        set { setConfigInt(.showEmails, newValue) }
+        get { return getConfigInt(.showEmails) }
     }
     
+    class var rfc724MsgIdPrefix: String? {
+        set { setConfig(.rfc724MsgIdPrefix, newValue) }
+        get { return getConfig(.rfc724MsgIdPrefix) }
+    }
+
     
     class var configuredEmail: String {
-        return getConfig("configured_addr") ?? ""
+        return getConfig(.configuredEmail) ?? ""
     }
     
     class var configuredMailServer: String {
-        return getConfig("configured_mail_server") ?? ""
+        return getConfig(.configuredMailServer) ?? ""
     }
     
     class var configuredMailUser: String {
-        return getConfig("configured_mail_user") ?? ""
+        return getConfig(.configuredMailUser) ?? ""
     }
     
     class var configuredMailPw: String {
-        return getConfig("configured_mail_pw") ?? ""
+        return getConfig(.configuredMailPw) ?? ""
     }
     
     class var configuredMailPort: String {
-        return getConfig("configured_mail_port") ?? ""
+        return getConfig(.configuredMailPort) ?? ""
     }
     
     class var configuredSendServer: String {
-        return getConfig("configured_send_server") ?? ""
+        return getConfig(.configuredSendServer) ?? ""
     }
     
     class var configuredSendUser: String {
-        return getConfig("configured_send_user") ?? ""
+        return getConfig(.configuredSendUser) ?? ""
     }
     
     class var configuredSendPw: String {
-        return getConfig("configured_send_pw") ?? ""
+        return getConfig(.configuredSendPw) ?? ""
     }
     
     class var configuredSendPort: String {
-        return getConfig("configured_send_port") ?? ""
+        return getConfig(.configuredSendPort) ?? ""
     }
     
     class var configuredServerFlags: String {
-        return getConfig("configured_server_flags") ?? ""
+        return getConfig(.configuredServerFlags) ?? ""
     }
     
     class var configured: Bool {
-        return getConfigBool("configured")
+        return getConfigBool(.configured)
     }
 
+}
+
+enum DcConfigKey: String {
+    case addr                  = "addr"
+    case mailServer            = "mail_server"
+    case mailUser              = "mail_user"
+    case mailPw                = "mail_pw"
+    case mailPort              = "mail_port"
+    case sendServer            = "send_server"
+    case sendUser              = "send_user"
+    case sendPw                = "send_pw"
+    case sendPort              = "send_port"
+    case serverFlags           = "server_flags"
+    case displayname           = "displayname"
+    case selfstatus            = "selfstatus"
+    case selfavatar            = "selfavatar"
+    case e2eeEnabled           = "e2ee_enabled"
+    case mdnsEnabled           = "mdns_enabled"
+    case inboxWatch            = "inbox_watch"
+    case sentboxWatch          = "sentbox_watch"
+    case mvboxWatch            = "mvbox_watch"
+    case mvboxMove             = "mvbox_move"
+    case showEmails            = "show_emails"
+    case saveMimeHeaders       = "save_mime_headers"
+    case configuredEmail       = "configured_addr"
+    case configuredMailServer  = "configured_mail_server"
+    case configuredMailUser    = "configured_mail_user"
+    case configuredMailPw      = "configured_mail_pw"
+    case configuredMailPort    = "configured_mail_port"
+    case configuredSendServer  = "configured_send_server"
+    case configuredSendUser    = "configured_send_user"
+    case configuredSendPw      = "configured_send_pw"
+    case configuredSendPort    = "configured_send_port"
+    case configuredServerFlags = "configured_server_flags"
+    case configured            = "configured"
+    case rfc724MsgIdPrefix     = "rfc724_msg_id_prefix"
 }

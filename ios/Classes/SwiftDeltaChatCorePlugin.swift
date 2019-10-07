@@ -71,8 +71,6 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         self.registrar = registrar
         
         self.dcContext = DcContext()
-        self.dcEventHandler = DCEventHandler()
-        self.dcEventHandler.start()
 
         self.eventChannelHandler = EventChannelHandler(messenger: registrar.messenger())
         self.contextCallHandler  = ContextCallHandler(context: self.dcContext, contactCache: self.contactCache, messageCache: self.messageCache, chatCache: self.chatCache)
@@ -81,6 +79,9 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         self.chatListCallHandler = ChatListCallHandler(context: self.dcContext, chatCache: self.chatCache)
         self.contactCallHandler  = ContactCallHandler(context: self.dcContext, contextCallHandler: self.contextCallHandler)
         self.messageCallHandler  = MessageCallHandler(context: self.dcContext, contextCallHandler: self.contextCallHandler)
+
+        self.dcEventHandler = DCEventHandler()
+        self.dcEventHandler.start()
     }
     
     // This is our entry point
@@ -97,23 +98,23 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
 
         switch (call.methodPrefix) {
         case Method.Prefix.CONTEXT:
-            contextCallHandler.handle(call, result: result);
-
+            contextCallHandler.handle(call, result: result)
+            break
         case Method.Prefix.BASE:
-            baseCallHandler.handle(call, result: result);
-
+            baseCallHandler.handle(call, result: result)
+            break
         case Method.Prefix.CHAT:
-            chatCallHandler.handle(call, result: result);
-
+            chatCallHandler.handle(call, result: result)
+            break
         case Method.Prefix.CHAT_LIST:
-            chatListCallHandler.handle(call, result: result);
-
+            chatListCallHandler.handle(call, result: result)
+            break
         case Method.Prefix.CONTACT:
-            contactCallHandler.handle(call, result: result);
-
+            contactCallHandler.handle(call, result: result)
+            break
         case Method.Prefix.MSG:
-            messageCallHandler.handle(call, result: result);
-
+            messageCallHandler.handle(call, result: result)
+            break
         default:
             log.debug("Failing for \(call.method)")
             result(FlutterMethodNotImplemented)

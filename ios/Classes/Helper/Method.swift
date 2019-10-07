@@ -208,6 +208,10 @@ extension Method {
         static func generic(methodCall: FlutterMethodCall, result: FlutterResult) {
             result(FlutterError(code: methodCall.method, message: nil, details: nil));
         }
+        
+        static func couldNotCreateConfigKey(methodCall: FlutterMethodCall, result: FlutterResult, key: String) {
+            result(FlutterError(code: methodCall.method, message: "Could not create DcConfigKey for key: '\(key)'", details: nil));
+        }
     }
 
 }

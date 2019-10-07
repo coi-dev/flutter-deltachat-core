@@ -63,6 +63,8 @@ class DcEventCenter {
         var newObservers = observers
         newObservers.append(observer)
         allObservers[eventId] = newObservers
+        
+        log.info("add observer for event ID: \(eventId)")
 
         objc_sync_exit(allObservers)
     }
@@ -76,6 +78,8 @@ class DcEventCenter {
         
         // TODO: We need to find a way to make DcEventDelegate equatable!
 //        var observers = idObservers.filter({ $0 != observer })
+        
+        log.info("remove observer for event ID: \(eventId)")
 
         objc_sync_exit(allObservers)
     }

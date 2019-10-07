@@ -161,6 +161,7 @@ class ContextCallHandler: MethodCallHandling {
             break
         case Method.Context.CONTINUE_KEY_TRANSFER:
             continueKeyTransfer(methodCall: call, result: result)
+            break
         case Method.Context.GET_SECUREJOIN_QR:
             getSecurejoinQr(methodCall: call, result: result)
             break
@@ -175,6 +176,7 @@ class ContextCallHandler: MethodCallHandling {
             break
         case Method.Context.DELETE_MESSAGES:
             deleteMessages(methodCall: call, result: result)
+            break
         case Method.Context.STAR_MESSAGES:
             starMessages(methodCall: call, result: result)
             break
@@ -220,18 +222,19 @@ class ContextCallHandler: MethodCallHandling {
     // MARK: - Configuration
     
     fileprivate func setConfig(methodCall: FlutterMethodCall, result: FlutterResult) {
-        let parameters = methodCall.parameters
+        guard let key = methodCall.stringValue(for: Argument.KEY, result: result) else {
+                Method.Error.missingArgument(result: result)
+                return
+        }
+
+        guard let configKey = DcConfigKey(rawValue: key) else {
+            Method.Error.couldNotCreateConfigKey(methodCall: methodCall, result: result, key: key)
+            return
+        }
         
-        if let key = parameters["key"] as? String,
-            let configKey = DcConfigKey(rawValue: key) {
-            let value = parameters["value"] as? String
-            
-            let dc_result = DcConfig.set(key: configKey, value: value)
-            result(NSNumber(value: dc_result))
-        }
-        else {
-            result("iOS could not extract flutter arguments in method: (sendParams)")
-        }
+        let value = methodCall.stringValue(for: Argument.VALUE, result: result)
+        let configSet = DcConfig.set(key: configKey, value: value)
+        result(NSNumber(value: configSet))
     }
     
     fileprivate func getConfig(methodCall: FlutterMethodCall, result: FlutterResult, type: String) {

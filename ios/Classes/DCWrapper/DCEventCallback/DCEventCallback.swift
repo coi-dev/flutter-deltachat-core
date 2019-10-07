@@ -53,26 +53,29 @@ public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsi
     if isData2AString(for: event) {
         logMessage = "\(logMessage): \(String(cString: data2String))"
     }
-
+    
     switch Int32(event) {
-    case DC_EVENT_INFO:
-        log.info(logMessage)
-
-    case DC_EVENT_WARNING:
-        log.warning(logMessage)
-
-    case DC_EVENT_ERROR,
-         DC_EVENT_ERROR_NETWORK,
-         DC_EVENT_ERROR_SELF_NOT_IN_GROUP:
-        log.error(logMessage)
+        case DC_EVENT_INFO:
+            log.info(logMessage)
+            break
         
-    case DC_EVENT_GET_STRING:
-        log.info(logMessage)
-        break
-
-    default:
-        log.info(logMessage)
-        DcEventCenter.sharedInstance.send(data1: data1, data2: data2, toObserversWith: Int(event))
+        case DC_EVENT_WARNING:
+            log.warning(logMessage)
+            break
+        
+        case DC_EVENT_ERROR,
+             DC_EVENT_ERROR_NETWORK,
+             DC_EVENT_ERROR_SELF_NOT_IN_GROUP:
+            log.error(logMessage)
+            break
+        
+        case DC_EVENT_GET_STRING:
+            log.info(logMessage)
+            break
+        
+        default:
+            log.info(logMessage)
+            DcEventCenter.sharedInstance.send(data1: data1, data2: data2, toObserversWith: Int(event))
     }
     
     return nil
