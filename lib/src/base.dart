@@ -71,6 +71,7 @@ abstract class Base {
   static const String argumentUid = "uid";
   static const String argumentMode = "mode";
   static const String argumentEnable = "enable";
+  static const String argumentMimeType = "mimeType";
 
   final DeltaChatCore core = DeltaChatCore();
 
