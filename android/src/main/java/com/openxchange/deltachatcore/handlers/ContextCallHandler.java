@@ -98,7 +98,7 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
     private static final String METHOD_STAR_MESSAGES = "context_starMessages";
     private static final String METHOD_SET_CHAT_NAME = "context_setChatName";
     private static final String METHOD_SET_CHAT_PROFILE_IMAGE = "context_setChatProfileImage";
-    private static final String METHOD_PERFORM_IMAP = "context_performImap";
+    private static final String METHOD_INTERRUPT_IDLE_FOR_INCOMING_MESSAGES = "context_interruptIdleForIncomingMessages";
     private static final String METHOD_CLOSE = "context_close";
     private static final String METHOD_IS_COI_SUPPORTED = "context_isCoiSupported";
     private static final String METHOD_IS_COI_ENABLED = "context_isCoiEnabled";
@@ -253,8 +253,8 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
             case METHOD_SET_CHAT_PROFILE_IMAGE:
                 setChatProfileImage(methodCall, result);
                 break;
-            case METHOD_PERFORM_IMAP:
-                performImap(result);
+            case METHOD_INTERRUPT_IDLE_FOR_INCOMING_MESSAGES:
+                interruptIdleForIncomingMessages(result);
                 break;
             case METHOD_CLOSE:
                 close(result);
@@ -952,10 +952,9 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
         result.success(coreResult);
     }
 
-    private void performImap(MethodChannel.Result result) {
-        dcContext.performImapJobs();
-        dcContext.performImapFetch();
-        dcContext.performMvboxFetch();
+    private void interruptIdleForIncomingMessages(MethodChannel.Result result) {
+        dcContext.interruptImapIdle();
+        dcContext.interruptMvboxIdle();
         result.success(null);
     }
 

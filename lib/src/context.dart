@@ -89,7 +89,7 @@ class Context {
   static const String methodStarMessages = "context_starMessages";
   static const String methodSetChatName = "context_setChatName";
   static const String methodSetChatProfileImage = "context_setChatProfileImage";
-  static const String methodPerformImap = "context_performImap";
+  static const String methodInterruptIdleForIncomingMessages = "context_interruptIdleForIncomingMessages";
   static const String methodClose = "context_close";
   static const String methodIsCoiSupported = "context_isCoiSupported";
   static const String methodIsCoiEnabled = "context_isCoiEnabled";
@@ -330,8 +330,8 @@ class Context {
     return await core.invokeMethod(methodSetChatProfileImage, getSetNameOrImageArguments(chatId, newImagePath));
   }
 
-  Future<void> performImap() async {
-    return await core.invokeMethod(methodPerformImap);
+  Future<void> interruptIdleForIncomingMessages() async {
+    return await core.invokeMethod(methodInterruptIdleForIncomingMessages);
   }
 
   Future<void> close() async {

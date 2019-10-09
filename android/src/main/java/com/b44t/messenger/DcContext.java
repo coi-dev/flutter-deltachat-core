@@ -69,6 +69,9 @@ public class DcContext {
     public final static int DC_SHOW_EMAILS_ACCEPTED_CONTACTS = 1;
     public final static int DC_SHOW_EMAILS_ALL               = 2;
 
+    public final static int DC_EMPTY_MVBOX           = 0x01;
+    public final static int DC_EMPTY_INBOX           = 0x02;
+
     public DcContext(String osName) {
         handleEvent(0,0,0); // call handleEvent() to make sure it is not optimized away and JNI won't find it
         contextCPtr = createContextCPtr(osName);
@@ -80,18 +83,24 @@ public class DcContext {
     public native void         configure            ();
     public native void         stopOngoingProcess   ();
     public native int          isConfigured         ();
+
     public native void         performImapJobs      ();
     public native void         performImapFetch     ();
     public native void         performImapIdle      ();
     public native void         interruptImapIdle    ();
+
     public native void         performMvboxFetch    ();
     public native void         performMvboxIdle     ();
     public native void         interruptMvboxIdle   ();
-    public native void         performSentboxFetch    ();
-    public native void         performSentboxIdle     ();
-    public native void         interruptSentboxIdle   ();
+
+    public native void         performSentboxFetch  ();
+    public native void         performSentboxIdle   ();
+    public native void         interruptSentboxIdle ();
+
     public native void         performSmtpJobs      ();
     public native void         performSmtpIdle      ();
+    public native void         interruptSmtpIdle ();
+
     public native void         maybeNetwork         ();
     public native void         setConfig            (String key, String value);
     public void                setConfigInt         (String key, int value) { setConfig(key, Integer.toString(value)); }
@@ -105,6 +114,7 @@ public class DcContext {
     public native boolean      continueKeyTransfer  (int msg_id, String setup_code);
     public native void         imex                 (int what, String dir);
     public native String       imexHasBackup        (String dir);
+    public native void         emptyServer          (int flags);
     public native boolean      mayBeValidAddr       (String addr);
     public native int          lookupContactIdByAddr(String addr);
     public native int[]        getContacts          (int flags, String query);
