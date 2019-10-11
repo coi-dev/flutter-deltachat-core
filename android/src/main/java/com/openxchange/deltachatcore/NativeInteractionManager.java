@@ -153,7 +153,7 @@ public class NativeInteractionManager extends DcContext {
                         imapThreadSynchronized.notifyAll();
                     }
 
-                    Log.i(TAG, "###################### IMAP-Thread started. ######################");
+                    Log.i(TAG, "###################### IMAP-Thread " + Thread.currentThread().getId() + " started. ######################");
 
 
                     while (true) {
@@ -162,6 +162,7 @@ public class NativeInteractionManager extends DcContext {
                                 imapThreadStarted = false;
                                 imapThreadSynchronized.notifyAll();
                             }
+                            Log.i(TAG, "###################### IMAP-Thread " + Thread.currentThread().getId() + " stopped. ######################");
                             return;
                         }
                         imapWakeLock.acquire(wakeLockTimeout);
@@ -193,7 +194,7 @@ public class NativeInteractionManager extends DcContext {
                         mvboxThreadSynchronized.notifyAll();
                     }
 
-                    Log.i(TAG, "###################### MVBOX-Thread started. ######################");
+                    Log.i(TAG, "###################### MVBOX-Thread " + Thread.currentThread().getId() + " started. ######################");
 
 
                     while (true) {
@@ -202,6 +203,7 @@ public class NativeInteractionManager extends DcContext {
                                 mvboxThreadStarted = false;
                                 mvboxThreadSynchronized.notifyAll();
                             }
+                            Log.i(TAG, "###################### MVBOX-Thread " + Thread.currentThread().getId() + " stopped. ######################");
                             return;
                         }
                         mvboxWakeLock.acquire(wakeLockTimeout);
@@ -232,7 +234,7 @@ public class NativeInteractionManager extends DcContext {
                         sentBoxThreadSynchronized.notifyAll();
                     }
 
-                    Log.i(TAG, "###################### SENTBOX-Thread started. ######################");
+                    Log.i(TAG, "###################### SENTBOX-Thread " + Thread.currentThread().getId() + " started. ######################");
 
 
                     while (true) {
@@ -241,6 +243,7 @@ public class NativeInteractionManager extends DcContext {
                                 sentBoxThreadStarted = false;
                                 sentBoxThreadSynchronized.notifyAll();
                             }
+                            Log.i(TAG, "###################### SENTBOX-Thread " + Thread.currentThread().getId() + " stopped. ######################");
                             return;
                         }
                         sentBoxWakeLock.acquire(wakeLockTimeout);
@@ -271,7 +274,7 @@ public class NativeInteractionManager extends DcContext {
                         smtpThreadSynchronized.notifyAll();
                     }
 
-                    Log.i(TAG, "###################### SMTP-Thread started. ######################");
+                    Log.i(TAG, "###################### SMTP-Thread " + Thread.currentThread().getId() + " started. ######################");
 
 
                     while (true) {
@@ -280,6 +283,7 @@ public class NativeInteractionManager extends DcContext {
                                 smtpThreadStarted = false;
                                 smtpThreadSynchronized.notifyAll();
                             }
+                            Log.i(TAG, "###################### SMTP-Thread " + Thread.currentThread().getId() + " stopped. ######################");
                             return;
                         }
                         smtpWakeLock.acquire(wakeLockTimeout);
@@ -296,19 +300,15 @@ public class NativeInteractionManager extends DcContext {
 
     private void stopThreads() {
         if (imapThread != null) {
-            Log.d(TAG, "Stopping imapThread " + imapThread.getId());
             imapThread.interrupt();
         }
         if (mvboxThread != null) {
-            Log.d(TAG, "Stopping mvboxThread " + mvboxThread.getId());
             mvboxThread.interrupt();
         }
         if (sentBoxThread != null) {
-            Log.d(TAG, "Stopping sentBoxThread " + sentBoxThread.getId());
             sentBoxThread.interrupt();
         }
         if (smtpThread != null) {
-            Log.d(TAG, "Stopping smtpThread " + smtpThread.getId());
             smtpThread.interrupt();
         }
     }
