@@ -1,6 +1,8 @@
 package com.openxchange.deltachatcore;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.os.PowerManager;
 import android.util.Log;
 
@@ -74,6 +76,9 @@ public class NativeInteractionManager extends DcContext {
             Log.e(TAG, "Cannot create wakeLocks");
         }
         start();
+
+        BroadcastReceiver connectivityReceiverReceiver = new ConnectivityReceiver(this);
+        context.registerReceiver(connectivityReceiverReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     public void start() {
@@ -390,7 +395,7 @@ public class NativeInteractionManager extends DcContext {
                         if (responseCode == HttpURLConnection.HTTP_OK) {
                             postContent = total.toString();
                         } else {
-                            Log.i("DeltaChat", String.format("DC_EVENT_HTTP_POST error: %s", total.toString()));
+                            Log.i(TAG, String.format("DC_EVENT_HTTP_POST error: %s", total.toString()));
                         }
                     } finally {
                         conn.disconnect();
