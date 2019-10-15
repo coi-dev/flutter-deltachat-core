@@ -89,10 +89,12 @@ public class DcContext {
     public native void         performImapIdle      ();
     public native void         interruptImapIdle    ();
 
+    public native void         performMvboxJobs     ();
     public native void         performMvboxFetch    ();
     public native void         performMvboxIdle     ();
     public native void         interruptMvboxIdle   ();
 
+    public native void         performSentboxJobs   ();
     public native void         performSentboxFetch  ();
     public native void         performSentboxIdle   ();
     public native void         interruptSentboxIdle ();

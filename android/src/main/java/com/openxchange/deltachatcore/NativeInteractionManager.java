@@ -207,6 +207,7 @@ public class NativeInteractionManager extends DcContext {
                             return;
                         }
                         mvboxWakeLock.acquire(wakeLockTimeout);
+                        performMvboxJobs();
                         performMvboxFetch();
                         mvboxWakeLock.release();
                         performMvboxIdle();
@@ -247,6 +248,7 @@ public class NativeInteractionManager extends DcContext {
                             return;
                         }
                         sentBoxWakeLock.acquire(wakeLockTimeout);
+                        performSentboxJobs();
                         performSentboxFetch();
                         sentBoxWakeLock.release();
                         performSentboxIdle();

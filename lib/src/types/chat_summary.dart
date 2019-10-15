@@ -46,11 +46,13 @@ class ChatSummary {
   int summaryId;
   String preview;
   int timestamp;
+  int state;
 
   ChatSummary.fromMethodChannel(dynamic data) {
     var lotMapping = LotMapping.fromMethodChannel(data);
     summaryId = lotMapping.id;
     preview = lotMapping.text2;
     timestamp = lotMapping.timestamp;
+    state = lotMapping.state;
   }
 }
