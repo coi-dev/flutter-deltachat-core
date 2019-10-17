@@ -77,26 +77,16 @@ class DcContext {
     
     func getChatlist(flags: Int32, queryString: String?, queryId: Int) -> DcChatlist {
         let chatlistPointer = dc_get_chatlist(DcContext.contextPointer, flags, queryString, UInt32(queryId))
-        let chatlist = DcChatlist(chatListPointer: chatlistPointer)
-
-        return chatlist
+        return DcChatlist(chatListPointer: chatlistPointer)
     }
     
     func getChat(with id: UInt32) -> DcChat {
-        let chat = DcChat(id: id)
-
-        return chat
+        return DcChat(id: id)
     }
     
     func getChatByContactId(contactId: UInt32) -> DcChat? {
         let chatId = dc_get_chat_id_by_contact_id(DcContext.contextPointer, contactId)
-        
-        if chatId > 0 {
-            let chat = DcChat(id: chatId)
-            return chat
-        }
-        
-        return nil
+        return 0 == chatId ? nil : DcChat(id: chatId)
     }
     
     /**
@@ -134,7 +124,6 @@ class DcContext {
     
     func createChatByMessageId(messageId: UInt32) -> DcChat {
         let chatId = dc_create_chat_by_msg_id(DcContext.contextPointer, messageId)
-
         return DcChat(id: chatId)
     }
     
@@ -191,8 +180,7 @@ class DcContext {
     /// - Parameter id: The contact id whose DcContact object should be returned
     /// - Returns: The DcChat object for the given chat id
     func getContact(with id: UInt32) -> DcContact {
-        let contact  = DcContact(id: id)
-        return contact
+        return DcContact(id: id)
     }
     
     /**
@@ -225,8 +213,7 @@ class DcContext {
     }
     
     func createContact(name: String, emailAddress: String) -> UInt32 {
-        let contactId = dc_create_contact(DcContext.contextPointer, name, emailAddress)
-        return contactId
+        return dc_create_contact(DcContext.contextPointer, name, emailAddress)
     }
     
     // MARK: - Addressbook
@@ -238,9 +225,7 @@ class DcContext {
     // MARK: - Messages
     
     func getMsg(with id: UInt32) -> DcMsg {
-        let msg = DcMsg(id: id)
-
-        return msg
+        return DcMsg(id: id)
     }
     
     func getMsgInfo(msgId: Int) -> String {
@@ -261,9 +246,7 @@ class DcContext {
     }
     
     func getFreshMessageCount(for chatId: UInt32) -> Int32 {
-        let count = dc_get_fresh_msg_cnt(DcContext.contextPointer, chatId)
-
-        return count
+        return dc_get_fresh_msg_cnt(DcContext.contextPointer, chatId)
     }
     
     func sendText(_ text: String, forChatId chatId: UInt32) -> UInt32 {
@@ -356,14 +339,11 @@ class DcContext {
     }
     
     func joinSecurejoin (qrCode: String) -> UInt32 {
-        let chatId = dc_join_securejoin(DcContext.contextPointer, qrCode)
-        return chatId
+        return dc_join_securejoin(DcContext.contextPointer, qrCode)
     }
     
     func checkQR(qrCode: String) -> DcLot {
-        let lot = DcLot(dc_check_qr(DcContext.contextPointer, qrCode))
-        
-        return lot
+        return DcLot(dc_check_qr(DcContext.contextPointer, qrCode))
     }
     
     func stopOngoingProcess() {
