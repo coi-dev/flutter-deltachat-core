@@ -326,14 +326,10 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     fileprivate func getContact(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let args = methodCall.arguments else {
-            Method.Error.missingArgument(result: result)
-            return
-        }
-        if let myArgs = args as? [String: Any], let id = myArgs[Argument.ID] as? UInt32 {
-            result(dc_array_get_contact_id(DcContext.contextPointer, Int(id)))
-        }
+        let contactId = UInt32(methodCall.intValue(for: Argument.ID, result: result))
+        let contact = context.getContact(with: contactId)
         
+        result(NSNumber(value: contact.id))
     }
     
     fileprivate func getContacts(methodCall: FlutterMethodCall, result: FlutterResult) {
