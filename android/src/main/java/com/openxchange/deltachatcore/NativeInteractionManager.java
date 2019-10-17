@@ -1,7 +1,8 @@
 package com.openxchange.deltachatcore;
 
-import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.os.PowerManager;
 import android.util.Log;
 
@@ -29,11 +30,11 @@ public class NativeInteractionManager extends DcContext {
     private static final int EVENT_ERROR = 400;
     private static final int INTERRUPT_IDLE = 0x01; // interrupt idle if the thread is already running
 
-    private final Object threadsCritical = new Object();
-    private final Object imapThreadStartedCond = new Object();
-    private final Object mvboxThreadStartedCond = new Object();
-    private final Object sentBoxThreadStartedCond = new Object();
-    private final Object smtpThreadStartedCond = new Object();
+    private final Object threadsSynchronized = new Object();
+    private final Object imapThreadSynchronized = new Object();
+    private final Object mvboxThreadSynchronized = new Object();
+    private final Object sentBoxThreadSynchronized = new Object();
+    private final Object smtpThreadSynchronized = new Object();
     public DcEventCenter eventCenter = new DcEventCenter();
     private Thread imapThread = null;
     private PowerManager.WakeLock imapWakeLock = null;
@@ -46,46 +47,87 @@ public class NativeInteractionManager extends DcContext {
     private long wakeLockTimeout = 10 * 60 * 1000L; /*10 minutes*/
     private Map<Long, String> coreStrings;
     private String dbPath;
+    private boolean imapThreadStarted;
+    private boolean mvboxThreadStarted;
+    private boolean sentBoxThreadStarted;
+    private boolean smtpThreadStarted;
 
-
-    NativeInteractionManager(Context context, Activity activity, String dbName) {
+    NativeInteractionManager(Context context, String dbName) {
         super("Android " + BuildConfig.VERSION_NAME);
-
         File databaseFile = new File(context.getFilesDir(), dbName);
         dbPath = databaseFile.getAbsolutePath();
         open(databaseFile.getAbsolutePath());
 
-        if (activity != null) {
-            try {
-                PowerManager powerManager = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
+        try {
+            PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
 
-                imapWakeLock = Objects.requireNonNull(powerManager).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, COI_IMAP_WAKE_LOCK);
-                imapWakeLock.setReferenceCounted(false); // if the idle-thread is killed for any reasons, it is better not to rely on reference counting
+            imapWakeLock = Objects.requireNonNull(powerManager).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, COI_IMAP_WAKE_LOCK);
+            imapWakeLock.setReferenceCounted(false); // if the idle-thread is killed for any reasons, it is better not to rely on reference counting
 
-                mvboxWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, COI_MVBOX_WAKE_LOCK);
-                mvboxWakeLock.setReferenceCounted(false); // if the idle-thread is killed for any reasons, it is better not to rely on reference counting
+            mvboxWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, COI_MVBOX_WAKE_LOCK);
+            mvboxWakeLock.setReferenceCounted(false); // if the idle-thread is killed for any reasons, it is better not to rely on reference counting
 
-                sentBoxWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, COI_SENT_BOX_WAKE_LOCK);
-                sentBoxWakeLock.setReferenceCounted(false); // if the idle-thread is killed for any reasons, it is better not to rely on reference counting
+            sentBoxWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, COI_SENT_BOX_WAKE_LOCK);
+            sentBoxWakeLock.setReferenceCounted(false); // if the idle-thread is killed for any reasons, it is better not to rely on reference counting
 
-                smtpWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, COI_SMTP_WAKE_LOCK);
-                smtpWakeLock.setReferenceCounted(false); // if the idle-thread is killed for any reasons, it is better not to rely on reference counting
-            } catch (Exception e) {
-                Log.e(TAG, "Cannot create wakeLocks");
-            }
-
-            start();
+            smtpWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, COI_SMTP_WAKE_LOCK);
+            smtpWakeLock.setReferenceCounted(false); // if the idle-thread is killed for any reasons, it is better not to rely on reference counting
+        } catch (Exception e) {
+            Log.e(TAG, "Cannot create wakeLocks");
         }
+        start();
+
+        BroadcastReceiver connectivityReceiverReceiver = new ConnectivityReceiver(this);
+        context.registerReceiver(connectivityReceiverReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     public void start() {
         Log.d(TAG, "Starting threads");
-        startThreads(0);
+        startThreads(INTERRUPT_IDLE);
+        waitForThreadsRunning();
+    }
+
+    private void waitForThreadsRunning() {
+        try {
+            synchronized (imapThreadSynchronized) {
+                while (!imapThreadStarted) {
+                    imapThreadSynchronized.wait();
+                }
+            }
+
+            synchronized (mvboxThreadSynchronized) {
+                while (!mvboxThreadStarted) {
+                    mvboxThreadSynchronized.wait();
+                }
+            }
+
+            synchronized (sentBoxThreadSynchronized) {
+                while (!sentBoxThreadStarted) {
+                    sentBoxThreadSynchronized.wait();
+                }
+            }
+
+            synchronized (smtpThreadSynchronized) {
+                while (!smtpThreadStarted) {
+                    smtpThreadSynchronized.wait();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void stop() {
         Log.d(TAG, "Stopping threads");
         stopThreads();
+        interruptImapIdle();
+        interruptMvboxIdle();
+        interruptSentboxIdle();
+        interruptSmtpIdle();
+        imapThread = null;
+        mvboxThread = null;
+        sentBoxThread = null;
+        smtpThread = null;
     }
 
     void setCoreStrings(Map<Long, String> coreStrings) {
@@ -93,11 +135,12 @@ public class NativeInteractionManager extends DcContext {
     }
 
     private void startThreads(@SuppressWarnings("SameParameterValue") int flags) {
-        synchronized (threadsCritical) {
+        synchronized (threadsSynchronized) {
 
             if (imapThread == null || !imapThread.isAlive()) {
 
-                synchronized (imapThreadStartedCond) {
+                synchronized (imapThreadSynchronized) {
+                    imapThreadStarted = false;
                 }
 
                 imapThread = new Thread(() -> {
@@ -105,15 +148,21 @@ public class NativeInteractionManager extends DcContext {
                     // after acquiring a wakelock so that the process is not terminated.
                     // as imapWakeLock is not reference counted that would result in a wakelock-gap is not needed here.
                     imapWakeLock.acquire(wakeLockTimeout);
-                    synchronized (imapThreadStartedCond) {
-                        imapThreadStartedCond.notifyAll();
+                    synchronized (imapThreadSynchronized) {
+                        imapThreadStarted = true;
+                        imapThreadSynchronized.notifyAll();
                     }
 
-                    Log.i(TAG, "###################### IMAP-Thread started. ######################");
+                    Log.i(TAG, "###################### IMAP-Thread " + Thread.currentThread().getId() + " started. ######################");
 
 
                     while (true) {
                         if (Thread.interrupted()) {
+                            synchronized (imapThreadSynchronized) {
+                                imapThreadStarted = false;
+                                imapThreadSynchronized.notifyAll();
+                            }
+                            Log.i(TAG, "###################### IMAP-Thread " + Thread.currentThread().getId() + " stopped. ######################");
                             return;
                         }
                         imapWakeLock.acquire(wakeLockTimeout);
@@ -134,23 +183,31 @@ public class NativeInteractionManager extends DcContext {
 
             if (mvboxThread == null || !mvboxThread.isAlive()) {
 
-                synchronized (mvboxThreadStartedCond) {
+                synchronized (mvboxThreadSynchronized) {
+                    mvboxThreadStarted = false;
                 }
 
                 mvboxThread = new Thread(() -> {
                     mvboxWakeLock.acquire(wakeLockTimeout);
-                    synchronized (mvboxThreadStartedCond) {
-                        mvboxThreadStartedCond.notifyAll();
+                    synchronized (mvboxThreadSynchronized) {
+                        mvboxThreadStarted = true;
+                        mvboxThreadSynchronized.notifyAll();
                     }
 
-                    Log.i(TAG, "###################### MVBOX-Thread started. ######################");
+                    Log.i(TAG, "###################### MVBOX-Thread " + Thread.currentThread().getId() + " started. ######################");
 
 
                     while (true) {
                         if (Thread.interrupted()) {
+                            synchronized (mvboxThreadSynchronized) {
+                                mvboxThreadStarted = false;
+                                mvboxThreadSynchronized.notifyAll();
+                            }
+                            Log.i(TAG, "###################### MVBOX-Thread " + Thread.currentThread().getId() + " stopped. ######################");
                             return;
                         }
                         mvboxWakeLock.acquire(wakeLockTimeout);
+                        performMvboxJobs();
                         performMvboxFetch();
                         mvboxWakeLock.release();
                         performMvboxIdle();
@@ -167,23 +224,31 @@ public class NativeInteractionManager extends DcContext {
 
             if (sentBoxThread == null || !sentBoxThread.isAlive()) {
 
-                synchronized (sentBoxThreadStartedCond) {
+                synchronized (sentBoxThreadSynchronized) {
+                    sentBoxThreadStarted = false;
                 }
 
                 sentBoxThread = new Thread(() -> {
                     sentBoxWakeLock.acquire(wakeLockTimeout);
-                    synchronized (sentBoxThreadStartedCond) {
-                        sentBoxThreadStartedCond.notifyAll();
+                    synchronized (sentBoxThreadSynchronized) {
+                        sentBoxThreadStarted = true;
+                        sentBoxThreadSynchronized.notifyAll();
                     }
 
-                    Log.i(TAG, "###################### SENTBOX-Thread started. ######################");
+                    Log.i(TAG, "###################### SENTBOX-Thread " + Thread.currentThread().getId() + " started. ######################");
 
 
                     while (true) {
                         if (Thread.interrupted()) {
+                            synchronized (sentBoxThreadSynchronized) {
+                                sentBoxThreadStarted = false;
+                                sentBoxThreadSynchronized.notifyAll();
+                            }
+                            Log.i(TAG, "###################### SENTBOX-Thread " + Thread.currentThread().getId() + " stopped. ######################");
                             return;
                         }
                         sentBoxWakeLock.acquire(wakeLockTimeout);
+                        performSentboxJobs();
                         performSentboxFetch();
                         sentBoxWakeLock.release();
                         performSentboxIdle();
@@ -200,20 +265,27 @@ public class NativeInteractionManager extends DcContext {
 
             if (smtpThread == null || !smtpThread.isAlive()) {
 
-                synchronized (smtpThreadStartedCond) {
+                synchronized (smtpThreadSynchronized) {
+                    smtpThreadStarted = false;
                 }
 
                 smtpThread = new Thread(() -> {
                     smtpWakeLock.acquire(wakeLockTimeout);
-                    synchronized (smtpThreadStartedCond) {
-                        smtpThreadStartedCond.notifyAll();
+                    synchronized (smtpThreadSynchronized) {
+                        smtpThreadStarted = true;
+                        smtpThreadSynchronized.notifyAll();
                     }
 
-                    Log.i(TAG, "###################### SMTP-Thread started. ######################");
+                    Log.i(TAG, "###################### SMTP-Thread " + Thread.currentThread().getId() + " started. ######################");
 
 
                     while (true) {
                         if (Thread.interrupted()) {
+                            synchronized (smtpThreadSynchronized) {
+                                smtpThreadStarted = false;
+                                smtpThreadSynchronized.notifyAll();
+                            }
+                            Log.i(TAG, "###################### SMTP-Thread " + Thread.currentThread().getId() + " stopped. ######################");
                             return;
                         }
                         smtpWakeLock.acquire(wakeLockTimeout);
@@ -325,7 +397,7 @@ public class NativeInteractionManager extends DcContext {
                         if (responseCode == HttpURLConnection.HTTP_OK) {
                             postContent = total.toString();
                         } else {
-                            Log.i("DeltaChat", String.format("DC_EVENT_HTTP_POST error: %s", total.toString()));
+                            Log.i(TAG, String.format("DC_EVENT_HTTP_POST error: %s", total.toString()));
                         }
                     } finally {
                         conn.disconnect();

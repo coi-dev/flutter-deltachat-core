@@ -55,7 +55,6 @@ public class ChatCallHandler extends AbstractCallHandler {
     private static final String METHOD_CHAT_GET_ARCHIVED = "chat_getArchived";
     private static final String METHOD_CHAT_GET_COLOR = "chat_getColor";
     private static final String METHOD_CHAT_GET_NAME = "chat_getName";
-    private static final String METHOD_CHAT_GET_SUBTITLE = "chat_getSubtitle";
     private static final String METHOD_CHAT_GET_PROFILE_IMAGE = "chat_getProfileImage";
     private static final String METHOD_CHAT_IS_UNPROMOTED = "chat_isUnpromoted";
     private static final String METHOD_CHAT_IS_SELF_TALK = "chat_isSelfTalk";
@@ -85,9 +84,6 @@ public class ChatCallHandler extends AbstractCallHandler {
                 break;
             case METHOD_CHAT_GET_NAME:
                 getName(methodCall, result);
-                break;
-            case METHOD_CHAT_GET_SUBTITLE:
-                getSubtitle(methodCall, result);
                 break;
             case METHOD_CHAT_GET_PROFILE_IMAGE:
                 getProfileImage(methodCall, result);
@@ -131,15 +127,6 @@ public class ChatCallHandler extends AbstractCallHandler {
             return;
         }
         result.success(chat.getProfileImage());
-    }
-
-    private void getSubtitle(MethodCall methodCall, MethodChannel.Result result) {
-        DcChat chat = getChat(methodCall, result);
-        if (chat == null) {
-            resultErrorGeneric(methodCall, result);
-            return;
-        }
-        result.success(chat.getSubtitle());
     }
 
     private void getName(MethodCall methodCall, MethodChannel.Result result) {

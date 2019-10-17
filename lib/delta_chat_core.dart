@@ -42,8 +42,10 @@
 
 import 'dart:async';
 
+import 'package:delta_chat_core/src/log.dart';
 import 'package:delta_chat_core/src/types/event.dart';
 import 'package:flutter/services.dart';
+import 'package:logging/logging.dart';
 
 export 'package:delta_chat_core/src/types/chat_summary.dart';
 export 'package:delta_chat_core/src/types/event.dart';
@@ -73,6 +75,7 @@ class DeltaChatCore {
 
   static DeltaChatCore _instance;
 
+  final _logger = Logger("delta_chat_core");
   final MethodChannel _methodChannel;
   final _eventChannel = EventChannel(channelDeltaChatCoreEvents);
   final _eventChannelSubscribers = Map<int, Map<int, StreamController>>();
@@ -87,6 +90,7 @@ class DeltaChatCore {
     if (_instance == null) {
       final MethodChannel _methodChannel = MethodChannel(channelDeltaChatCore);
       _instance = new DeltaChatCore._createInstance(_methodChannel);
+      setupLogger();
     }
     return _instance;
   }
@@ -146,6 +150,8 @@ class DeltaChatCore {
   }
 
   delegateEventToSubscribers(Event event) {
+    var logMessage = "Event - id: ${event.eventId}, data1: ${event.data1}, data2: ${event.data2}";
+    _logger.fine(logMessage);
     _eventChannelSubscribers[event.eventId].forEach((_, streamController) {
       streamController.add(event);
     });

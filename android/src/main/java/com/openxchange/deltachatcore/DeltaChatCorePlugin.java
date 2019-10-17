@@ -63,9 +63,11 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
+import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
+import io.flutter.view.FlutterNativeView;
 
-public class DeltaChatCorePlugin implements MethodCallHandler {
+public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.ViewDestroyListener {
     public static final String TAG = "coi";
 
     private static final String LIBRARY_NAME = "native-utils";
@@ -118,7 +120,9 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
 
     public static void registerWith(Registrar registrar) {
         final MethodChannel channel = new MethodChannel(registrar.messenger(), CHANNEL_DELTA_CHAT_CORE);
-        channel.setMethodCallHandler(new DeltaChatCorePlugin(registrar));
+        DeltaChatCorePlugin deltaChatCorePlugin = new DeltaChatCorePlugin(registrar);
+        channel.setMethodCallHandler(deltaChatCorePlugin);
+        registrar.addViewDestroyListener(deltaChatCorePlugin);
     }
 
     @Override
@@ -209,7 +213,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
             throw new IllegalArgumentException("No database name given, exiting.");
         }
         System.loadLibrary(LIBRARY_NAME);
-        nativeInteractionManager = new NativeInteractionManager(registrar.context(), registrar.activity(), dbName);
+        nativeInteractionManager = new NativeInteractionManager(registrar.context(), dbName);
         contextCallHandler = new ContextCallHandler(nativeInteractionManager, contactCache, messageCache, chatCache);
         chatListCallHandler = new ChatListCallHandler(nativeInteractionManager, chatCache);
         messageCallHandler = new MessageCallHandler(nativeInteractionManager, contextCallHandler);
@@ -278,4 +282,9 @@ public class DeltaChatCorePlugin implements MethodCallHandler {
         messageCallHandler.handleCall(methodCall, result);
     }
 
+    @Override
+    public boolean onViewDestroy(FlutterNativeView flutterNativeView) {
+        nativeInteractionManager.stop();
+        return false;
+    }
 }

@@ -81,6 +81,7 @@ abstract public class AbstractCallHandler {
     static final String ARGUMENT_UID = "uid";
     static final String ARGUMENT_MODE = "mode";
     static final String ARGUMENT_ENABLE = "enable";
+    static final String ARGUMENT_MIME_TYPE = "mimeType";
     private static final String ERROR_ARGUMENT_MISSING = "1";
     private static final String ERROR_ARGUMENT_TYPE_MISMATCH = "2";
     private static final String ERROR_ARGUMENT_MISSING_VALUE = "3";

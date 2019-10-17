@@ -89,7 +89,7 @@ class Context {
   static const String methodStarMessages = "context_starMessages";
   static const String methodSetChatName = "context_setChatName";
   static const String methodSetChatProfileImage = "context_setChatProfileImage";
-  static const String methodPerformImap = "context_performImap";
+  static const String methodInterruptIdleForIncomingMessages = "context_interruptIdleForIncomingMessages";
   static const String methodClose = "context_close";
   static const String methodIsCoiSupported = "context_isCoiSupported";
   static const String methodIsCoiEnabled = "context_isCoiEnabled";
@@ -234,8 +234,8 @@ class Context {
     return await core.invokeMethod(methodCreateChatMessage, createChatMessageArguments(chatId, text));
   }
 
-  Future<int> createChatAttachmentMessage(int chatId, String path, int msgType, [String text]) async {
-    return await core.invokeMethod(methodCreateChatAttachmentMessage, getCreateAttachmentMessageArguments(chatId, path, msgType, text));
+  Future<int> createChatAttachmentMessage(int chatId, String path, int msgType, String mimeType, [String text]) async {
+    return await core.invokeMethod(methodCreateChatAttachmentMessage, getCreateAttachmentMessageArguments(chatId, path, msgType, mimeType, text));
   }
 
   Future<int> addContactToChat(int chatId, int contactId) async {
@@ -330,8 +330,8 @@ class Context {
     return await core.invokeMethod(methodSetChatProfileImage, getSetNameOrImageArguments(chatId, newImagePath));
   }
 
-  Future<void> performImap() async {
-    return await core.invokeMethod(methodPerformImap);
+  Future<void> interruptIdleForIncomingMessages() async {
+    return await core.invokeMethod(methodInterruptIdleForIncomingMessages);
   }
 
   Future<void> close() async {
@@ -402,8 +402,8 @@ class Context {
   Map<String, dynamic> createChatMessageArguments(int chatId, String text) =>
     <String, dynamic>{Base.argumentChatId: chatId, Base.argumentText: text};
 
-  Map<String, dynamic> getCreateAttachmentMessageArguments(int chatId, String path, int msgType, String text) =>
-    <String, dynamic>{Base.argumentChatId: chatId, Base.argumentPath: path, Base.argumentType: msgType, Base.argumentText: text};
+  Map<String, dynamic> getCreateAttachmentMessageArguments(int chatId, String path, int msgType, String mimeType, String text) =>
+    <String, dynamic>{Base.argumentChatId: chatId, Base.argumentPath: path, Base.argumentType: msgType, Base.argumentMimeType: mimeType, Base.argumentText: text};
 
   Map<String, dynamic> getChatAndContactIdArguments(int chatId, int contactId) =>
     <String, dynamic>{Base.argumentChatId: chatId, Base.argumentContactId: contactId};

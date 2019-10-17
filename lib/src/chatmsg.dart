@@ -86,6 +86,7 @@ class ChatMsg extends Base {
   static const int typeVideo = 50;
   static const int typeFile = 60;
 
+  static const int messageNone = 0;
   static const int messageStatePreparing = 18;
   static const int messageStateDraft = 19;
   static const int messageStatePending = 20;

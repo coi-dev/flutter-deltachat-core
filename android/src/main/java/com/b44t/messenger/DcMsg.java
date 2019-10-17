@@ -21,6 +21,7 @@ public class DcMsg {
     public final static int DC_STATE_IN_FRESH = 10;
     public final static int DC_STATE_IN_NOTICED = 13;
     public final static int DC_STATE_IN_SEEN = 16;
+    public final static int DC_STATE_OUT_PREPARING = 18;
     public final static int DC_STATE_OUT_PENDING = 20;
     public final static int DC_STATE_OUT_ERROR = 24;
     public final static int DC_STATE_OUT_DELIVERED = 26;
@@ -60,6 +61,7 @@ public class DcMsg {
     public native long    getTimestamp       ();
     public native long    getSortTimestamp   ();
     public native boolean hasDeviatingTimestamp();
+    public native boolean hasLocation        ();
     public native int     getType            ();
     public native int     getState           ();
     public native int     getChatId          ();
@@ -86,6 +88,7 @@ public class DcMsg {
     public native void    setDimension       (int width, int height);
     public native void    setDuration        (int duration);
     public native boolean isStarred          ();
+    public native void    setLocation        (float latitude, float longitude);
 
     public File getFileAsFile() {
         if(getFile()==null)
@@ -126,6 +129,9 @@ public class DcMsg {
 
     public boolean isFailed() {
         return getState() == DC_STATE_OUT_ERROR;
+    }
+    public boolean isPreparing() {
+        return getState() == DC_STATE_OUT_PREPARING;
     }
     public long getExpiresIn() {
         return -1; // never.

@@ -40,19 +40,15 @@
  * for more details.
  */
 
-import 'lot_mapping.dart';
+import 'package:logging/logging.dart';
 
-class ChatSummary {
-  int summaryId;
-  String preview;
-  int timestamp;
-  int state;
+void setupLogger() {
+  Logger.root.level = Level.FINE;
+  Logger.root.onRecord.listen((LogRecord logRecord) {
+    _logTemplatePrint(logRecord);
+  });
+}
 
-  ChatSummary.fromMethodChannel(dynamic data) {
-    var lotMapping = LotMapping.fromMethodChannel(data);
-    summaryId = lotMapping.id;
-    preview = lotMapping.text2;
-    timestamp = lotMapping.timestamp;
-    state = lotMapping.state;
-  }
+String _logTemplatePrint(LogRecord logRecord) {
+  return '[COI - ${logRecord.loggerName}] ${logRecord.message}';
 }
