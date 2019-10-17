@@ -71,11 +71,11 @@ function build_dcc() {
     
     show_header "Copying '${DCC_PRODUCT_NAME}' to destination..."
     mv "./${DCC_PRODUCT_PATH}" "../"
-    
+}
+
+function clean() {
     show_header "Cleaning up..."
     cargo clean
-    
-    cd "${PWD}"
 }
 
 
@@ -86,6 +86,9 @@ function build_dcc() {
 show_version;
 test_cargo;
 build_dcc;
+clean;
+
+cd "${PWD}"
 
 
 # /////////////////////////////////////////////////////////////////////////////
