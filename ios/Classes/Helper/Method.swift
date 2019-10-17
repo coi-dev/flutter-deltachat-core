@@ -45,7 +45,6 @@ extension Method {
         static let GET_ARCHIVED                   = "chat_getArchived"
         static let GET_COLOR                      = "chat_getColor"
         static let GET_NAME                       = "chat_getName"
-        static let GET_SUBTITLE                   = "chat_getSubtitle"
         static let GET_PROFILE_IMAGE              = "chat_getProfileImage"
         static let IS_UNPROMOTED                  = "chat_isUnpromoted"
         static let IS_SELF_TALK                   = "chat_isSelfTalk"

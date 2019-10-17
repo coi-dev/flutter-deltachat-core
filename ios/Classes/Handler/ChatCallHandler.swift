@@ -71,9 +71,6 @@ class ChatCallHandler: MethodCallHandling {
         case Method.Chat.GET_NAME:
             getName(methodCall: call, result: result);
             break
-        case Method.Chat.GET_SUBTITLE:
-            getSubtitle(methodCall: call, result: result);
-            break
         case Method.Chat.GET_PROFILE_IMAGE:
             getProfileImage(methodCall: call, result: result);
             break
@@ -106,11 +103,6 @@ class ChatCallHandler: MethodCallHandling {
     private func getProfileImage(methodCall: FlutterMethodCall, result: FlutterResult) {
         let chat = getChat(methodCall: methodCall, result: result)
         result(chat.profileImageFilePath)
-    }
-    
-    private func getSubtitle(methodCall: FlutterMethodCall, result: FlutterResult) {
-        let chat = getChat(methodCall: methodCall, result: result)
-        result(chat.subtitle ?? NSNull())
     }
     
     private func getName(methodCall: FlutterMethodCall, result: FlutterResult) {

@@ -111,15 +111,6 @@ class DcChat {
         return ""
     }()
     
-    var subtitle: String? {
-        if let cString = dc_chat_get_subtitle(chatPointer) {
-            let str = String(cString: cString)
-            free(cString)
-            return str.isEmpty ? nil : str
-        }
-        return nil
-    }
-    
     var archived: Int32 {
         return dc_chat_get_archived(chatPointer)
     }
