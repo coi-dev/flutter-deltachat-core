@@ -63,7 +63,9 @@ class DCEventHandler {
         
         state = .running
 
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global(qos: .background).async { [weak self] in
+            guard let self = self else { return }
+            
             self.registerBackgroundTask()
             while self.state == .running {
                 dc_perform_imap_jobs(DcContext.contextPointer)

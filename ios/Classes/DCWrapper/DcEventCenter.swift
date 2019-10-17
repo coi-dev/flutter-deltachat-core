@@ -50,9 +50,9 @@ class DcEventCenter {
     
     static let sharedInstance: DcEventCenter = DcEventCenter()
     
-    var allObservers: [Int: [DcEventDelegate]] = [:]
+    var allObservers: [Int: [EventChannelHandler]] = [:]
     
-    func add(observer: DcEventDelegate, for eventId: Int) {
+    func add(observer: EventChannelHandler, for eventId: Int) {
         objc_sync_enter(allObservers)
 
         guard let observers = allObservers[eventId] else {
@@ -69,15 +69,10 @@ class DcEventCenter {
         objc_sync_exit(allObservers)
     }
     
-    func remove(observer: DcEventDelegate, with eventId: Int) {
+    func remove(observer: EventChannelHandler, with eventId: Int) {
         objc_sync_enter(allObservers)
 
-//        guard let idObservers = allObservers[eventId] else {
-//            return
-//        }
-        
-        // TODO: We need to find a way to make DcEventDelegate equatable!
-//        var observers = idObservers.filter({ $0 != observer })
+        allObservers[eventId] = allObservers[eventId]?.filter { $0 != observer }
         
         log.info("remove observer for event ID: \(eventId)")
 

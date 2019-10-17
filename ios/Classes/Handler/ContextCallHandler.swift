@@ -186,6 +186,9 @@ class ContextCallHandler: MethodCallHandling {
         case Method.Context.SET_CHAT_PROFILE_IMAGE:
             setChatProfileImage(methodCall: call, result: result)
             break
+        case Method.Context.INTERRUPT_IDLE_FOR_INCOMING_MESSAGES:
+            interruptIdleForIncomingMessages(result: result)
+            break
         case Method.Context.IS_COI_SUPPORTED:
             isCoiSupported(result: result)
             break
@@ -509,6 +512,13 @@ class ContextCallHandler: MethodCallHandling {
         
         let imageHasBeenSet = context.setChatProfileImage(withPath: imagePath, forChatId: chatId)
         result(NSNumber(value: imageHasBeenSet))
+    }
+    
+    fileprivate func interruptIdleForIncomingMessages(result: FlutterResult) {
+        context.interruptImapIdle()
+        context.interruptMvboxIdle()
+        
+        result(nil)
     }
 
     // MARK: - Message Related

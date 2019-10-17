@@ -427,5 +427,15 @@ class DcContext {
     func validateWebPush(uid: String, message: String, id: Int32) {
         dc_validate_webpush(DcContext.contextPointer, uid, message, id)
     }
+    
+    // MARK: - IMAP
+    
+    func interruptImapIdle() {
+        dc_interrupt_imap_idle(DcContext.contextPointer)
+    }
+    
+    func interruptMvboxIdle() {
+        dc_interrupt_mvbox_idle(DcContext.contextPointer)
+    }
 
 }
