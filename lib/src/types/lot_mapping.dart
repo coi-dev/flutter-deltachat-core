@@ -67,4 +67,19 @@ class LotMapping {
     timestamp = dataMap[indexTimestamp];
     state = dataMap[indexState];
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is LotMapping &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          text1 == other.text1 &&
+          text1Meaning == other.text1Meaning &&
+          text2 == other.text2 &&
+          timestamp == other.timestamp &&
+          state == other.state;
+
+  @override
+  int get hashCode => id.hashCode ^ text1.hashCode ^ text1Meaning.hashCode ^ text2.hashCode ^ timestamp.hashCode ^ state.hashCode;
 }

@@ -42,15 +42,8 @@
 
 import 'lot_mapping.dart';
 
-class QrCodeResult {
-  int state;
-  int contactId;
-  String text;
+class QrCodeResult extends LotMapping {
+  get text => text1;
 
-  QrCodeResult.fromMethodChannel(dynamic data) {
-    var lotMapping = LotMapping.fromMethodChannel(data);
-    state = lotMapping.state;
-    contactId = lotMapping.id;
-    text = lotMapping.text1;
-  }
+  QrCodeResult.fromMethodChannel(dynamic data) : super.fromMethodChannel(data);
 }
