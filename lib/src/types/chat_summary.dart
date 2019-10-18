@@ -42,17 +42,8 @@
 
 import 'lot_mapping.dart';
 
-class ChatSummary {
-  int summaryId;
-  String preview;
-  int timestamp;
-  int state;
+class ChatSummary extends LotMapping {
+  get preview => text2;
 
-  ChatSummary.fromMethodChannel(dynamic data) {
-    var lotMapping = LotMapping.fromMethodChannel(data);
-    summaryId = lotMapping.id;
-    preview = lotMapping.text2;
-    timestamp = lotMapping.timestamp;
-    state = lotMapping.state;
-  }
+  ChatSummary.fromMethodChannel(dynamic data) : super.fromMethodChannel(data);
 }
