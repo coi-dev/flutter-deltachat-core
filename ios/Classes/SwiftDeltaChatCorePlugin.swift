@@ -51,7 +51,6 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
     fileprivate let registrar: FlutterPluginRegistrar!
 
     fileprivate let dcContext: DcContext!
-    fileprivate let dcEventHandler: DCEventHandler!
 
     fileprivate let chatCache: Cache<DcChat> = Cache()
     fileprivate let contactCache: Cache<DcContact> = Cache()
@@ -79,9 +78,6 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         self.chatListCallHandler = ChatListCallHandler(context: self.dcContext, chatCache: self.chatCache)
         self.contactCallHandler  = ContactCallHandler(context: self.dcContext, contextCallHandler: self.contextCallHandler)
         self.messageCallHandler  = MessageCallHandler(context: self.dcContext, contextCallHandler: self.contextCallHandler)
-
-        self.dcEventHandler = DCEventHandler()
-        self.dcEventHandler.start()
     }
     
     // This is our entry point

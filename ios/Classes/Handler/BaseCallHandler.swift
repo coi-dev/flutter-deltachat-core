@@ -45,6 +45,7 @@ import Foundation
 class BaseCallHandler: MethodCallHandling {
     
     fileprivate let context: DcContext!
+    fileprivate let dcEventHandler: DCEventHandler!
     fileprivate let contextCallHandler: ContextCallHandler!
     fileprivate let eventChannelHandler: EventChannelHandler!
 
@@ -52,6 +53,7 @@ class BaseCallHandler: MethodCallHandling {
     
     init(context: DcContext, contextCallHandler: ContextCallHandler, eventChannelHandler: EventChannelHandler) {
         self.context = context
+        self.dcEventHandler = DCEventHandler()
         self.contextCallHandler = contextCallHandler
         self.eventChannelHandler = eventChannelHandler
     }
@@ -82,6 +84,9 @@ class BaseCallHandler: MethodCallHandling {
     
     fileprivate func baseInit(result: FlutterResult) {
         if context.openUserDataBase() {
+
+            dcEventHandler.start()
+
             result(context.userDatabasePath)
             return
         }
