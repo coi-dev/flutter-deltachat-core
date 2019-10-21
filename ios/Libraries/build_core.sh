@@ -97,6 +97,5 @@ cd "${PWD}"
 
 show_header "🎉🚀🤘🏻 Hooray... build and installation of Deltachat-Core successfully finished! 👏"
 echo
-cd "$PWD"
 
 exit 0
