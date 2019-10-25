@@ -400,7 +400,7 @@ class ContextCallHandler: MethodCallHandling {
     fileprivate func getChatByContactId(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contactId = UInt32(methodCall.intValue(for: Argument.CONTACT_ID, result: result))
         guard let chat = context.getChatByContactId(contactId: contactId) else {
-            result(NSNull())
+            result(NSNumber(value: 0))
             return
         }
         result(NSNumber(value: chat.id))
