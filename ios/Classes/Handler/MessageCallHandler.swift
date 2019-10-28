@@ -138,7 +138,7 @@ class MessageCallHandler: MethodCallHandling {
     
     private func getFile(methodCall: FlutterMethodCall, result: FlutterResult) {
         let msg = getMessage(methodCall: methodCall, result: result)
-        result(msg.file ?? NSNull())
+        result(msg.file)
     }
     
     private func getFileBytes(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -148,12 +148,12 @@ class MessageCallHandler: MethodCallHandling {
     
     private func getFileName(methodCall: FlutterMethodCall, result: FlutterResult) {
         let msg = getMessage(methodCall: methodCall, result: result)
-        result(msg.filename ?? NSNull())
+        result(msg.filename)
     }
     
     private func getFileMime(methodCall: FlutterMethodCall, result: FlutterResult) {
         let msg = getMessage(methodCall: methodCall, result: result)
-        result(msg.filemime ?? NSNull())
+        result(msg.filemime)
     }
     
     private func getFromId(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -173,7 +173,7 @@ class MessageCallHandler: MethodCallHandling {
     
     private func getText(methodCall: FlutterMethodCall, result: FlutterResult) {
         let msg = getMessage(methodCall: methodCall, result: result)
-        result(msg.text ?? NSNull())
+        result(msg.text)
     }
     
     private func getId(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -184,7 +184,7 @@ class MessageCallHandler: MethodCallHandling {
     private func getSummaryText(methodCall: FlutterMethodCall, result: FlutterResult) {
         let msg = getMessage(methodCall: methodCall, result: result)
         let characterCount = methodCall.intValue(for: Argument.COUNT, result: result)
-        result(msg.summary(chars: characterCount) ?? NSNull())
+        result(msg.summary(chars: characterCount))
     }
     
     private func isSetupMessage(methodCall: FlutterMethodCall, result: FlutterResult) {

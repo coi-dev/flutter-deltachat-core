@@ -49,8 +49,8 @@ class EventChannelHandler: NSObject, FlutterStreamHandler, DcEventDelegate {
     fileprivate let messenger: FlutterBinaryMessenger!
     fileprivate var eventSink: FlutterEventSink?
     fileprivate var eventDelegate: DcEventDelegate!
-    fileprivate var listeners: [Int: Int] = [:]
-    fileprivate var listenerId = 0
+    fileprivate var listeners: [Int32: Int32] = [:]
+    fileprivate var listenerId: Int32 = 0
     fileprivate var eventChannel: FlutterEventChannel!
     
     let dcEventCenter: DcEventCenter = DcEventCenter.sharedInstance
@@ -69,7 +69,7 @@ class EventChannelHandler: NSObject, FlutterStreamHandler, DcEventDelegate {
     
     // MARK: - Public API
     
-    func addListener(eventId: Int) -> Int {
+    func addListener(eventId: Int32) -> Int32 {
         guard !hasListeners(for: eventId) else {
             return -1
         }
@@ -81,7 +81,7 @@ class EventChannelHandler: NSObject, FlutterStreamHandler, DcEventDelegate {
         return listenerId
     }
     
-    func remove(listener listenerId: Int) {
+    func remove(listener listenerId: Int32) {
         guard let eventId = listeners[listenerId] else {
             return
         }
@@ -108,7 +108,7 @@ class EventChannelHandler: NSObject, FlutterStreamHandler, DcEventDelegate {
     
     // MARK: - DcEventDelegate
     
-    func handle(eventWith eventId: Int, data1: Any, data2: Any) {
+    func handle(eventWith eventId: Int32, data1: Any, data2: Any) {
         if !hasListeners(for: eventId) {
             return
         }
@@ -119,7 +119,7 @@ class EventChannelHandler: NSObject, FlutterStreamHandler, DcEventDelegate {
     
     // MARK: - Private Helper
     
-    private func hasListeners(for eventId: Int) -> Bool {
+    private func hasListeners(for eventId: Int32) -> Bool {
         let values =  Array(listeners.values)
         guard let index = values.firstIndex(of: eventId) else {
             return false

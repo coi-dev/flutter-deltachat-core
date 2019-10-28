@@ -84,9 +84,8 @@ class DcContext {
         return DcChat(id: id)
     }
     
-    func getChatByContactId(contactId: UInt32) -> DcChat? {
-        let chatId = dc_get_chat_id_by_contact_id(DcContext.contextPointer, contactId)
-        return 0 == chatId ? nil : DcChat(id: chatId)
+    func getChatByContactId(contactId: UInt32) -> UInt32 {
+        return dc_get_chat_id_by_contact_id(DcContext.contextPointer, contactId)
     }
     
     /**

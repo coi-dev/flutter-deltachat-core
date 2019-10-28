@@ -240,6 +240,7 @@ class ContextCallHandler: MethodCallHandling {
         result(NSNumber(value: configSet))
     }
     
+    // TODO: Complete Rewrite!!
     fileprivate func getConfig(methodCall: FlutterMethodCall, result: FlutterResult, type: String) {
         guard let key = methodCall.stringValue(for: Argument.KEY, result: result) else {
             Method.Error.missingArgument(result: result)
@@ -296,6 +297,7 @@ class ContextCallHandler: MethodCallHandling {
                 return
         }
         let contactId = context.createContact(name: name, emailAddress: emailAddress)
+        contactCache.set(value: context.getContact(with: contactId), for: contactId)
         
         result(NSNumber(value: contactId))
     }
@@ -303,10 +305,12 @@ class ContextCallHandler: MethodCallHandling {
     fileprivate func deleteContact(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contactId = UInt32(methodCall.intValue(for: Argument.ID, result: result))
         let deleted = context.deleteContact(contactId: contactId)
+        _ = contactCache.removeValue(for: contactId)
         
         result(NSNumber(value: deleted))
     }
     
+    // TODO: Block/Unblock as one method!
     fileprivate func blockContact(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contactId = UInt32(methodCall.intValue(for: Argument.ID, result: result))
         context.blockContact(contactId: contactId, block: true)
@@ -399,11 +403,9 @@ class ContextCallHandler: MethodCallHandling {
     
     fileprivate func getChatByContactId(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contactId = UInt32(methodCall.intValue(for: Argument.CONTACT_ID, result: result))
-        guard let chat = context.getChatByContactId(contactId: contactId) else {
-            result(NSNumber(value: 0))
-            return
-        }
-        result(NSNumber(value: chat.id))
+        let chatId = context.getChatByContactId(contactId: contactId)
+
+        result(NSNumber(value: chatId))
     }
     
     fileprivate func getChat(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -445,6 +447,7 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     fileprivate func createChatAttachmentMessage(methodCall: FlutterMethodCall, result: FlutterResult) {
+        //TODO: Mime Type arrives with method call!
         let chatId = methodCall.intValue(for: Argument.CHAT_ID, result: result)
         let type = methodCall.intValue(for: Argument.TYPE, result: result)
         let text = methodCall.stringValue(for: Argument.TEXT, result: result)

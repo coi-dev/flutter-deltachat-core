@@ -145,7 +145,7 @@ class DCEventHandler {
     }
     
     fileprivate func endSMTPBackgroundTask() {
-        log.info(">> end IMAP background task")
+        log.info(">> end SMTP background task")
         UIApplication.shared.endBackgroundTask(smtpBackgroundTask)
         smtpBackgroundTask = .invalid
     }

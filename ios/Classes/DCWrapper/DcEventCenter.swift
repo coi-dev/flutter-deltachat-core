@@ -43,16 +43,16 @@
 import Foundation
 
 protocol DcEventDelegate {
-    func handle(eventWith eventId: Int, data1: Any, data2: Any)
+    func handle(eventWith eventId: Int32, data1: Any, data2: Any)
 }
 
 class DcEventCenter {
     
     static let sharedInstance: DcEventCenter = DcEventCenter()
     
-    var allObservers: [Int: [EventChannelHandler]] = [:]
+    var allObservers: [Int32: [EventChannelHandler]] = [:]
     
-    func add(observer: EventChannelHandler, for eventId: Int) {
+    func add(observer: EventChannelHandler, for eventId: Int32) {
         objc_sync_enter(allObservers)
 
         guard let observers = allObservers[eventId] else {
@@ -69,7 +69,7 @@ class DcEventCenter {
         objc_sync_exit(allObservers)
     }
     
-    func remove(observer: EventChannelHandler, with eventId: Int) {
+    func remove(observer: EventChannelHandler, with eventId: Int32) {
         objc_sync_enter(allObservers)
 
         allObservers[eventId] = allObservers[eventId]?.filter { $0 != observer }
@@ -83,7 +83,7 @@ class DcEventCenter {
         
     }
     
-    func send(data1: Any, data2: Any, toObserversWith eventId: Int) {
+    func send(data1: Any, data2: Any, toObserversWith eventId: Int32) {
         objc_sync_enter(allObservers)
         
         guard let observers = allObservers[eventId] else {

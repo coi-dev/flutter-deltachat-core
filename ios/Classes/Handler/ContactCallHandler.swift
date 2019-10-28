@@ -128,7 +128,7 @@ class ContactCallHandler: MethodCallHandling {
     
     fileprivate func getProfileImage(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
-        result(contact.profileImageFilePath ?? NSNull())
+        result(contact.profileImageFilePath)
     }
     
     fileprivate func getColor(methodCall: FlutterMethodCall, result: FlutterResult) {

@@ -97,7 +97,7 @@ class DcChat {
         return Utils.copyAndFreeArray(inputArray: chatContacts)
     }
     
-    lazy var profileImageFilePath: String = {
+    lazy var profileImageFilePath: String? = {
         guard let cString = dc_chat_get_profile_image(chatPointer) else { return "" }
         let filePath = String(cString: cString)
         free(cString)
@@ -108,7 +108,7 @@ class DcChat {
             return path.absoluteString
         }
         
-        return ""
+        return nil
     }()
     
     var archived: Int32 {

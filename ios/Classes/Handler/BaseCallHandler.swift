@@ -53,9 +53,10 @@ class BaseCallHandler: MethodCallHandling {
     
     init(context: DcContext, contextCallHandler: ContextCallHandler, eventChannelHandler: EventChannelHandler) {
         self.context = context
-        self.dcEventHandler = DCEventHandler()
         self.contextCallHandler = contextCallHandler
         self.eventChannelHandler = eventChannelHandler
+
+        self.dcEventHandler = DCEventHandler()
     }
 
     // MARK: - Protocol MethodCallHandling
@@ -84,9 +85,7 @@ class BaseCallHandler: MethodCallHandling {
     
     fileprivate func baseInit(result: FlutterResult) {
         if context.openUserDataBase() {
-
             dcEventHandler.start()
-
             result(context.userDatabasePath)
             return
         }
@@ -104,14 +103,13 @@ class BaseCallHandler: MethodCallHandling {
         
         // Add a new Listener
         if true == add {
-            let listenerId = eventChannelHandler.addListener(eventId: Int(eventId))
+            let listenerId = eventChannelHandler.addListener(eventId: eventId)
             result(listenerId)
             return
         }
 
         // Remove a given Listener
-        let listenerId = methodCall.intValue(for: Argument.EVENT_ID, result: result)
-        eventChannelHandler.remove(listener: Int(listenerId))
+        eventChannelHandler.remove(listener: eventId)
         
         result(nil)
     }

@@ -42,6 +42,7 @@
 
 import Foundation
 
+// TODO: Complete Rewrite!!
 class DcConfig {
 
     private class func getConfig(_ key: DcConfigKey) -> String? {
@@ -126,7 +127,7 @@ class DcConfig {
     }
     
     class var isConfigured: Bool {
-        return 0 != dc_is_configured(DcContext.contextPointer)
+        return 1 == dc_is_configured(DcContext.contextPointer)
     }
     
     class var displayname: String? {
