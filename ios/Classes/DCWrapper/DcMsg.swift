@@ -76,17 +76,15 @@ class DcMsg: MessageType {
 
     lazy var kind: MessageKind = {
         if isInfoMessage {
-            let text = NSAttributedString(string: self.text ?? "", attributes: [
-                NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 12),
+            let text = NSAttributedString(string: self.text, attributes: [
+                NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: UIFont.systemFontSize),
                 NSAttributedString.Key.foregroundColor: UIColor.darkGray,
                 ])
             return MessageKind.attributedText(text)
         }
 
-        let text = self.text ?? ""
-
         if self.viewtype == nil {
-            return MessageKind.text(text)
+            return MessageKind.text(self.text)
         }
 
         switch self.viewtype! {
@@ -96,8 +94,8 @@ class DcMsg: MessageType {
             return MessageKind.video(Media(url: fileURL))
         default:
             // TODO: custom views for audio, etc
-            if let filename = self.filename {
-                return MessageKind.text("File: \(self.filename ?? "") (\(self.filesize) bytes)")
+            if !self.filename.isEmpty {
+                return MessageKind.text("File: \(self.filename) (\(self.filesize) bytes)")
             }
             return MessageKind.text(text)
         }
@@ -132,8 +130,8 @@ class DcMsg: MessageType {
         return dc_msg_get_chat_id(messagePointer)
     }
 
-    var text: String? {
-        guard let cString = dc_msg_get_text(messagePointer) else { return nil }
+    var text: String {
+        guard let cString = dc_msg_get_text(messagePointer) else { return "" }
         let swiftString = String(cString: cString)
         free(cString)
         return swiftString
@@ -161,8 +159,8 @@ class DcMsg: MessageType {
     }
 
     var fileURL: URL? {
-        if let file = self.file {
-            return URL(fileURLWithPath: file, isDirectory: false)
+        if !self.file.isEmpty {
+            return URL(fileURLWithPath: self.file, isDirectory: false)
         }
         return nil
     }
@@ -186,34 +184,34 @@ class DcMsg: MessageType {
         }
         }()
 
-    var file: String? {
+    var file: String {
         if let cString = dc_msg_get_file(messagePointer) {
             let str = String(cString: cString)
             free(cString)
-            return str.isEmpty ? nil : str
+            return str
         }
 
-        return nil
+        return ""
     }
 
-    var filemime: String? {
+    var filemime: String {
         if let cString = dc_msg_get_filemime(messagePointer) {
             let str = String(cString: cString)
             free(cString)
-            return str.isEmpty ? nil : str
+            return str
         }
 
-        return nil
+        return ""
     }
 
-    var filename: String? {
+    var filename: String {
         if let cString = dc_msg_get_filename(messagePointer) {
             let str = String(cString: cString)
             free(cString)
-            return str.isEmpty ? nil : str
+            return str
         }
 
-        return nil
+        return ""
     }
 
     var filesize: UInt64 {
@@ -254,11 +252,11 @@ class DcMsg: MessageType {
     }
 
     var timestamp: Int64 {
-        return Int64(dc_msg_get_timestamp(messagePointer))
+        return dc_msg_get_timestamp(messagePointer) * 1000
     }
 
-    func summary(chars: Int32) -> String? {
-        guard let cString = dc_msg_get_summarytext(messagePointer, chars) else { return nil }
+    func summary(chars: Int32) -> String {
+        guard let cString = dc_msg_get_summarytext(messagePointer, chars) else { return "" }
         let swiftString = String(cString: cString)
         free(cString)
         return swiftString
@@ -282,12 +280,7 @@ class DcMsg: MessageType {
     }
     
     var hasFile: Bool {
-        if let file = self.file {
-            if !file.isEmpty {
-                return true
-            }
-        }
-        return false
+        return !self.file.isEmpty
     }
     
     var showPadLock: Int32 {
@@ -302,7 +295,7 @@ class DcMsg: MessageType {
         if let cString = dc_msg_get_setupcodebegin(messagePointer) {
             let str = String(cString: cString)
             free(cString)
-            return str.isEmpty ? "" : str
+            return str
         }
         return ""
     }

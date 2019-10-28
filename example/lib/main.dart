@@ -138,9 +138,8 @@ class _MyAppState extends State<MyApp> {
         var groupAddResult = await context.addContactToChat(groupChatId, contactId);
         _addListItem(text: "addContactToChat", assertion: 1, result: groupAddResult);
         StreamController controller = StreamController();
-        var listenerId = await core.listen(Event.configureProgress, controller);
-        _addListItem(text: "listen (core)", assertion: 1, result: listenerId);
-        await core.removeListener(Event.configureProgress, listenerId);
+        await core.listen(Event.configureProgress, controller);
+        await core.removeListener(Event.configureProgress, controller);
         var contactIds = await context.getContacts(2, null);
         _addListItem(text: "getContacts (context)", assertion: 3, result: contactIds.length);
         var chatContactIds = await context.getChatContacts(chatId);

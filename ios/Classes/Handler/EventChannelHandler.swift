@@ -42,89 +42,84 @@
 
 import Foundation
 
-class EventChannelHandler: NSObject, FlutterStreamHandler, DcEventDelegate {
+class EventChannelHandler: NSObject, FlutterStreamHandler {
     
+    fileprivate enum ListenersCountUpdateMethod {
+        case inc
+        case dec
+    }
+
     fileprivate let CHANNEL_DELTA_CHAT_CORE_EVENTS = "deltaChatCoreEvents"
-    
-    fileprivate let messenger: FlutterBinaryMessenger!
     fileprivate var eventSink: FlutterEventSink?
-    fileprivate var eventDelegate: DcEventDelegate!
-    fileprivate var listeners: [Int: Int] = [:]
-    fileprivate var listenerId = 0
+    fileprivate var listeners: [Int32: Int32] = [:]
     fileprivate var eventChannel: FlutterEventChannel!
     
-    let dcEventCenter: DcEventCenter = DcEventCenter.sharedInstance
-
-    // MARK: - Initialization
+    var messenger: FlutterBinaryMessenger? {
+        didSet {
+            if let messenger = messenger {
+                self.eventChannel = FlutterEventChannel(name: CHANNEL_DELTA_CHAT_CORE_EVENTS, binaryMessenger: messenger)
+            }
+            self.eventChannel.setStreamHandler(self)
+        }
+    }
     
-    init(messenger: FlutterBinaryMessenger) {
-        self.messenger = messenger
-        self.eventChannel = FlutterEventChannel(name: CHANNEL_DELTA_CHAT_CORE_EVENTS, binaryMessenger: messenger)
+    static let sharedInstance: EventChannelHandler = EventChannelHandler()
 
+    override init() {
         super.init()
-
-        self.eventDelegate = self
-        self.eventChannel.setStreamHandler(self)
     }
     
     // MARK: - Public API
     
-    func addListener(eventId: Int) -> Int {
-        guard !hasListeners(for: eventId) else {
-            return -1
-        }
-
-        listenerId += 1
-        listeners[listenerId] = eventId
-        dcEventCenter.add(observer: self, for: eventId)
-
-        return listenerId
+    func addListener(eventId: Int32) {
+        updateListenersCount(for: eventId, updateBy: .inc)
+        return
     }
     
-    func remove(listener listenerId: Int) {
-        guard let eventId = listeners[listenerId] else {
-            return
-        }
-        
-        listeners.removeValue(forKey: listenerId)
-        dcEventCenter.remove(observer: self, with: eventId)
+    func removeListener(eventId: Int32) {
+        updateListenersCount(for: eventId, updateBy: .dec)
     }
  
     // MARK: - FlutterStreamHandler
     
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-        if nil != self.eventSink {
-            return nil
-        }
-        
+        if nil != eventSink { return nil }
         eventSink = events
         return nil
     }
     
     func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        if nil == eventSink { return nil }
         eventSink = nil
         return nil
     }
     
-    // MARK: - DcEventDelegate
-    
-    func handle(eventWith eventId: Int, data1: Any, data2: Any) {
-        if !hasListeners(for: eventId) {
-            return
-        }
+    func handle(_ eventId: Int32, data1: Any, data2: Any) {
+        if !hasListeners(for: eventId) { return }
 
+        log.info("Begin handle event [\(eventId)]: data1 (\(data1)), data2 (\(data2))")
         let result = [eventId, data1, data2]
         self.eventSink?(result)
+        log.info("End handle event [\(eventId)]: result (\(result))")
     }
     
     // MARK: - Private Helper
     
-    private func hasListeners(for eventId: Int) -> Bool {
-        let values =  Array(listeners.values)
-        guard let index = values.firstIndex(of: eventId) else {
-            return false
+    fileprivate func hasListeners(for eventId: Int32) -> Bool {
+        if let listenersCount = listeners[eventId] {
+            return listenersCount > 0
         }
-        return eventId != 0 && index >= 0
+        return false
+    }
+    
+    fileprivate func updateListenersCount(for eventId: Int32, updateBy: ListenersCountUpdateMethod) {
+        switch updateBy {
+            case .inc:
+                listeners[eventId] = (listeners[eventId] ?? 0) + 1
+            
+            case .dec:
+                listeners[eventId] = (listeners[eventId] ?? 1) - 1
+        }
     }
 
 }

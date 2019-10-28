@@ -61,8 +61,8 @@ class DcLot {
         return swiftString
     }
     
-    var text1Meaning: Int {
-        return Int(dc_lot_get_text1_meaning(dcLotPointer))
+    var text1Meaning: Int32 {
+        return dc_lot_get_text1_meaning(dcLotPointer)
     }
     
     var text2: String? {
@@ -73,15 +73,15 @@ class DcLot {
     }
     
     var timestamp: Int64 {
-        return Int64(dc_lot_get_timestamp(dcLotPointer))
+        return dc_lot_get_timestamp(dcLotPointer) * 1000
     }
     
-    var state: Int {
-        return Int(dc_lot_get_state(dcLotPointer))
+    var state: Int32 {
+        return dc_lot_get_state(dcLotPointer)
     }
     
-    var id: Int {
-        return Int(dc_lot_get_id(dcLotPointer))
+    var id: UInt32 {
+        return dc_lot_get_id(dcLotPointer)
     }
     
     var propertyArray: [Any] {

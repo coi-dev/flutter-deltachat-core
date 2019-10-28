@@ -84,9 +84,8 @@ class DcContext {
         return DcChat(id: id)
     }
     
-    func getChatByContactId(contactId: UInt32) -> DcChat? {
-        let chatId = dc_get_chat_id_by_contact_id(DcContext.contextPointer, contactId)
-        return 0 == chatId ? nil : DcChat(id: chatId)
+    func getChatByContactId(contactId: UInt32) -> UInt32 {
+        return dc_get_chat_id_by_contact_id(DcContext.contextPointer, contactId)
     }
     
     /**
@@ -258,7 +257,7 @@ class DcContext {
         return messageId
     }
     
-    func sendAttachment(fromPath path: String, withType type: Int32, text: String?, forChatId chatId: UInt32) throws -> UInt32 {
+    func sendAttachment(fromPath path: String, withType type: Int32, mimeType: String, text: String?, forChatId chatId: UInt32) throws -> UInt32 {
         guard Int(type).isValidAttachmentType else {
             throw DcContextError(kind: .wrongAttachmentType(type))
         }
@@ -292,7 +291,7 @@ class DcContext {
             default: break
         }
         
-        dc_msg_set_file(msg, path, path.mimeType)
+        dc_msg_set_file(msg, path, mimeType)
 
         if let text = text {
             dc_msg_set_text(msg, text.cString(using: .utf8))
@@ -418,4 +417,44 @@ class DcContext {
         dc_interrupt_mvbox_idle(DcContext.contextPointer)
     }
 
+    // MARK: - Config
+
+    func setConfig(value: String, forKey key: String) -> Int32 {
+        log.debug("setConfig value: '\(value)', for key: '\(key)'")
+        return dc_set_config(DcContext.contextPointer, key, value)
+    }
+
+    func setConfigInt(value: Int32, forKey key: String) -> Int32 {
+        return setConfig(value: "\(value)", forKey: key)
+    }
+
+    func getConfig(for key: String) -> String? {
+        log.debug("getConfig for key: '\(key)'")
+        let value = dc_get_config(DcContext.contextPointer, key)
+        if let cString = value {
+            let str = String(cString: cString)
+            if !str.isEmpty {
+                return str
+            }
+        }
+        return nil
+    }
+
+    func getConfigInt(for key: String) -> Int32? {
+        if let value = getConfig(for: key) {
+            return Int32(value)
+        }
+        return nil
+    }
+
+    func configure() {
+        if (!isConfigured) {
+            dc_configure(DcContext.contextPointer)
+        }
+    }
+    
+    var isConfigured: Bool {
+        return 1 == dc_is_configured(DcContext.contextPointer)
+    }
+    
 }

@@ -26,7 +26,7 @@
  * https://www.open-xchange.com/legal/. The contributing author shall be
  * given Attribution for the derivative code and a license granting use.
  *
- * Copyright (C) 2016-2020 OX Software GmbH
+ * Copyright (C) 2016-2019 OX Software GmbH
  * Mail: info@open-xchange.com
  *
  *
@@ -40,31 +40,18 @@
  * for more details.
  */
 
-package com.openxchange.deltachatcore;
+import Foundation
 
-import android.util.SparseArray;
-
-public abstract class Cache<T> {
-    SparseArray<T> items = new SparseArray<>();
-
-    public T get(int id) {
-        return items.get(id);
-    }
-
-    public void delete(int id) {
-        items.delete(id);
-    }
-
-    public int size() {
-        return items.size();
-    }
-
-    public boolean contains(int id) {
-        return items.indexOfKey(id) > 0;
-    }
-
-    public void clear() {
-        items.clear();
+class IdCache<T>: Cache<T> {
+    
+    // MARK: - Public API
+    
+    func set(value: T?, for key: UInt32) {
+        if nil == value {
+            _ = items.removeValue(forKey: key)
+            return
+        }
+        items[key] = value
     }
 
 }

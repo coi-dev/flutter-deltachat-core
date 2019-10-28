@@ -51,18 +51,17 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
     fileprivate let registrar: FlutterPluginRegistrar!
 
     fileprivate let dcContext: DcContext!
+    fileprivate let dcEventHandler: DCEventHandler!
 
-    fileprivate let chatCache: Cache<DcChat> = Cache()
-    fileprivate let contactCache: Cache<DcContact> = Cache()
-    fileprivate let messageCache: Cache<DcMsg> = Cache()
+    fileprivate let chatCache: IdCache<DcChat> = IdCache()
+    fileprivate let contactCache: IdCache<DcContact> = IdCache()
+    fileprivate let messageCache: IdCache<DcMsg> = IdCache()
 
-    fileprivate let baseCallHandler: BaseCallHandler!
     fileprivate let chatCallHandler: ChatCallHandler!
     fileprivate let chatListCallHandler: ChatListCallHandler!
     fileprivate let contactCallHandler: ContactCallHandler!
     fileprivate let contextCallHandler: ContextCallHandler!
     fileprivate let messageCallHandler: MessageCallHandler!
-    fileprivate let eventChannelHandler: EventChannelHandler!
 
     // MARK: - Initialization
 
@@ -70,14 +69,16 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         self.registrar = registrar
         
         self.dcContext = DcContext()
-
-        self.eventChannelHandler = EventChannelHandler(messenger: registrar.messenger())
+        self.dcEventHandler = DCEventHandler()
+        
         self.contextCallHandler  = ContextCallHandler(context: self.dcContext, contactCache: self.contactCache, messageCache: self.messageCache, chatCache: self.chatCache)
-        self.baseCallHandler     = BaseCallHandler(context: self.dcContext, contextCallHandler: self.contextCallHandler, eventChannelHandler: self.eventChannelHandler)
         self.chatCallHandler     = ChatCallHandler(contextCalHandler: self.contextCallHandler)
         self.chatListCallHandler = ChatListCallHandler(context: self.dcContext, chatCache: self.chatCache)
         self.contactCallHandler  = ContactCallHandler(context: self.dcContext, contextCallHandler: self.contextCallHandler)
         self.messageCallHandler  = MessageCallHandler(context: self.dcContext, contextCallHandler: self.contextCallHandler)
+        
+        let ech = EventChannelHandler.sharedInstance
+        ech.messenger = registrar.messenger()
     }
     
     // This is our entry point
@@ -95,22 +96,16 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         switch (call.methodPrefix) {
         case Method.Prefix.CONTEXT:
             contextCallHandler.handle(call, result: result)
-            break
         case Method.Prefix.BASE:
-            baseCallHandler.handle(call, result: result)
-            break
+            handleBaseCalls(with: call, result: result)
         case Method.Prefix.CHAT:
             chatCallHandler.handle(call, result: result)
-            break
         case Method.Prefix.CHAT_LIST:
             chatListCallHandler.handle(call, result: result)
-            break
         case Method.Prefix.CONTACT:
             contactCallHandler.handle(call, result: result)
-            break
         case Method.Prefix.MSG:
             messageCallHandler.handle(call, result: result)
-            break
         default:
             log.debug("Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
@@ -118,4 +113,59 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
 
     }
  
+    func handleBaseCalls(with call: FlutterMethodCall, result: FlutterResult) {
+        switch (call.method) {
+        case Method.Base.INIT:
+            baseInit(result: result)
+        case Method.Base.SYSTEM_INFO:
+            systemInfo(result: result)
+        case Method.Base.CORE_LISTENER:
+            coreListener(methodCall: call, result: result);
+        case Method.Base.SET_CORE_STRINGS:
+            setCoreStrings(methodCall: call, result: result);
+        default:
+            log.error("Failing for \(call.method)")
+            result(FlutterMethodNotImplemented)
+        }
+    }
+    
+    // MARK: - Handle Base Calls
+    
+    fileprivate func baseInit(result: FlutterResult) {
+        if dcContext.openUserDataBase() {
+            dcEventHandler.start()
+            result(dcContext.userDatabasePath)
+            return
+        }
+        log.error("Couldn't open user database at path: \(dcContext.userDatabasePath)")
+        result(DCPluginError.couldNotOpenDataBase())
+    }
+    
+    fileprivate func systemInfo(result: FlutterResult) {
+        result(UIApplication.version)
+    }
+    
+    fileprivate func coreListener(methodCall: FlutterMethodCall, result: FlutterResult) {
+        let eventId = methodCall.intValue(for: Argument.EVENT_ID, result: result)
+        let add = methodCall.boolValue(for: Argument.ADD, result: result)
+        
+        // Add a new Listener
+        if true == add {
+            EventChannelHandler.sharedInstance.addListener(eventId: eventId)
+            result(nil)
+            return
+        }
+
+        // Remove a given Listener
+        EventChannelHandler.sharedInstance.removeListener(eventId: eventId)
+        
+        result(nil)
+    }
+    
+    fileprivate func setCoreStrings(methodCall: FlutterMethodCall, result: FlutterResult) {
+        if let coreStrings: CoreStrings.CoreStringsDictionary = methodCall.arguments as? CoreStrings.CoreStringsDictionary {
+            CoreStrings.sharedInstance.strings = coreStrings
+        }
+        result(nil)
+    }
 }

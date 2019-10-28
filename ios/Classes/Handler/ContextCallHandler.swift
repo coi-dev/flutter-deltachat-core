@@ -45,11 +45,11 @@ import Foundation
 class ContextCallHandler: MethodCallHandling {
 
     fileprivate let context: DcContext!
-    fileprivate let contactCache: Cache<DcContact>!
-    fileprivate let messageCache: Cache<DcMsg>!
-    fileprivate let chatCache: Cache<DcChat>!
+    fileprivate let contactCache: IdCache<DcContact>!
+    fileprivate let messageCache: IdCache<DcMsg>!
+    fileprivate let chatCache: IdCache<DcChat>!
     
-    init(context: DcContext, contactCache: Cache<DcContact>, messageCache: Cache<DcMsg>, chatCache: Cache<DcChat>) {
+    init(context: DcContext, contactCache: IdCache<DcContact>, messageCache: IdCache<DcMsg>, chatCache: IdCache<DcChat>) {
         self.context = context
         self.contactCache = contactCache
         self.messageCache = messageCache
@@ -64,16 +64,16 @@ class ContextCallHandler: MethodCallHandling {
             setConfig(methodCall: call, result: result)
             break
         case Method.Context.CONFIG_GET:
-            getConfig(methodCall: call, result: result, type: ArgumentType.STRING)
+            getConfig(methodCall: call, result: result, type: .string)
             break
         case Method.Context.CONFIG_GET_INT:
-            getConfig(methodCall: call, result: result, type: ArgumentType.INT)
+            getConfig(methodCall: call, result: result, type: .int)
             break
         case Method.Context.CONFIGURE:
             configure(result: result)
             break
         case Method.Context.IS_CONFIGURED:
-            result(DcConfig.isConfigured)
+            result(context.isConfigured)
             break
         case Method.Context.ADD_ADDRESS_BOOK:
             addAddressBook(methodCall: call, result: result)
@@ -85,10 +85,10 @@ class ContextCallHandler: MethodCallHandling {
             deleteContact(methodCall: call, result: result)
             break
         case Method.Context.BLOCK_CONTACT:
-            blockContact(methodCall: call, result: result)
+            blockUnblockContact(methodCall: call, result: result, block: true)
             break
         case Method.Context.UNBLOCK_CONTACT:
-            unblockContact(methodCall: call, result: result)
+            blockUnblockContact(methodCall: call, result: result, block: false)
             break
         case Method.Context.CREATE_CHAT_BY_CONTACT_ID:
             createChatByContactId(methodCall: call, result: result)
@@ -225,55 +225,45 @@ class ContextCallHandler: MethodCallHandling {
     // MARK: - Configuration
     
     fileprivate func setConfig(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let key = methodCall.stringValue(for: Argument.KEY, result: result) else {
+        guard let key = methodCall.stringValue(for: Argument.KEY, result: result),
+            let type = methodCall.stringValue(for: Argument.TYPE, result: result),
+            let argumentType = ArgumentType(rawValue: type) else {
                 Method.Error.missingArgument(result: result)
                 return
         }
-
-        guard let configKey = DcConfigKey(rawValue: key) else {
-            Method.Error.couldNotCreateConfigKey(methodCall: methodCall, result: result, key: key)
-            return
+        
+        var configured: Int32 = 0
+        switch argumentType {
+            case .int:
+                let value = methodCall.intValue(for: Argument.VALUE, result: result)
+                configured = context.setConfigInt(value: value, forKey: key)
+            
+            case .string:
+                if let value = methodCall.stringValue(for: Argument.VALUE, result: result) {
+                    configured = context.setConfig(value: value, forKey: key)
+                }
         }
         
-        let value = methodCall.stringValue(for: Argument.VALUE, result: result)
-        let configSet = DcConfig.set(key: configKey, value: value)
-        result(NSNumber(value: configSet))
+        result(NSNumber(value: configured))
     }
     
-    fileprivate func getConfig(methodCall: FlutterMethodCall, result: FlutterResult, type: String) {
+    fileprivate func getConfig(methodCall: FlutterMethodCall, result: FlutterResult, type: ArgumentType) {
         guard let key = methodCall.stringValue(for: Argument.KEY, result: result) else {
             Method.Error.missingArgument(result: result)
             return
         }
         
-        switch (type) {
-            case ArgumentType.STRING:
-                let value = dc_get_config(DcContext.contextPointer, key)
-                if let pSafe = value {
-                    let c = String(cString: pSafe)
-                    if c.isEmpty {
-                        result(nil)
-                    }
-                    result(c)
-                }
-                break
-            
-            case ArgumentType.INT:
-                let value = dc_get_config(DcContext.contextPointer, key)
-                if let pSafe = value {
-                    let c = Int(bitPattern: pSafe)
-                    
-                    result(c)
-                }
-                break
-            
-            default: break
+        switch type {
+            case .int:
+                result(context.getConfigInt(for: key))
+
+            case .string:
+                result(context.getConfig(for: key))
         }
     }
     
     fileprivate func configure(result: FlutterResult) {
-        dc_configure(DcContext.contextPointer)
-
+        context.configure()
         result(nil)
     }
     
@@ -295,7 +285,9 @@ class ContextCallHandler: MethodCallHandling {
                 Method.Error.missingArgument(result: result)
                 return
         }
+
         let contactId = context.createContact(name: name, emailAddress: emailAddress)
+        contactCache.set(value: context.getContact(with: contactId), for: contactId)
         
         result(NSNumber(value: contactId))
     }
@@ -303,20 +295,14 @@ class ContextCallHandler: MethodCallHandling {
     fileprivate func deleteContact(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contactId = UInt32(methodCall.intValue(for: Argument.ID, result: result))
         let deleted = context.deleteContact(contactId: contactId)
+        _ = contactCache.removeValue(for: contactId)
         
         result(NSNumber(value: deleted))
     }
     
-    fileprivate func blockContact(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func blockUnblockContact(methodCall: FlutterMethodCall, result: FlutterResult, block: Bool) {
         let contactId = UInt32(methodCall.intValue(for: Argument.ID, result: result))
-        context.blockContact(contactId: contactId, block: true)
-
-        result(nil)
-    }
-    
-    fileprivate func unblockContact(methodCall: FlutterMethodCall, result: FlutterResult) {
-        let contactId = UInt32(methodCall.intValue(for: Argument.ID, result: result))
-        context.blockContact(contactId: contactId, block: false)
+        context.blockContact(contactId: contactId, block: block)
 
         result(nil)
     }
@@ -399,11 +385,9 @@ class ContextCallHandler: MethodCallHandling {
     
     fileprivate func getChatByContactId(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contactId = UInt32(methodCall.intValue(for: Argument.CONTACT_ID, result: result))
-        guard let chat = context.getChatByContactId(contactId: contactId) else {
-            result(NSNumber(value: 0))
-            return
-        }
-        result(NSNumber(value: chat.id))
+        let chatId = context.getChatByContactId(contactId: contactId)
+
+        result(NSNumber(value: chatId))
     }
     
     fileprivate func getChat(methodCall: FlutterMethodCall, result: FlutterResult) {
@@ -448,6 +432,7 @@ class ContextCallHandler: MethodCallHandling {
         let chatId = methodCall.intValue(for: Argument.CHAT_ID, result: result)
         let type = methodCall.intValue(for: Argument.TYPE, result: result)
         let text = methodCall.stringValue(for: Argument.TEXT, result: result)
+        let mimeType = String(describing: methodCall.stringValue(for: Argument.MIME_TYPE, result: result))
 
         guard let path = methodCall.stringValue(for: Argument.PATH, result: result) else {
             Method.Error.missingArgumentValue(for: Argument.PATH, result: result)
@@ -455,7 +440,7 @@ class ContextCallHandler: MethodCallHandling {
         }
 
         do {
-            let messageId = try context.sendAttachment(fromPath: path, withType: type, text: text, forChatId: UInt32(chatId))
+            let messageId = try context.sendAttachment(fromPath: path, withType: type, mimeType: mimeType, text: text, forChatId: UInt32(chatId))
             result(NSNumber(value: messageId))
             
         } catch DcContextError.ErrorKind.missingImageAtPath(let path) {
@@ -641,7 +626,7 @@ class ContextCallHandler: MethodCallHandling {
     func loadAndCacheChat(with id: UInt32, update: Bool = false) -> DcChat {
         guard let chat = chatCache.value(for: id) else {
             let chat = context.getChat(with: id)
-            _ = chatCache.add(object: chat)
+            chatCache.set(value: chat, for: id)
             return chat
         }
         return chat
@@ -650,7 +635,7 @@ class ContextCallHandler: MethodCallHandling {
     func loadAndCacheContact(with id: UInt32, update: Bool = false) -> DcContact {
         guard let contact = contactCache.value(for: id) else {
             let contact = context.getContact(with: id)
-            _ = contactCache.add(object: contact)
+            contactCache.set(value: contact, for: id)
             return contact
         }
         return contact
@@ -665,7 +650,7 @@ class ContextCallHandler: MethodCallHandling {
         
         guard let msg = messageCache.value(for: id) else {
             let msg = context.getMsg(with: id)
-            _ = messageCache.add(object: msg)
+            messageCache.set(value: msg, for: id)
             return msg
         }
         return msg

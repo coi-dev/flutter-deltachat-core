@@ -42,59 +42,23 @@
 
 import Foundation
 
-protocol DcEventDelegate {
-    func handle(eventWith eventId: Int, data1: Any, data2: Any)
-}
+class IncrementalCache<T>: Cache<T> {
 
-class DcEventCenter {
+    private(set) var currentKey: UInt32 = 0
     
-    static let sharedInstance: DcEventCenter = DcEventCenter()
-    
-    var allObservers: [Int: [EventChannelHandler]] = [:]
-    
-    func add(observer: EventChannelHandler, for eventId: Int) {
-        objc_sync_enter(allObservers)
+    // MARK: - Public API
 
-        guard let observers = allObservers[eventId] else {
-            allObservers[eventId] = [observer]
-            return
-        }
-
-        var newObservers = observers
-        newObservers.append(observer)
-        allObservers[eventId] = newObservers
+    func add(object: T) -> UInt32 {
+        let usedKey = currentKey
+        currentKey += 1
+        items[usedKey] = object
         
-        log.info("add observer for event ID: \(eventId)")
-
-        objc_sync_exit(allObservers)
+        return usedKey
     }
     
-    func remove(observer: EventChannelHandler, with eventId: Int) {
-        objc_sync_enter(allObservers)
-
-        allObservers[eventId] = allObservers[eventId]?.filter { $0 != observer }
-        
-        log.info("remove observer for event ID: \(eventId)")
-
-        objc_sync_exit(allObservers)
+    override func clear() {
+        super.clear()
+        currentKey = 0
     }
-    
-    func remove(observers observer: DcEventDelegate) {
-        
-    }
-    
-    func send(data1: Any, data2: Any, toObserversWith eventId: Int) {
-        objc_sync_enter(allObservers)
-        
-        guard let observers = allObservers[eventId] else {
-            return
-        }
-        
-        for observer in observers {
-            observer.handle(eventWith: eventId, data1: data1, data2: data2)
-        }
 
-        objc_sync_exit(allObservers)
-    }
-    
 }

@@ -56,26 +56,4 @@ struct Utils {
         return acc
     }
 
-    static func bool(for value: String?, defaultValue: Bool? = true) -> Bool {
-        if let vStr = value {
-            if let vInt = Int(vStr) {
-                return vInt == 1
-            }
-            return defaultValue!
-        }
-        
-        return defaultValue!
-    }
-    
-    static func int(for value: String?, defaultValue: Int? = 0) -> Int {
-        if let vStr = value {
-            if let vInt = Int(vStr) {
-                return vInt
-            }
-            return defaultValue!
-        }
-        
-        return defaultValue!
-    }
-
 }

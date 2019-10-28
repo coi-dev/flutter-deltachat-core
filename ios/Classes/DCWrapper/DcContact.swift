@@ -95,23 +95,6 @@ class DcContact {
     var isBlocked: Bool {
         return dc_contact_is_blocked(contactPointer) == 1
     }
-    
-    lazy var profileImage: UIImage? = { [unowned self] in
-        guard let cString = dc_contact_get_profile_image(contactPointer) else { return nil }
-        let filename = String(cString: cString)
-        free(cString)
-        let path: URL = URL(fileURLWithPath: filename, isDirectory: false)
-        if path.isFileURL {
-            do {
-                let data = try Data(contentsOf: path)
-                return UIImage(data: data)
-            } catch {
-                log.warning("failed to load image: \(filename), \(error)")
-                return nil
-            }
-        }
-        return nil
-        }()
   
     lazy var profileImageFilePath: String? = {
         guard let cString = dc_contact_get_profile_image(contactPointer) else { return nil }
@@ -131,8 +114,8 @@ class DcContact {
         return Int(dc_contact_get_color(contactPointer))
     }
     
-    var id: Int {
-        return Int(dc_contact_get_id(contactPointer))
+    var id: UInt32 {
+        return dc_contact_get_id(contactPointer)
     }
     
     func block() {

@@ -26,7 +26,7 @@
  * https://www.open-xchange.com/legal/. The contributing author shall be
  * given Attribution for the derivative code and a license granting use.
  *
- * Copyright (C) 2016-2019 OX Software GmbH
+ * Copyright (C) 2016-2020 OX Software GmbH
  * Mail: info@open-xchange.com
  *
  *
@@ -40,55 +40,13 @@
  * for more details.
  */
 
-import Foundation
+package com.openxchange.deltachatcore;
 
-class Cache<T> {
-    
-    fileprivate var items: [UInt32: T] = [:]
-    private(set) var lastKey: UInt32 = 0
-    
-    // MARK: - Public API
-    
-    func add(object: T) -> UInt32 {
-        let usedKey = lastKey
-        
-        items[lastKey] = object
-        lastKey += 1
-        
-        return usedKey
-    }
-    
-    func set(value: T?, for key: UInt32) {
-        if nil == value {
-            _ = items.removeValue(forKey: key)
-            return
-        }
-        items[key] = value
-    }
-    
-    func value(for key: UInt32) -> T? {
-        return items[key]
-    }
-    
-    func removeValue(for key: UInt32) -> T? {
-        return items.removeValue(forKey: key)
-    }
-    
-    func contains(key: UInt32) -> Bool {
-        return items.keys.contains(key)
-    }
-    
-    func clear() {
-        items.removeAll()
-        lastKey = 0
-    }
-    
-    var numberOfObjects: Int {
-        return items.keys.count
-    }
-    
-    var allObjects: [T] {
-        return items.values.map { $0 }
+
+public class IdCache<T> extends Cache<T>{
+
+    public void put(int id, T item) {
+        items.put(id, item);
     }
 
 }

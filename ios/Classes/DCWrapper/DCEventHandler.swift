@@ -62,7 +62,7 @@ class DCEventHandler {
         
         state = .running
 
-        DispatchQueue.global(qos: .utility).async { [weak self] in
+        DispatchQueue.global(qos: .background).async { [weak self] in
             guard let self = self else { return }
             
             self.beginIMAPBackgroundTask()
@@ -145,7 +145,7 @@ class DCEventHandler {
     }
     
     fileprivate func endSMTPBackgroundTask() {
-        log.info(">> end IMAP background task")
+        log.info(">> end SMTP background task")
         UIApplication.shared.endBackgroundTask(smtpBackgroundTask)
         smtpBackgroundTask = .invalid
     }

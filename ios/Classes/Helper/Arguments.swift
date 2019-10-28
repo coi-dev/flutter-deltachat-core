@@ -32,13 +32,13 @@ struct Argument {
     static let QR_TEXT           = "qrText"
     static let ADD               = "add"
     static let EVENT_ID          = "eventId"
-    static let LISTENER_ID       = "listenerId"
     static let DB_NAME           = "dbName"
     static let UID               = "uid"
     static let JSON              = "json"
     static let ENABLE            = "enable"
     static let MODE              = "mode"
     static let MESSAGE           = "message"
+    static let MIME_TYPE         = "mimeType"
 
     struct Error {
         static let MISSING       = "1"
@@ -50,7 +50,7 @@ struct Argument {
     
 }
 
-struct ArgumentType {
-    static let INT    = "int"
-    static let STRING = "String"
+enum ArgumentType: String {
+    case `int` = "int"
+    case string = "String"
 }

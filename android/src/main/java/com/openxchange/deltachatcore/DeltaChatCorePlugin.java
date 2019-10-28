@@ -90,7 +90,6 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
 
     private static final String ARGUMENT_ADD = "add";
     private static final String ARGUMENT_EVENT_ID = "eventId";
-    private static final String ARGUMENT_LISTENER_ID = "listenerId";
     private static final String ARGUMENT_REMOVE_CACHE_IDENTIFIER = "removeCacheIdentifier";
     private static final String ARGUMENT_DB_NAME = "dbName";
 
@@ -103,9 +102,9 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
     private Registrar registrar;
     private NativeInteractionManager nativeInteractionManager;
 
-    private Cache<DcChat> chatCache = new Cache<>();
-    private Cache<DcContact> contactCache = new Cache<>();
-    private Cache<DcMsg> messageCache = new Cache<>();
+    private IdCache<DcChat> chatCache = new IdCache<>();
+    private IdCache<DcContact> contactCache = new IdCache<>();
+    private IdCache<DcMsg> messageCache = new IdCache<>();
 
     private ChatCallHandler chatCallHandler;
     private ChatListCallHandler chatListCallHandler;
@@ -213,13 +212,13 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
             throw new IllegalArgumentException("No database name given, exiting.");
         }
         System.loadLibrary(LIBRARY_NAME);
-        nativeInteractionManager = new NativeInteractionManager(registrar.context(), dbName);
+        eventChannelHandler = new EventChannelHandler(registrar.messenger());
+        nativeInteractionManager = new NativeInteractionManager(registrar.context(), dbName, eventChannelHandler);
         contextCallHandler = new ContextCallHandler(nativeInteractionManager, contactCache, messageCache, chatCache);
         chatListCallHandler = new ChatListCallHandler(nativeInteractionManager, chatCache);
         messageCallHandler = new MessageCallHandler(nativeInteractionManager, contextCallHandler);
         contactCallHandler = new ContactCallHandler(nativeInteractionManager, contextCallHandler);
         chatCallHandler = new ChatCallHandler(nativeInteractionManager, contextCallHandler);
-        eventChannelHandler = new EventChannelHandler(nativeInteractionManager, registrar.messenger());
         result.success(nativeInteractionManager.getDbPath());
     }
 
@@ -236,18 +235,14 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
     private void coreListener(MethodCall methodCall, Result result) {
         Boolean add = methodCall.argument(ARGUMENT_ADD);
         Integer eventId = methodCall.argument(ARGUMENT_EVENT_ID);
-        Integer listenerId = methodCall.argument(ARGUMENT_LISTENER_ID);
         if (eventId == null || add == null) {
             return;
         }
         if (add) {
-            int newListenerId = eventChannelHandler.addListener(eventId);
-            result.success(newListenerId);
+            eventChannelHandler.addListener(eventId);
+            result.success(null);
         } else {
-            if (listenerId == null) {
-                return;
-            }
-            eventChannelHandler.removeListener(listenerId);
+            eventChannelHandler.removeListener(eventId);
             result.success(null);
         }
     }
