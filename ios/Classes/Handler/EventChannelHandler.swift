@@ -83,30 +83,24 @@ class EventChannelHandler: NSObject, FlutterStreamHandler {
     // MARK: - FlutterStreamHandler
     
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-        if nil != eventSink {
-            return nil
-        }
-        
+        if nil != eventSink { return nil }
         eventSink = events
         return nil
     }
     
     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-        if nil == eventSink {
-            return nil
-        }
-
+        if nil == eventSink { return nil }
         eventSink = nil
         return nil
     }
     
     func handle(_ eventId: Int32, data1: Any, data2: Any) {
-        if !hasListeners(for: eventId) {
-            return
-        }
+        if !hasListeners(for: eventId) { return }
 
+        log.info("Begin handle event [\(eventId)]: data1 (\(data1)), data2 (\(data2))")
         let result = [eventId, data1, data2]
         self.eventSink?(result)
+        log.info("End handle event [\(eventId)]: result (\(result))")
     }
     
     // MARK: - Private Helper
