@@ -73,7 +73,7 @@ class ContextCallHandler: MethodCallHandling {
             configure(result: result)
             break
         case Method.Context.IS_CONFIGURED:
-            result(DcConfig.isConfigured)
+            result(context.isConfigured)
             break
         case Method.Context.ADD_ADDRESS_BOOK:
             addAddressBook(methodCall: call, result: result)
@@ -85,10 +85,10 @@ class ContextCallHandler: MethodCallHandling {
             deleteContact(methodCall: call, result: result)
             break
         case Method.Context.BLOCK_CONTACT:
-            blockContact(methodCall: call, result: result)
+            blockUnblockContact(methodCall: call, result: result, block: true)
             break
         case Method.Context.UNBLOCK_CONTACT:
-            unblockContact(methodCall: call, result: result)
+            blockUnblockContact(methodCall: call, result: result, block: false)
             break
         case Method.Context.CREATE_CHAT_BY_CONTACT_ID:
             createChatByContactId(methodCall: call, result: result)
@@ -247,7 +247,6 @@ class ContextCallHandler: MethodCallHandling {
         result(NSNumber(value: configured))
     }
     
-    // TODO: Complete Rewrite!!
     fileprivate func getConfig(methodCall: FlutterMethodCall, result: FlutterResult, type: ArgumentType) {
         guard let key = methodCall.stringValue(for: Argument.KEY, result: result) else {
             Method.Error.missingArgument(result: result)
@@ -302,16 +301,9 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     // TODO: Block/Unblock as one method!
-    fileprivate func blockContact(methodCall: FlutterMethodCall, result: FlutterResult) {
+    fileprivate func blockUnblockContact(methodCall: FlutterMethodCall, result: FlutterResult, block: Bool) {
         let contactId = UInt32(methodCall.intValue(for: Argument.ID, result: result))
-        context.blockContact(contactId: contactId, block: true)
-
-        result(nil)
-    }
-    
-    fileprivate func unblockContact(methodCall: FlutterMethodCall, result: FlutterResult) {
-        let contactId = UInt32(methodCall.intValue(for: Argument.ID, result: result))
-        context.blockContact(contactId: contactId, block: false)
+        context.blockContact(contactId: contactId, block: block)
 
         result(nil)
     }
