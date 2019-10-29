@@ -42,11 +42,7 @@
 
 package com.openxchange.deltachatcore.handlers;
 
-import android.annotation.SuppressLint;
 import android.util.SparseIntArray;
-
-import com.b44t.messenger.DcEventCenter;
-import com.openxchange.deltachatcore.NativeInteractionManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -57,55 +53,43 @@ import io.flutter.plugin.common.EventChannel;
 public class EventChannelHandler implements EventChannel.StreamHandler {
 
     private static final String CHANNEL_DELTA_CHAT_CORE_EVENTS = "deltaChatCoreEvents";
-    private final NativeInteractionManager nativeInteractionManager;
     private EventChannel.EventSink eventSink;
-    private DcEventCenter.DcEventDelegate dcEventDelegate;
-    private int listenerId = 0;
-    @SuppressLint("UseSparseArrays")
     private SparseIntArray listeners = new SparseIntArray();
 
-    public EventChannelHandler(NativeInteractionManager nativeInteractionManager, BinaryMessenger messenger) {
-        this.nativeInteractionManager = nativeInteractionManager;
+    public EventChannelHandler(BinaryMessenger messenger) {
         EventChannel eventChannel = new EventChannel(messenger, CHANNEL_DELTA_CHAT_CORE_EVENTS);
         eventChannel.setStreamHandler(this);
-        dcEventDelegate = new DcEventCenter.DcEventDelegate() {
-            @Override
-            public void handleEvent(int eventId, Object data1, Object data2) {
-                List<Object> result = Arrays.asList(eventId, data1, data2);
-                if (!hasListenersForId(eventId)) {
-                    return;
-                }
-                eventSink.success(result);
-            }
-
-            @Override
-            public boolean runOnMain() {
-                return true;
-            }
-        };
     }
 
-    public int addListener(Integer eventId) {
-        if (eventId == null) {
-            return -1;
-        }
+    public void handleEvent(int eventId, Object data1, Object data2) {
+        List<Object> result = Arrays.asList(eventId, data1, data2);
         if (!hasListenersForId(eventId)) {
-            nativeInteractionManager.eventCenter.addObserver(eventId, dcEventDelegate);
-        }
-        listenerId++;
-        listeners.put(listenerId, eventId);
-        return listenerId;
-    }
-
-    public void removeListener(Integer listenerId) {
-        if (listenerId == null) {
             return;
         }
-        int eventId = listeners.get(listenerId);
-        listeners.delete(listenerId);
-        if (!hasListenersForId(eventId)) {
-            nativeInteractionManager.eventCenter.removeObserver(eventId, dcEventDelegate);
+        eventSink.success(result);
+    }
+
+    public void addListener(Integer eventId) {
+        if (eventId == null) {
+            return;
         }
+        int counter = listeners.get(eventId) + 1;
+        updateListenerCounter(eventId, counter);
+    }
+
+    public void removeListener(Integer eventId) {
+        if (eventId == null) {
+            return;
+        }
+        int counter = listeners.get(eventId) - 1;
+        updateListenerCounter(eventId, counter);
+    }
+
+    private void updateListenerCounter(Integer eventId, int counter) {
+        if (counter < 0) {
+            counter = 0;
+        }
+        listeners.put(eventId, counter);
     }
 
     @Override
@@ -125,7 +109,6 @@ public class EventChannelHandler implements EventChannel.StreamHandler {
         eventSink = null;
     }
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean hasListenersForId(int eventId) {
         return eventId != 0 && listeners.indexOfValue(eventId) >= 0;
     }

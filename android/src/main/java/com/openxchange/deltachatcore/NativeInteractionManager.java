@@ -7,7 +7,7 @@ import android.os.PowerManager;
 import android.util.Log;
 
 import com.b44t.messenger.DcContext;
-import com.b44t.messenger.DcEventCenter;
+import com.openxchange.deltachatcore.handlers.EventChannelHandler;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -35,7 +35,6 @@ public class NativeInteractionManager extends DcContext {
     private final Object mvboxThreadSynchronized = new Object();
     private final Object sentBoxThreadSynchronized = new Object();
     private final Object smtpThreadSynchronized = new Object();
-    public DcEventCenter eventCenter = new DcEventCenter();
     private Thread imapThread = null;
     private PowerManager.WakeLock imapWakeLock = null;
     private Thread mvboxThread = null;
@@ -51,9 +50,12 @@ public class NativeInteractionManager extends DcContext {
     private boolean mvboxThreadStarted;
     private boolean sentBoxThreadStarted;
     private boolean smtpThreadStarted;
+    private EventChannelHandler eventChannelHandler;
 
-    NativeInteractionManager(Context context, String dbName) {
+    NativeInteractionManager(Context context, String dbName, EventChannelHandler eventChannelHandler) {
         super("Android " + BuildConfig.VERSION_NAME);
+        this.eventChannelHandler = eventChannelHandler;
+
         File databaseFile = new File(context.getFilesDir(), dbName);
         dbPath = databaseFile.getAbsolutePath();
         open(databaseFile.getAbsolutePath());
@@ -417,8 +419,8 @@ public class NativeInteractionManager extends DcContext {
             default: {
                 final Object data1obj = data1IsString(event) ? dataToString(data1) : data1;
                 final Object data2obj = data2IsString(event) ? dataToString(data2) : data2;
-                if (eventCenter != null) {
-                    eventCenter.sendToObservers(event, data1obj, data2obj);
+                if (eventChannelHandler != null) {
+                    eventChannelHandler.handleEvent(event, data1obj, data2obj);
                 }
             }
             break;
@@ -427,7 +429,7 @@ public class NativeInteractionManager extends DcContext {
     }
 
     private void handleError(int event, String error) {
-        eventCenter.sendToObservers(EVENT_ERROR, event, error);
+        eventChannelHandler.handleEvent(EVENT_ERROR, event, error);
     }
 
     String getDbPath() {

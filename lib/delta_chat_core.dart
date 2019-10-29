@@ -138,15 +138,17 @@ class DeltaChatCore {
     await _methodChannel.invokeMethod(methodBaseSetCoreStrings, coreStrings);
   }
 
-  Future<int> listen(int eventId, StreamController streamController) async {
-    int listenerId = await invokeMethod(methodBaseCoreListener, <String, dynamic>{argumentAdd: true, argumentEventId: eventId});
+  Future<void> listen(int eventId, StreamController streamController) async {
+    if (eventId == null || streamController == null) {
+      return;
+    }
+    await invokeMethod(methodBaseCoreListener, <String, dynamic>{argumentAdd: true, argumentEventId: eventId});
     var eventIdSubscribers = _eventChannelSubscribers[eventId];
     if (eventIdSubscribers == null) {
       eventIdSubscribers = Map();
       _eventChannelSubscribers[eventId] = eventIdSubscribers;
     }
-    eventIdSubscribers[listenerId] = streamController;
-    return listenerId;
+    eventIdSubscribers[streamController.hashCode] = streamController;
   }
 
   delegateEventToSubscribers(Event event) {
@@ -159,14 +161,15 @@ class DeltaChatCore {
 
   delegateErrorToSubscribers(error) {}
 
-  removeListener(int eventId, int listenerId) async {
-    if (listenerId == null) {
+  removeListener(int eventId, StreamController streamController) async {
+    if (eventId == null || streamController == null) {
       return;
     }
     var eventIdSubscribers = _eventChannelSubscribers[eventId];
-    eventIdSubscribers[listenerId]?.close();
-    eventIdSubscribers.remove(listenerId);
-    await invokeMethod(methodBaseCoreListener, <String, dynamic>{argumentAdd: false, argumentEventId: eventId, argumentListenerId: listenerId});
+    int hashCode = streamController.hashCode;
+    eventIdSubscribers[hashCode]?.close();
+    eventIdSubscribers.remove(hashCode);
+    await invokeMethod(methodBaseCoreListener, <String, dynamic>{argumentAdd: false, argumentEventId: eventId});
   }
 
   // Manually adds events to the core stream. This shouldn't be required normally, as those events should be produced / captured by the

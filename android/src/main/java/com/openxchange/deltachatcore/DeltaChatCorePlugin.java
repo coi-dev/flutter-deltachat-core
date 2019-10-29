@@ -213,13 +213,13 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
             throw new IllegalArgumentException("No database name given, exiting.");
         }
         System.loadLibrary(LIBRARY_NAME);
-        nativeInteractionManager = new NativeInteractionManager(registrar.context(), dbName);
+        eventChannelHandler = new EventChannelHandler(registrar.messenger());
+        nativeInteractionManager = new NativeInteractionManager(registrar.context(), dbName, eventChannelHandler);
         contextCallHandler = new ContextCallHandler(nativeInteractionManager, contactCache, messageCache, chatCache);
         chatListCallHandler = new ChatListCallHandler(nativeInteractionManager, chatCache);
         messageCallHandler = new MessageCallHandler(nativeInteractionManager, contextCallHandler);
         contactCallHandler = new ContactCallHandler(nativeInteractionManager, contextCallHandler);
         chatCallHandler = new ChatCallHandler(nativeInteractionManager, contextCallHandler);
-        eventChannelHandler = new EventChannelHandler(nativeInteractionManager, registrar.messenger());
         result.success(nativeInteractionManager.getDbPath());
     }
 
@@ -241,8 +241,8 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
             return;
         }
         if (add) {
-            int newListenerId = eventChannelHandler.addListener(eventId);
-            result.success(newListenerId);
+            eventChannelHandler.addListener(eventId);
+            result.success(null);
         } else {
             if (listenerId == null) {
                 return;
