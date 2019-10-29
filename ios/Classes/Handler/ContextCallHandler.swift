@@ -300,7 +300,6 @@ class ContextCallHandler: MethodCallHandling {
         result(NSNumber(value: deleted))
     }
     
-    // TODO: Block/Unblock as one method!
     fileprivate func blockUnblockContact(methodCall: FlutterMethodCall, result: FlutterResult, block: Bool) {
         let contactId = UInt32(methodCall.intValue(for: Argument.ID, result: result))
         context.blockContact(contactId: contactId, block: block)
