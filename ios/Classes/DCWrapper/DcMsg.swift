@@ -77,7 +77,7 @@ class DcMsg: MessageType {
     lazy var kind: MessageKind = {
         if isInfoMessage {
             let text = NSAttributedString(string: self.text, attributes: [
-                NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 12),
+                NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: UIFont.systemFontSize),
                 NSAttributedString.Key.foregroundColor: UIColor.darkGray,
                 ])
             return MessageKind.attributedText(text)
@@ -252,7 +252,7 @@ class DcMsg: MessageType {
     }
 
     var timestamp: Int64 {
-        return Int64(dc_msg_get_timestamp(messagePointer))
+        return Int64(dc_msg_get_timestamp(messagePointer) * 1000)
     }
 
     func summary(chars: Int32) -> String {

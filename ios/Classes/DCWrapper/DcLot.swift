@@ -73,7 +73,7 @@ class DcLot {
     }
     
     var timestamp: Int64 {
-        return Int64(dc_lot_get_timestamp(dcLotPointer))
+        return Int64(dc_lot_get_timestamp(dcLotPointer) * 1000)
     }
     
     var state: Int {
