@@ -51,9 +51,9 @@ class Cache<T> {
     
     func add(object: T) -> UInt32 {
         let usedKey = lastKey
-        
-        items[lastKey] = object
         lastKey += 1
+
+        items[usedKey] = object
         
         return usedKey
     }

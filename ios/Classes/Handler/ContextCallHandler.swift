@@ -447,7 +447,6 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     fileprivate func createChatAttachmentMessage(methodCall: FlutterMethodCall, result: FlutterResult) {
-        //TODO: Mime Type arrives with method call!
         let chatId = methodCall.intValue(for: Argument.CHAT_ID, result: result)
         let type = methodCall.intValue(for: Argument.TYPE, result: result)
         let text = methodCall.stringValue(for: Argument.TEXT, result: result)

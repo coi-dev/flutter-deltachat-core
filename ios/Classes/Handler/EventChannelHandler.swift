@@ -44,7 +44,10 @@ import Foundation
 
 class EventChannelHandler: NSObject, FlutterStreamHandler {
     
-    static let sharedInstance: EventChannelHandler = EventChannelHandler()
+    fileprivate enum ListenersCountUpdateMethod {
+        case inc
+        case dec
+    }
 
     fileprivate let CHANNEL_DELTA_CHAT_CORE_EVENTS = "deltaChatCoreEvents"
     fileprivate var eventSink: FlutterEventSink?
@@ -55,11 +58,13 @@ class EventChannelHandler: NSObject, FlutterStreamHandler {
         didSet {
             if let messenger = messenger {
                 self.eventChannel = FlutterEventChannel(name: CHANNEL_DELTA_CHAT_CORE_EVENTS, binaryMessenger: messenger)
-                self.eventChannel.setStreamHandler(self)
             }
+            self.eventChannel.setStreamHandler(self)
         }
     }
     
+    static let sharedInstance: EventChannelHandler = EventChannelHandler()
+
     override init() {
         super.init()
     }
@@ -67,24 +72,12 @@ class EventChannelHandler: NSObject, FlutterStreamHandler {
     // MARK: - Public API
     
     func addListener(eventId: Int32) {
-        if let counter = listeners[eventId] {
-            let newCounter = counter + 1
-            listeners[eventId] = newCounter
-            return
-        }
-        
-        listeners[eventId] = 0
+        updateListenersCount(for: eventId, updateBy: .inc)
         return
     }
     
     func removeListener(eventId: Int32) {
-        if let counter = listeners[eventId] {
-            var newCounter = counter - 1
-            if newCounter == 0 {
-                newCounter = 0
-                listeners[eventId] =  newCounter
-            }
-        }
+        updateListenersCount(for: eventId, updateBy: .dec)
     }
  
     // MARK: - FlutterStreamHandler
@@ -118,11 +111,21 @@ class EventChannelHandler: NSObject, FlutterStreamHandler {
     
     // MARK: - Private Helper
     
-    private func hasListeners(for eventId: Int32) -> Bool {
+    fileprivate func hasListeners(for eventId: Int32) -> Bool {
         if let listenersCount = listeners[eventId] {
             return listenersCount > 0
         }
         return false
+    }
+    
+    fileprivate func updateListenersCount(for eventId: Int32, updateBy: ListenersCountUpdateMethod) {
+        switch updateBy {
+            case .inc:
+                listeners[eventId] = (listeners[eventId] ?? 0) + 1
+            
+            case .dec:
+                listeners[eventId] = (listeners[eventId] ?? 1) - 1
+        }
     }
 
 }
