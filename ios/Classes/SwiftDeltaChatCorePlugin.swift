@@ -163,14 +163,9 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
     }
     
     fileprivate func setCoreStrings(methodCall: FlutterMethodCall, result: FlutterResult) {
-        // TODO: Ask Daniel for NativeInteractionManager
-        //        guard let coreStrings = methodCall.arguments else {
-        //            return
-        //        }
-        //
-        //    Map<Long, String> coreStrings = methodCall.arguments();
-        //    nativeInteractionManager.setCoreStrings(coreStrings);
-        //    result.success(null);
+        if let coreStrings: CoreStrings.CoreStringsDictionary = methodCall.arguments as? CoreStrings.CoreStringsDictionary {
+            CoreStrings.sharedInstance.strings = coreStrings
+        }
         result(nil)
     }
 }
