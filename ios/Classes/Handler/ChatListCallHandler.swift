@@ -144,7 +144,7 @@ class ChatListCallHandler: MethodCallHandling {
         }
         
         let chat = chatList.getChat(for: chatId)
-        _ = chatCache.add(object: chat)
+        chatCache.set(value: chat, for: chatId)
         
         result(NSNumber(value: chat.id))
     }

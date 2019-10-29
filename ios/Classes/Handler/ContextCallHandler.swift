@@ -645,7 +645,7 @@ class ContextCallHandler: MethodCallHandling {
     func loadAndCacheChat(with id: UInt32, update: Bool = false) -> DcChat {
         guard let chat = chatCache.value(for: id) else {
             let chat = context.getChat(with: id)
-            _ = chatCache.add(object: chat)
+            chatCache.set(value: chat, for: id)
             return chat
         }
         return chat
@@ -654,7 +654,7 @@ class ContextCallHandler: MethodCallHandling {
     func loadAndCacheContact(with id: UInt32, update: Bool = false) -> DcContact {
         guard let contact = contactCache.value(for: id) else {
             let contact = context.getContact(with: id)
-            _ = contactCache.add(object: contact)
+            contactCache.set(value: contact, for: id)
             return contact
         }
         return contact
@@ -669,7 +669,7 @@ class ContextCallHandler: MethodCallHandling {
         
         guard let msg = messageCache.value(for: id) else {
             let msg = context.getMsg(with: id)
-            _ = messageCache.add(object: msg)
+            messageCache.set(value: msg, for: id)
             return msg
         }
         return msg

@@ -114,8 +114,8 @@ class DcContact {
         return Int(dc_contact_get_color(contactPointer))
     }
     
-    var id: Int {
-        return Int(dc_contact_get_id(contactPointer))
+    var id: UInt32 {
+        return dc_contact_get_id(contactPointer)
     }
     
     func block() {
