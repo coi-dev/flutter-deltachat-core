@@ -417,4 +417,40 @@ class DcContext {
         dc_interrupt_mvbox_idle(DcContext.contextPointer)
     }
 
+    // MARK: - Config
+
+    func setConfig(value: String, forKey key: String) -> Int32 {
+        log.debug("setConfig value: '\(value)', for key: '\(key)'")
+        return dc_set_config(DcContext.contextPointer, key, value)
+    }
+
+    func setConfigInt(value: Int32, forKey key: String) -> Int32 {
+        return setConfig(value: "\(value)", forKey: key)
+    }
+
+    func getConfig(for key: String) -> String? {
+        log.debug("getConfig for key: '\(key)'")
+        let value = dc_get_config(DcContext.contextPointer, key)
+        if let cString = value {
+            let str = String(cString: cString)
+            if !str.isEmpty {
+                return str
+            }
+        }
+        return nil
+    }
+
+    func getConfigInt(for key: String) -> Int32? {
+        if let value = getConfig(for: key) {
+            return Int32(value)
+        }
+        return nil
+    }
+
+    func configure() {
+        if (0 == dc_is_configured(DcContext.contextPointer)) {
+            dc_configure(DcContext.contextPointer)
+        }
+    }
+    
 }

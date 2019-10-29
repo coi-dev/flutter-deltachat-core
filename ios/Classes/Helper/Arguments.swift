@@ -50,7 +50,7 @@ struct Argument {
     
 }
 
-struct ArgumentType {
-    static let INT    = "int"
-    static let STRING = "String"
+enum ArgumentType: String {
+    case `int` = "int"
+    case string = "String"
 }

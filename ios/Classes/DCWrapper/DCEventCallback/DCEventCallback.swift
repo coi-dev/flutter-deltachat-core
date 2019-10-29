@@ -69,7 +69,7 @@ public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsi
         case DC_EVENT_GET_STRING:
             log.info(logMessage)
             if let coreStrings = CoreStrings.sharedInstance.strings {
-                //TODO: Ask Daniel who will gget this string!
+                //TODO: Ask Daniel who will get this string!
                 if let str = coreStrings[UInt32(data1)] {
                     log.info("DC_EVENT_GET_STRING: \(str)")
                 }

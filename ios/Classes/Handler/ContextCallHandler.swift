@@ -64,10 +64,10 @@ class ContextCallHandler: MethodCallHandling {
             setConfig(methodCall: call, result: result)
             break
         case Method.Context.CONFIG_GET:
-            getConfig(methodCall: call, result: result, type: ArgumentType.STRING)
+            getConfig(methodCall: call, result: result, type: .string)
             break
         case Method.Context.CONFIG_GET_INT:
-            getConfig(methodCall: call, result: result, type: ArgumentType.INT)
+            getConfig(methodCall: call, result: result, type: .int)
             break
         case Method.Context.CONFIGURE:
             configure(result: result)
@@ -225,56 +225,46 @@ class ContextCallHandler: MethodCallHandling {
     // MARK: - Configuration
     
     fileprivate func setConfig(methodCall: FlutterMethodCall, result: FlutterResult) {
-        guard let key = methodCall.stringValue(for: Argument.KEY, result: result) else {
+        guard let key = methodCall.stringValue(for: Argument.KEY, result: result),
+            let type = methodCall.stringValue(for: Argument.TYPE, result: result),
+            let argumentType = ArgumentType(rawValue: type) else {
                 Method.Error.missingArgument(result: result)
                 return
         }
-
-        guard let configKey = DcConfigKey(rawValue: key) else {
-            Method.Error.couldNotCreateConfigKey(methodCall: methodCall, result: result, key: key)
-            return
+        
+        var configured: Int32 = 0
+        switch argumentType {
+            case .int:
+                let value = methodCall.intValue(for: Argument.VALUE, result: result)
+                configured = context.setConfigInt(value: value, forKey: key)
+            
+            case .string:
+                if let value = methodCall.stringValue(for: Argument.VALUE, result: result) {
+                    configured = context.setConfig(value: value, forKey: key)
+                }
         }
         
-        let value = methodCall.stringValue(for: Argument.VALUE, result: result)
-        let configSet = DcConfig.set(key: configKey, value: value)
-        result(NSNumber(value: configSet))
+        result(NSNumber(value: configured))
     }
     
     // TODO: Complete Rewrite!!
-    fileprivate func getConfig(methodCall: FlutterMethodCall, result: FlutterResult, type: String) {
+    fileprivate func getConfig(methodCall: FlutterMethodCall, result: FlutterResult, type: ArgumentType) {
         guard let key = methodCall.stringValue(for: Argument.KEY, result: result) else {
             Method.Error.missingArgument(result: result)
             return
         }
         
-        switch (type) {
-            case ArgumentType.STRING:
-                let value = dc_get_config(DcContext.contextPointer, key)
-                if let pSafe = value {
-                    let c = String(cString: pSafe)
-                    if c.isEmpty {
-                        result(nil)
-                    }
-                    result(c)
-                }
-                break
-            
-            case ArgumentType.INT:
-                let value = dc_get_config(DcContext.contextPointer, key)
-                if let pSafe = value {
-                    let c = Int(bitPattern: pSafe)
-                    
-                    result(c)
-                }
-                break
-            
-            default: break
+        switch type {
+            case .int:
+                result(context.getConfigInt(for: key))
+
+            case .string:
+                result(context.getConfig(for: key))
         }
     }
     
     fileprivate func configure(result: FlutterResult) {
-        dc_configure(DcContext.contextPointer)
-
+        context.configure()
         result(nil)
     }
     
@@ -296,6 +286,7 @@ class ContextCallHandler: MethodCallHandling {
                 Method.Error.missingArgument(result: result)
                 return
         }
+
         let contactId = context.createContact(name: name, emailAddress: emailAddress)
         contactCache.set(value: context.getContact(with: contactId), for: contactId)
         
