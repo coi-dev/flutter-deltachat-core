@@ -257,7 +257,7 @@ class DcContext {
         return messageId
     }
     
-    func sendAttachment(fromPath path: String, withType type: Int32, text: String?, forChatId chatId: UInt32) throws -> UInt32 {
+    func sendAttachment(fromPath path: String, withType type: Int32, mimeType: String, text: String?, forChatId chatId: UInt32) throws -> UInt32 {
         guard Int(type).isValidAttachmentType else {
             throw DcContextError(kind: .wrongAttachmentType(type))
         }
@@ -291,7 +291,7 @@ class DcContext {
             default: break
         }
         
-        dc_msg_set_file(msg, path, path.mimeType)
+        dc_msg_set_file(msg, path, mimeType)
 
         if let text = text {
             dc_msg_set_text(msg, text.cString(using: .utf8))

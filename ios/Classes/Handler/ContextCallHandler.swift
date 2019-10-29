@@ -451,6 +451,7 @@ class ContextCallHandler: MethodCallHandling {
         let chatId = methodCall.intValue(for: Argument.CHAT_ID, result: result)
         let type = methodCall.intValue(for: Argument.TYPE, result: result)
         let text = methodCall.stringValue(for: Argument.TEXT, result: result)
+        let mimeType = String(describing: methodCall.stringValue(for: Argument.MIME_TYPE, result: result))
 
         guard let path = methodCall.stringValue(for: Argument.PATH, result: result) else {
             Method.Error.missingArgumentValue(for: Argument.PATH, result: result)
@@ -458,7 +459,7 @@ class ContextCallHandler: MethodCallHandling {
         }
 
         do {
-            let messageId = try context.sendAttachment(fromPath: path, withType: type, text: text, forChatId: UInt32(chatId))
+            let messageId = try context.sendAttachment(fromPath: path, withType: type, mimeType: mimeType, text: text, forChatId: UInt32(chatId))
             result(NSNumber(value: messageId))
             
         } catch DcContextError.ErrorKind.missingImageAtPath(let path) {

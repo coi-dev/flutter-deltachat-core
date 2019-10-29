@@ -42,58 +42,55 @@
 
 import Foundation
 
-class EventChannelHandler: NSObject, FlutterStreamHandler, DcEventDelegate {
+class EventChannelHandler: NSObject, FlutterStreamHandler {
     
+    static let sharedInstance: EventChannelHandler = EventChannelHandler()
+
     fileprivate let CHANNEL_DELTA_CHAT_CORE_EVENTS = "deltaChatCoreEvents"
-    
-    fileprivate let messenger: FlutterBinaryMessenger!
     fileprivate var eventSink: FlutterEventSink?
-    fileprivate var eventDelegate: DcEventDelegate!
     fileprivate var listeners: [Int32: Int32] = [:]
-    fileprivate var listenerId: Int32 = 0
     fileprivate var eventChannel: FlutterEventChannel!
     
-    let dcEventCenter: DcEventCenter = DcEventCenter.sharedInstance
-
-    // MARK: - Initialization
+    var messenger: FlutterBinaryMessenger? {
+        didSet {
+            if let messenger = messenger {
+                self.eventChannel = FlutterEventChannel(name: CHANNEL_DELTA_CHAT_CORE_EVENTS, binaryMessenger: messenger)
+                self.eventChannel.setStreamHandler(self)
+            }
+        }
+    }
     
-    init(messenger: FlutterBinaryMessenger) {
-        self.messenger = messenger
-        self.eventChannel = FlutterEventChannel(name: CHANNEL_DELTA_CHAT_CORE_EVENTS, binaryMessenger: messenger)
-
+    override init() {
         super.init()
-
-        self.eventDelegate = self
-        self.eventChannel.setStreamHandler(self)
     }
     
     // MARK: - Public API
     
-    func addListener(eventId: Int32) -> Int32 {
-        guard !hasListeners(for: eventId) else {
-            return -1
-        }
-
-        listenerId += 1
-        listeners[listenerId] = eventId
-        dcEventCenter.add(observer: self, for: eventId)
-
-        return listenerId
-    }
-    
-    func remove(listener listenerId: Int32) {
-        guard let eventId = listeners[listenerId] else {
+    func addListener(eventId: Int32) {
+        if let counter = listeners[eventId] {
+            let newCounter = counter + 1
+            listeners[eventId] = newCounter
             return
         }
         
-        listeners.removeValue(forKey: listenerId)
-        dcEventCenter.remove(observer: self, with: eventId)
+        listeners[eventId] = 0
+        return
+    }
+    
+    func removeListener(eventId: Int32) {
+        if let counter = listeners[eventId] {
+            var newCounter = counter - 1
+            if newCounter == 0 {
+                newCounter = 0
+                listeners[eventId] =  newCounter
+            }
+        }
     }
  
     // MARK: - FlutterStreamHandler
     
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-        if nil != self.eventSink {
+        if nil != eventSink {
             return nil
         }
         
@@ -102,13 +99,15 @@ class EventChannelHandler: NSObject, FlutterStreamHandler, DcEventDelegate {
     }
     
     func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        if nil == eventSink {
+            return nil
+        }
+
         eventSink = nil
         return nil
     }
     
-    // MARK: - DcEventDelegate
-    
-    func handle(eventWith eventId: Int32, data1: Any, data2: Any) {
+    func handle(_ eventId: Int32, data1: Any, data2: Any) {
         if !hasListeners(for: eventId) {
             return
         }
@@ -120,11 +119,10 @@ class EventChannelHandler: NSObject, FlutterStreamHandler, DcEventDelegate {
     // MARK: - Private Helper
     
     private func hasListeners(for eventId: Int32) -> Bool {
-        let values =  Array(listeners.values)
-        guard let index = values.firstIndex(of: eventId) else {
-            return false
+        if let listenersCount = listeners[eventId] {
+            return listenersCount > 0
         }
-        return eventId != 0 && index >= 0
+        return false
     }
 
 }

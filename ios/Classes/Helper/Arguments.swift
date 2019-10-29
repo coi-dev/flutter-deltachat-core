@@ -39,6 +39,7 @@ struct Argument {
     static let ENABLE            = "enable"
     static let MODE              = "mode"
     static let MESSAGE           = "message"
+    static let MIME_TYPE         = "mimeType"
 
     struct Error {
         static let MISSING       = "1"

@@ -75,7 +75,7 @@ public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsi
         
         default:
             log.info(logMessage)
-            DcEventCenter.sharedInstance.send(data1: data1, data2: data2, toObserversWith: Int32(event))
+            EventChannelHandler.sharedInstance.handle(event, data1: data1, data2: data2)
     }
     
     return nil
