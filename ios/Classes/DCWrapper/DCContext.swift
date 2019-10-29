@@ -448,9 +448,13 @@ class DcContext {
     }
 
     func configure() {
-        if (0 == dc_is_configured(DcContext.contextPointer)) {
+        if (!isConfigured) {
             dc_configure(DcContext.contextPointer)
         }
+    }
+    
+    var isConfigured: Bool {
+        return 1 == dc_is_configured(DcContext.contextPointer)
     }
     
 }
