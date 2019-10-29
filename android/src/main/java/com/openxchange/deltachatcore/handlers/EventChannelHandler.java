@@ -44,6 +44,8 @@ package com.openxchange.deltachatcore.handlers;
 
 import android.util.SparseIntArray;
 
+import com.openxchange.deltachatcore.Utils;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -66,7 +68,14 @@ public class EventChannelHandler implements EventChannel.StreamHandler {
         if (!hasListenersForId(eventId)) {
             return;
         }
-        eventSink.success(result);
+        Utils.runOnMain(() -> {
+            try {
+                eventSink.success(result);
+            }
+            catch(Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public void addListener(Integer eventId) {
@@ -110,6 +119,6 @@ public class EventChannelHandler implements EventChannel.StreamHandler {
     }
 
     private boolean hasListenersForId(int eventId) {
-        return eventId != 0 && listeners.indexOfValue(eventId) >= 0;
+        return eventId != 0 && listeners.get(eventId) > 0;
     }
 }

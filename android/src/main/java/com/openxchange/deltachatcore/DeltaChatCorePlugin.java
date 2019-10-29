@@ -90,7 +90,6 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
 
     private static final String ARGUMENT_ADD = "add";
     private static final String ARGUMENT_EVENT_ID = "eventId";
-    private static final String ARGUMENT_LISTENER_ID = "listenerId";
     private static final String ARGUMENT_REMOVE_CACHE_IDENTIFIER = "removeCacheIdentifier";
     private static final String ARGUMENT_DB_NAME = "dbName";
 
@@ -236,7 +235,6 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
     private void coreListener(MethodCall methodCall, Result result) {
         Boolean add = methodCall.argument(ARGUMENT_ADD);
         Integer eventId = methodCall.argument(ARGUMENT_EVENT_ID);
-        Integer listenerId = methodCall.argument(ARGUMENT_LISTENER_ID);
         if (eventId == null || add == null) {
             return;
         }
@@ -244,10 +242,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
             eventChannelHandler.addListener(eventId);
             result.success(null);
         } else {
-            if (listenerId == null) {
-                return;
-            }
-            eventChannelHandler.removeListener(listenerId);
+            eventChannelHandler.removeListener(eventId);
             result.success(null);
         }
     }

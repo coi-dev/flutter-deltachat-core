@@ -70,7 +70,6 @@ class DeltaChatCore {
 
   static const String argumentAdd = "add";
   static const String argumentEventId = "eventId";
-  static const String argumentListenerId = "listenerId";
   static const String argumentDBName = "dbName";
 
   static DeltaChatCore _instance;
