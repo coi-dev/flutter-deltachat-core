@@ -42,29 +42,11 @@
 
 package com.openxchange.deltachatcore;
 
-import android.util.SparseArray;
 
-public abstract class Cache<T> {
-    SparseArray<T> items = new SparseArray<>();
+public class IdCache<T> extends Cache<T>{
 
-    public T get(int id) {
-        return items.get(id);
-    }
-
-    public void delete(int id) {
-        items.delete(id);
-    }
-
-    public int size() {
-        return items.size();
-    }
-
-    public boolean contains(int id) {
-        return items.indexOfKey(id) > 0;
-    }
-
-    public void clear() {
-        items.clear();
+    public void put(int id, T item) {
+        items.put(id, item);
     }
 
 }

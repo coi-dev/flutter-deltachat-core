@@ -42,29 +42,19 @@
 
 package com.openxchange.deltachatcore;
 
-import android.util.SparseArray;
+public class IncrementalCache<T> extends Cache<T> {
+    private int generatedId = 0;
 
-public abstract class Cache<T> {
-    SparseArray<T> items = new SparseArray<>();
-
-    public T get(int id) {
-        return items.get(id);
+    public int put(T item) {
+        int currentId = generatedId;
+        items.put(currentId, item);
+        generatedId++;
+        return currentId;
     }
 
-    public void delete(int id) {
-        items.delete(id);
-    }
-
-    public int size() {
-        return items.size();
-    }
-
-    public boolean contains(int id) {
-        return items.indexOfKey(id) > 0;
-    }
-
+    @Override
     public void clear() {
-        items.clear();
+        super.clear();
+        generatedId = 0;
     }
-
 }

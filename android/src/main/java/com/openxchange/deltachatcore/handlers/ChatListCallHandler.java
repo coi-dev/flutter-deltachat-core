@@ -47,7 +47,8 @@ import com.b44t.messenger.DcChatlist;
 import com.b44t.messenger.DcContext;
 import com.b44t.messenger.DcLot;
 import com.b44t.messenger.DcMsg;
-import com.openxchange.deltachatcore.Cache;
+import com.openxchange.deltachatcore.IdCache;
+import com.openxchange.deltachatcore.IncrementalCache;
 
 import java.util.Collections;
 import java.util.List;
@@ -65,11 +66,11 @@ public class ChatListCallHandler extends AbstractCallHandler {
     private static final String METHOD_CHAT_LIST_GET_MSG = "chatList_getMsg";
     private static final String METHOD_CHAT_LIST_GET_SUMMARY = "chatList_getSummary";
 
-    private Cache<DcChatlist> chatListCache = new Cache<>();
+    private IncrementalCache<DcChatlist> chatListCache = new IncrementalCache<>();
 
-    private Cache<DcChat> chatCache;
+    private IdCache<DcChat> chatCache;
 
-    public ChatListCallHandler(DcContext dcContext, Cache<DcChat> chatCache) {
+    public ChatListCallHandler(DcContext dcContext, IdCache<DcChat> chatCache) {
         super(dcContext);
         this.chatCache = chatCache;
     }
@@ -134,8 +135,7 @@ public class ChatListCallHandler extends AbstractCallHandler {
         }
         String query = methodCall.argument(ARGUMENT_QUERY);
         DcChatlist dcChatlist = dcContext.getChatlist(chatListFlag, query, 0);
-        int cacheId = chatListCache.getGenerateId();
-        chatListCache.append(cacheId, dcChatlist);
+        int cacheId = chatListCache.put(dcChatlist);
         result.success(cacheId);
     }
 
