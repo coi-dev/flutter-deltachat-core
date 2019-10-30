@@ -102,9 +102,9 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
     private Registrar registrar;
     private NativeInteractionManager nativeInteractionManager;
 
-    private Cache<DcChat> chatCache = new Cache<>();
-    private Cache<DcContact> contactCache = new Cache<>();
-    private Cache<DcMsg> messageCache = new Cache<>();
+    private IdCache<DcChat> chatCache = new IdCache<>();
+    private IdCache<DcContact> contactCache = new IdCache<>();
+    private IdCache<DcMsg> messageCache = new IdCache<>();
 
     private ChatCallHandler chatCallHandler;
     private ChatListCallHandler chatListCallHandler;

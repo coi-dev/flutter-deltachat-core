@@ -47,7 +47,7 @@ import com.b44t.messenger.DcContact;
 import com.b44t.messenger.DcContext;
 import com.b44t.messenger.DcLot;
 import com.b44t.messenger.DcMsg;
-import com.openxchange.deltachatcore.Cache;
+import com.openxchange.deltachatcore.IdCache;
 
 import java.util.ArrayList;
 
@@ -113,11 +113,11 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
     private static final String TYPE_INT = "int";
     private static final String TYPE_STRING = "String";
 
-    private final Cache<DcContact> contactCache;
-    private final Cache<DcMsg> messageCache;
-    private final Cache<DcChat> chatCache;
+    private final IdCache<DcContact> contactCache;
+    private final IdCache<DcMsg> messageCache;
+    private final IdCache<DcChat> chatCache;
 
-    public ContextCallHandler(DcContext dcContext, Cache<DcContact> contactCache, Cache<DcMsg> messageCache, Cache<DcChat> chatCache) {
+    public ContextCallHandler(DcContext dcContext, IdCache<DcContact> contactCache, IdCache<DcMsg> messageCache, IdCache<DcChat> chatCache) {
         super(dcContext);
         this.contactCache = contactCache;
         this.messageCache = messageCache;
@@ -784,9 +784,7 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
     private void initiateKeyTransfer(MethodChannel.Result result) {
         new Thread(() -> {
             String setupKey = dcContext.initiateKeyTransfer();
-            getUiThreadHandler().post(() -> {
-                result.success(setupKey);
-            });
+            getUiThreadHandler().post(() -> result.success(setupKey));
         }).start();
     }
 
@@ -852,9 +850,7 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
         }
         new Thread(() -> {
             int chatId = dcContext.joinSecurejoin(qrText);
-            getUiThreadHandler().post(() -> {
-                result.success(chatId);
-            });
+            getUiThreadHandler().post(() -> result.success(chatId));
         }).start();
     }
 
