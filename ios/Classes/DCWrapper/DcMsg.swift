@@ -252,7 +252,7 @@ class DcMsg: MessageType {
     }
 
     var timestamp: Int64 {
-        return Int64(dc_msg_get_timestamp(messagePointer) * 1000)
+        return dc_msg_get_timestamp(messagePointer) * 1000
     }
 
     func summary(chars: Int32) -> String {
