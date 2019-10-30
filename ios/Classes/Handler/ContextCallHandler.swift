@@ -633,11 +633,18 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     func loadAndCacheContact(with id: UInt32, update: Bool = false) -> DcContact {
+        if update {
+            let contact = context.getContact(with: id)
+            contactCache.set(value: contact, for: id)
+            return contact
+        }
+
         guard let contact = contactCache.value(for: id) else {
             let contact = context.getContact(with: id)
             contactCache.set(value: contact, for: id)
             return contact
         }
+
         return contact
     }
     
@@ -653,6 +660,7 @@ class ContextCallHandler: MethodCallHandling {
             messageCache.set(value: msg, for: id)
             return msg
         }
+
         return msg
     }
 
