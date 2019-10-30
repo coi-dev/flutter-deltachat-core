@@ -45,11 +45,11 @@ import Foundation
 class ContextCallHandler: MethodCallHandling {
 
     fileprivate let context: DcContext!
-    fileprivate let contactCache: Cache<DcContact>!
-    fileprivate let messageCache: Cache<DcMsg>!
-    fileprivate let chatCache: Cache<DcChat>!
+    fileprivate let contactCache: IdCache<DcContact>!
+    fileprivate let messageCache: IdCache<DcMsg>!
+    fileprivate let chatCache: IdCache<DcChat>!
     
-    init(context: DcContext, contactCache: Cache<DcContact>, messageCache: Cache<DcMsg>, chatCache: Cache<DcChat>) {
+    init(context: DcContext, contactCache: IdCache<DcContact>, messageCache: IdCache<DcMsg>, chatCache: IdCache<DcChat>) {
         self.context = context
         self.contactCache = contactCache
         self.messageCache = messageCache

@@ -45,16 +45,16 @@ import Foundation
 class ChatListCallHandler: MethodCallHandling {
     
     fileprivate let context: DcContext!
-    fileprivate let chatCache: Cache<DcChat>!
-
-    fileprivate let chatListCache: Cache<DcChatlist> = Cache()
-    fileprivate var chatList: DcChatlist!
     
+    fileprivate let chatCache: IdCache<DcChat>!
+    fileprivate let chatListCache: IncrementalCache<DcChatlist> = IncrementalCache()
+    
+    fileprivate var chatList: DcChatlist!
     fileprivate var args: MethodCallParameters = [:]
     
     // MARK: - Initialization
     
-    init(context: DcContext, chatCache: Cache<DcChat>) {
+    init(context: DcContext, chatCache: IdCache<DcChat>) {
         self.context = context
         self.chatCache = chatCache
     }

@@ -42,53 +42,23 @@
 
 import Foundation
 
-class Cache<T> {
-    
-    fileprivate var items: [UInt32: T] = [:]
-    private(set) var lastKey: UInt32 = 0
+class IncrementalCache<T>: Cache<T> {
+
+    private(set) var currentKey: UInt32 = 0
     
     // MARK: - Public API
-    
-    func add(object: T) -> UInt32 {
-        let usedKey = lastKey
-        lastKey += 1
 
+    func add(object: T) -> UInt32 {
+        let usedKey = currentKey
+        currentKey += 1
         items[usedKey] = object
         
         return usedKey
     }
     
-    func set(value: T?, for key: UInt32) {
-        if nil == value {
-            _ = items.removeValue(forKey: key)
-            return
-        }
-        items[key] = value
-    }
-    
-    func value(for key: UInt32) -> T? {
-        return items[key]
-    }
-    
-    func removeValue(for key: UInt32) -> T? {
-        return items.removeValue(forKey: key)
-    }
-    
-    func contains(key: UInt32) -> Bool {
-        return items.keys.contains(key)
-    }
-    
-    func clear() {
-        items.removeAll()
-        lastKey = 0
-    }
-    
-    var numberOfObjects: Int {
-        return items.keys.count
-    }
-    
-    var allObjects: [T] {
-        return items.values.map { $0 }
+    override func clear() {
+        super.clear()
+        currentKey = 0
     }
 
 }
