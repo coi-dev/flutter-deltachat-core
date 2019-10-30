@@ -52,7 +52,7 @@ struct Utils {
             acc.append(UInt32(e))
         }
         dc_array_unref(inputArray)
-        
+
         return acc
     }
 

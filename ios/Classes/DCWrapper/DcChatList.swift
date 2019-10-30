@@ -44,36 +44,36 @@ import Foundation
 
 class DcChatlist {
     private var chatListPointer: OpaquePointer?
-    
+
     // takes ownership of specified pointer
     init(chatListPointer: OpaquePointer?) {
         self.chatListPointer = chatListPointer
     }
-    
+
     deinit {
         dc_chatlist_unref(chatListPointer)
     }
-    
+
     var length: Int {
         return dc_chatlist_get_cnt(chatListPointer)
     }
-    
+
     func getChatId(index: UInt32) -> UInt32 {
         return dc_chatlist_get_chat_id(chatListPointer, Int(index))
     }
-    
+
     func getChat(for chatId: UInt32) -> DcChat {
         return DcChat(id: chatId)
     }
-    
+
     func getMsgId(index: UInt32) -> UInt32 {
         return dc_chatlist_get_msg_id(chatListPointer, Int(index))
     }
-    
+
     func getMsg(index: UInt32) -> DcMsg {
         return DcMsg(id: index)
     }
-    
+
     func getSummary(index: Int) -> DcLot {
         guard let lotPointer = dc_chatlist_get_summary(chatListPointer, index, nil) else {
             fatalError("lot-pointer was nil")

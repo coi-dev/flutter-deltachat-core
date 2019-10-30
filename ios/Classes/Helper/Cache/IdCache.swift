@@ -43,9 +43,9 @@
 import Foundation
 
 class IdCache<T>: Cache<T> {
-    
+
     // MARK: - Public API
-    
+
     func set(value: T?, for key: UInt32) {
         if nil == value {
             _ = items.removeValue(forKey: key)

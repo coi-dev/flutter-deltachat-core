@@ -43,7 +43,7 @@
 import Foundation
 
 extension String {
-    
+
     static func bool(for str: String?) -> Bool {
         guard let boolStr = str,
             let bool = Bool(boolStr) else {
@@ -51,12 +51,12 @@ extension String {
         }
         return bool
     }
-    
+
     func boolValue() -> Bool {
         guard let bool = Bool(self) else {
             return false
         }
         return bool
     }
-    
+
 }

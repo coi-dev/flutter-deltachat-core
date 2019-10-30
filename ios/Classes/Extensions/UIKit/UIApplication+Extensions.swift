@@ -43,15 +43,15 @@
 import UIKit
 
 extension UIApplication {
-    
+
     // MARK: - UIApplication
-    
+
     public static var name: String {
         return Bundle.displayName
     }
-    
+
     public static var version: String {
         return Bundle.versionBuildString
     }
-    
+
 }

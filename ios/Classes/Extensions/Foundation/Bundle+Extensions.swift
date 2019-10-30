@@ -43,39 +43,39 @@
 import Foundation
 
 extension Bundle {
-    
+
     // MARK: - Application Informations
-    
+
     public static let versionString: String = Bundle.versionString(forBundle: Bundle.main)
     public static let buildString: String = Bundle.buildString(forBundle: Bundle.main)
     public static let versionBuildString: String = Bundle.versionBuildString(forBundle: Bundle.main)
     public static let displayName: String = Bundle.displayName(forBundle: Bundle.main)
-    
+
     // MARK: - Private Helper
-    
+
     private static func versionString(forBundle bundle: Bundle) -> String {
         if let versionString = bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String {
             return versionString
         }
         return "n/a"
     }
-    
+
     private static func buildString(forBundle bundle: Bundle) -> String {
         if let versionString = bundle.object(forInfoDictionaryKey: "CFBundleVersion") as? String {
             return versionString
         }
         return "n/a"
     }
-    
+
     private static func versionBuildString(forBundle bundle: Bundle) -> String {
         return "\(Bundle.versionString(forBundle: bundle)) (\(Bundle.buildString(forBundle: bundle)))"
     }
-    
+
     private static func displayName(forBundle bundle: Bundle) -> String {
         if let displayName = bundle.object(forInfoDictionaryKey: "CFBundleName") as? String {
             return displayName
         }
         return "n/a"
     }
-    
+
 }

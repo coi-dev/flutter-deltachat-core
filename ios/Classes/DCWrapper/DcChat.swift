@@ -44,7 +44,7 @@ import Foundation
 
 class DcChat {
     var chatPointer: OpaquePointer?
-    
+
     init(id: UInt32) {
         if let pointer = dc_get_chat(DcContext.contextPointer, id) {
             chatPointer = pointer
@@ -52,77 +52,77 @@ class DcChat {
             fatalError("Invalid chatID opened \(id)")
         }
     }
-    
+
     deinit {
         dc_chat_unref(chatPointer)
     }
-    
+
     var id: UInt32 {
         return dc_chat_get_id(chatPointer)
     }
-    
+
     var name: String {
         guard let cString = dc_chat_get_name(chatPointer) else { return "" }
         let swiftString = String(cString: cString)
         free(cString)
         return swiftString
     }
-    
+
     var type: Int32 {
         return dc_chat_get_type(chatPointer)
     }
-    
+
     var chatType: ChatType {
         return ChatType(rawValue: type) ?? .group // group as fallback - shouldn't get here
     }
-    
+
     var isGroup: Bool {
         return (chatType == .group || chatType == .verifiedGroup)
     }
-    
+
     var isVerified: Bool {
         return dc_chat_is_verified(chatPointer) > 0
     }
-    
+
     var isUnpromoted: Bool {
         return dc_chat_is_unpromoted(chatPointer) > 0
     }
-    
+
     var isSelfTalk: Bool {
         return dc_chat_is_self_talk(chatPointer) > 0
     }
-    
+
     var contactIds: [UInt32] {
         let chatContacts = dc_get_chat_contacts(DcContext.contextPointer, UInt32(id))
         return Utils.copyAndFreeArray(inputArray: chatContacts)
     }
-    
+
     lazy var profileImageFilePath: String? = {
         guard let cString = dc_chat_get_profile_image(chatPointer) else { return "" }
         let filePath = String(cString: cString)
         free(cString)
-        
+
         let path: URL = URL(fileURLWithPath: filePath, isDirectory: false)
-        
+
         if path.isFileURL {
             return path.absoluteString
         }
-        
+
         return nil
     }()
-    
+
     var archived: Int32 {
         return dc_chat_get_archived(chatPointer)
     }
-    
+
     var color: UInt32 {
         return dc_chat_get_color(chatPointer)
     }
-    
+
 }
 
 enum ChatType: Int32 {
-    case single        = 100
-    case group         = 120
+    case single = 100
+    case group = 120
     case verifiedGroup = 130
 }
