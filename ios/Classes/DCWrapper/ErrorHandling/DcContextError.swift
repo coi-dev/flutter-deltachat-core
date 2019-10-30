@@ -48,7 +48,7 @@ struct DcContextError: Error {
         case missingImageAtPath(String)
         case wrongAttachmentType(Int32)
     }
-    
+
     let kind: ErrorKind
 
 }

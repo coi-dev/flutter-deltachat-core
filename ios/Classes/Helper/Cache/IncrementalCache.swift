@@ -45,17 +45,17 @@ import Foundation
 class IncrementalCache<T>: Cache<T> {
 
     private(set) var currentKey: UInt32 = 0
-    
+
     // MARK: - Public API
 
     func add(object: T) -> UInt32 {
         let usedKey = currentKey
         currentKey += 1
         items[usedKey] = object
-        
+
         return usedKey
     }
-    
+
     override func clear() {
         super.clear()
         currentKey = 0

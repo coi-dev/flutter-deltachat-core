@@ -44,46 +44,46 @@ import Foundation
 
 class DcLot {
     private var dcLotPointer: OpaquePointer?
-    
+
     // takes ownership of specified pointer
     init(_ dcLotPointer: OpaquePointer) {
         self.dcLotPointer = dcLotPointer
     }
-    
+
     deinit {
         dc_lot_unref(dcLotPointer)
     }
-    
+
     var text1: String? {
         guard let cString = dc_lot_get_text1(dcLotPointer) else { return nil }
         let swiftString = String(cString: cString)
         free(cString)
         return swiftString
     }
-    
+
     var text1Meaning: Int32 {
         return dc_lot_get_text1_meaning(dcLotPointer)
     }
-    
+
     var text2: String? {
         guard let cString = dc_lot_get_text2(dcLotPointer) else { return nil }
         let swiftString = String(cString: cString)
         free(cString)
         return swiftString
     }
-    
+
     var timestamp: Int64 {
-        return dc_lot_get_timestamp(dcLotPointer) * 1000
+        return dc_lot_get_timestamp(dcLotPointer) * 1_000
     }
-    
+
     var state: Int32 {
         return dc_lot_get_state(dcLotPointer)
     }
-    
+
     var id: UInt32 {
         return dc_lot_get_id(dcLotPointer)
     }
-    
+
     var propertyArray: [Any] {
         return [
             NSNumber(value: id),
@@ -94,5 +94,5 @@ class DcLot {
             NSNumber(value: state)
         ]
     }
-    
+
 }

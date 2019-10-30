@@ -43,7 +43,7 @@
 import Foundation
 
 class EventChannelHandler: NSObject, FlutterStreamHandler {
-    
+
     fileprivate enum ListenersCountUpdateMethod {
         case inc
         case dec
@@ -53,7 +53,7 @@ class EventChannelHandler: NSObject, FlutterStreamHandler {
     fileprivate var eventSink: FlutterEventSink?
     fileprivate var listeners: [Int32: Int32] = [:]
     fileprivate var eventChannel: FlutterEventChannel!
-    
+
     var messenger: FlutterBinaryMessenger? {
         didSet {
             if let messenger = messenger {
@@ -62,38 +62,38 @@ class EventChannelHandler: NSObject, FlutterStreamHandler {
             self.eventChannel.setStreamHandler(self)
         }
     }
-    
+
     static let sharedInstance: EventChannelHandler = EventChannelHandler()
 
     override init() {
         super.init()
     }
-    
+
     // MARK: - Public API
-    
+
     func addListener(eventId: Int32) {
         updateListenersCount(for: eventId, updateBy: .inc)
         return
     }
-    
+
     func removeListener(eventId: Int32) {
         updateListenersCount(for: eventId, updateBy: .dec)
     }
- 
+
     // MARK: - FlutterStreamHandler
-    
+
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
         if nil != eventSink { return nil }
         eventSink = events
         return nil
     }
-    
+
     func onCancel(withArguments arguments: Any?) -> FlutterError? {
         if nil == eventSink { return nil }
         eventSink = nil
         return nil
     }
-    
+
     func handle(_ eventId: Int32, data1: Any, data2: Any) {
         if !hasListeners(for: eventId) { return }
 
@@ -102,21 +102,21 @@ class EventChannelHandler: NSObject, FlutterStreamHandler {
         self.eventSink?(result)
         log.info("End handle event [\(eventId)]: result (\(result))")
     }
-    
+
     // MARK: - Private Helper
-    
+
     fileprivate func hasListeners(for eventId: Int32) -> Bool {
         if let listenersCount = listeners[eventId] {
             return listenersCount > 0
         }
         return false
     }
-    
+
     fileprivate func updateListenersCount(for eventId: Int32, updateBy: ListenersCountUpdateMethod) {
         switch updateBy {
             case .inc:
                 listeners[eventId] = (listeners[eventId] ?? 0) + 1
-            
+
             case .dec:
                 listeners[eventId] = (listeners[eventId] ?? 1) - 1
         }

@@ -44,43 +44,43 @@ import Foundation
 
 class DcContact {
     private var contactPointer: OpaquePointer?
-    
+
     init(id: UInt32) {
         contactPointer = dc_get_contact(DcContext.contextPointer, id)
     }
-    
+
     deinit {
         dc_contact_unref(contactPointer)
     }
-    
+
     var displayName: String {
         guard let cString = dc_contact_get_display_name(contactPointer) else { return "" }
         let swiftString = String(cString: cString)
         free(cString)
         return swiftString
     }
-    
+
     var nameAndAddress: String {
         guard let cString = dc_contact_get_name_n_addr(contactPointer) else { return "" }
         let swiftString = String(cString: cString)
         free(cString)
         return swiftString
     }
-    
+
     var name: String {
         guard let cString = dc_contact_get_name(contactPointer) else { return "" }
         let swiftString = String(cString: cString)
         free(cString)
         return swiftString
     }
-    
+
     var firstName: String {
         guard let cString = dc_contact_get_first_name(contactPointer) else { return "" }
         let swiftString = String(cString: cString)
         free(cString)
         return swiftString
     }
-    
+
     var email: String {
         guard let cString = dc_contact_get_addr(contactPointer) else { return "" }
         let swiftString = String(cString: cString)
@@ -91,41 +91,41 @@ class DcContact {
     var isVerified: Bool {
         return dc_contact_is_verified(contactPointer) > 0
     }
-    
+
     var isBlocked: Bool {
         return dc_contact_is_blocked(contactPointer) == 1
     }
-  
+
     lazy var profileImageFilePath: String? = {
         guard let cString = dc_contact_get_profile_image(contactPointer) else { return nil }
         let filePath = String(cString: cString)
         free(cString)
-        
+
         let path: URL = URL(fileURLWithPath: filePath, isDirectory: false)
-        
+
         if path.isFileURL {
             return path.absoluteString
         }
-        
+
         return nil
     }()
 
     var color: Int {
         return Int(dc_contact_get_color(contactPointer))
     }
-    
+
     var id: UInt32 {
         return dc_contact_get_id(contactPointer)
     }
-    
+
     func block() {
         dc_block_contact(DcContext.contextPointer, UInt32(id), 1)
     }
-    
+
     func unblock() {
         dc_block_contact(DcContext.contextPointer, UInt32(id), 0)
     }
-    
+
     func marknoticed() {
         dc_marknoticed_contact(DcContext.contextPointer, UInt32(id))
     }

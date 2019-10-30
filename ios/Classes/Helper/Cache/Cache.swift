@@ -43,31 +43,31 @@
 import Foundation
 
 class Cache<T> {
-    
+
     var items: [UInt32: T] = [:]
-    
+
     // MARK: - Public API
-    
+
     func value(for key: UInt32) -> T? {
         return items[key]
     }
-    
+
     func removeValue(for key: UInt32) -> T? {
         return items.removeValue(forKey: key)
     }
-    
+
     func contains(key: UInt32) -> Bool {
         return items.keys.contains(key)
     }
-    
+
     func clear() {
         items.removeAll()
     }
-    
+
     var numberOfObjects: Int {
         return items.keys.count
     }
-    
+
     var allObjects: [T] {
         return items.values.map { $0 }
     }

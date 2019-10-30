@@ -43,45 +43,45 @@
 import Foundation
 
 class ChatCallHandler: MethodCallHandling {
-    
+
     fileprivate let contextCalHandler: ContextCallHandler!
-    
+
     // MARK: - Initialization
-    
+
     init(contextCalHandler: ContextCallHandler) {
         self.contextCalHandler = contextCalHandler
     }
 
     // MARK: - Protocol MethodCallHandling
-    
+
     func handle(_ call: FlutterMethodCall, result: FlutterResult) {
         switch (call.method) {
         case Method.Chat.GET_ID:
-            getChatId(methodCall: call, result: result);
+            getChatId(methodCall: call, result: result)
             break
         case Method.Chat.IS_GROUP:
-            isGroup(methodCall: call, result: result);
+            isGroup(methodCall: call, result: result)
             break
         case Method.Chat.GET_ARCHIVED:
-            getArchived(methodCall: call, result: result);
+            getArchived(methodCall: call, result: result)
             break
         case Method.Chat.GET_COLOR:
-            getColor(methodCall: call, result: result);
+            getColor(methodCall: call, result: result)
             break
         case Method.Chat.GET_NAME:
-            getName(methodCall: call, result: result);
+            getName(methodCall: call, result: result)
             break
         case Method.Chat.GET_PROFILE_IMAGE:
-            getProfileImage(methodCall: call, result: result);
+            getProfileImage(methodCall: call, result: result)
             break
         case Method.Chat.IS_UNPROMOTED:
-            isUnpromoted(methodCall: call, result: result);
+            isUnpromoted(methodCall: call, result: result)
             break
         case Method.Chat.IS_SELF_TALK:
-            isSelfTalk(methodCall: call, result: result);
+            isSelfTalk(methodCall: call, result: result)
             break
         case Method.Chat.IS_VERIFIED:
-            isVerified(methodCall: call, result: result);
+            isVerified(methodCall: call, result: result)
             break
         default:
             log.error("Context: Failing for \(call.method)")
@@ -89,57 +89,56 @@ class ChatCallHandler: MethodCallHandling {
         }
     }
 
-    
     private func isSelfTalk(methodCall: FlutterMethodCall, result: FlutterResult) {
         let chat = getChat(methodCall: methodCall, result: result)
         result(NSNumber(value: chat.isSelfTalk))
     }
-    
+
     private func isUnpromoted(methodCall: FlutterMethodCall, result: FlutterResult) {
         let chat = getChat(methodCall: methodCall, result: result)
         result(NSNumber(value: chat.isUnpromoted))
     }
-    
+
     private func getProfileImage(methodCall: FlutterMethodCall, result: FlutterResult) {
         let chat = getChat(methodCall: methodCall, result: result)
         result(chat.profileImageFilePath)
     }
-    
+
     private func getName(methodCall: FlutterMethodCall, result: FlutterResult) {
         let chat = getChat(methodCall: methodCall, result: result)
         result(chat.name)
     }
-    
+
     private func getArchived(methodCall: FlutterMethodCall, result: FlutterResult) {
         let chat = getChat(methodCall: methodCall, result: result)
         result(NSNumber(value: chat.archived))
     }
-    
+
     private func getColor(methodCall: FlutterMethodCall, result: FlutterResult) {
         let chat = getChat(methodCall: methodCall, result: result)
         result(NSNumber(value: chat.color))
     }
-    
+
     private func isGroup(methodCall: FlutterMethodCall, result: FlutterResult) {
         let chat = getChat(methodCall: methodCall, result: result)
         result(NSNumber(value: chat.isGroup))
     }
-    
+
     private func getChatId(methodCall: FlutterMethodCall, result: FlutterResult) {
         let chat = getChat(methodCall: methodCall, result: result)
         result(NSNumber(value: chat.id))
     }
-    
+
     private func isVerified(methodCall: FlutterMethodCall, result: FlutterResult) {
         let chat = getChat(methodCall: methodCall, result: result)
         result(NSNumber(value: chat.isVerified))
     }
-    
+
     // MARK: - Helper
-    
+
     private func getChat(methodCall: FlutterMethodCall, result: FlutterResult) -> DcChat {
         let id = methodCall.intValue(for: Argument.ID, result: result)
         let chat = contextCalHandler.loadAndCacheChat(with: UInt32(id))
-        return chat;
+        return chat
     }
 }

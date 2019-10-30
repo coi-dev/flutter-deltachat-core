@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 struct Method {}
 
 extension Method {
@@ -27,7 +26,7 @@ extension Method {
 }
 
 extension Method {
-    
+
     struct Base {
         static let INIT                                 = "base_init"
         static let SYSTEM_INFO                          = "base_systemInfo"
@@ -38,7 +37,7 @@ extension Method {
 }
 
 extension Method {
-    
+
     struct Chat {
         static let GET_ID                               = "chat_getId"
         static let IS_GROUP                             = "chat_isGroup"
@@ -54,7 +53,7 @@ extension Method {
 }
 
 extension Method {
-    
+
     struct ChatList {
         static let INTERNAL_SETUP                       = "chatList_internal_setup"
         static let INTERNAL_TEAR_DOWN                   = "chatList_internal_tearDown"
@@ -69,7 +68,7 @@ extension Method {
 }
 
 extension Method {
-    
+
     struct Contact {
         static let GET_ID                               = "contact_getId"
         static let GET_NAME                             = "contact_getName"
@@ -86,7 +85,7 @@ extension Method {
 }
 
 extension Method {
-    
+
     struct Message {
         static let GET_ID                               = "msg_getId"
         static let GET_TEXT                             = "msg_getText"
@@ -123,7 +122,7 @@ extension Method {
 }
 
 extension Method {
-    
+
     struct Context {
         static let CONFIG_SET                           = "context_configSet"
         static let CONFIG_GET                           = "context_configGet"
@@ -183,12 +182,12 @@ extension Method {
 }
 
 extension Method {
-    
+
     struct Error {
         static func missingArgument(result: FlutterResult) {
             result(FlutterError(code: Argument.Error.MISSING, message: "Argument is missing", details: nil))
         }
-        
+
         static func missingArgumentValue(for argument: String, result: FlutterResult) {
             result(FlutterError(code: Argument.Error.MISSING_VALUE, message: "Argument value for key: '\(argument)' is missing or null", details: nil))
         }
@@ -196,21 +195,21 @@ extension Method {
         static func typeMismatch(for argument: String, result: FlutterResult) {
             result(FlutterError(code: Argument.Error.TYPE_MISMATCH, message: "Wrong type for argument " + argument, details: nil))
         }
-        
+
         static func noInt(for argument: String, result: FlutterResult) {
             result(FlutterError(code: Argument.Error.NO_INT, message: "Argument is no integer: " + argument, details: nil))
         }
-        
+
         static func noBool(for argument: String, result: FlutterResult) {
             result(FlutterError(code: Argument.Error.NO_INT, message: "Argument is no boolean: " + argument, details: nil))
         }
 
         static func generic(methodCall: FlutterMethodCall, result: FlutterResult) {
-            result(FlutterError(code: methodCall.method, message: nil, details: nil));
+            result(FlutterError(code: methodCall.method, message: nil, details: nil))
         }
-        
+
         static func couldNotCreateConfigKey(methodCall: FlutterMethodCall, result: FlutterResult, key: String) {
-            result(FlutterError(code: methodCall.method, message: "Could not create DcConfigKey for key: '\(key)'", details: nil));
+            result(FlutterError(code: methodCall.method, message: "Could not create DcConfigKey for key: '\(key)'", details: nil))
         }
     }
 
