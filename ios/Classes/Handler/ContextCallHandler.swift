@@ -398,17 +398,17 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     fileprivate func getChatMessages(methodCall: FlutterMethodCall, result: FlutterResult) {
-        let chatId = methodCall.intValue(for: Argument.CHAT_ID, result: result)
-        let flags = methodCall.intValue(for: Argument.FLAGS, result: result)
-        
-        let messageIds = context.getMessageIds(for: UInt32(chatId), flags: UInt32(flags), marker1before: 0).map { Int32($0) }
+        let chatId = UInt32(methodCall.intValue(for: Argument.CHAT_ID, result: result))
+        let flags = UInt32(methodCall.intValue(for: Argument.FLAGS, result: result))
+
+        let messageIds: [UInt32] = context.getMessageIds(for: chatId, flags: flags, marker1before: 0).map { UInt32($0) }
         let buffer = messageIds.withUnsafeBufferPointer { Data(buffer: $0) }
 
-        for id: Int32 in messageIds {
+        for id in messageIds {
             if id != DC_MSG_ID_MARKER1 && id != DC_MSG_ID_DAYMARKER {
-                guard nil != messageCache.value(for: UInt32(id)) else {
-                    let message = context.getMsg(with: UInt32(id))
-                    messageCache.set(value: message, for: UInt32(id))
+                guard nil != messageCache.value(for: id) else {
+                    let message = context.getMsg(with: id)
+                    messageCache.set(value: message, for: id)
                     continue
                 }
             }
