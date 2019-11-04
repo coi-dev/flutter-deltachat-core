@@ -164,10 +164,10 @@ class DeltaChatCore {
     if (eventId == null || streamController == null) {
       return;
     }
-    var eventIdSubscribers = _eventChannelSubscribers[eventId];
     int hashCode = streamController.hashCode;
-    eventIdSubscribers[hashCode]?.close();
-    eventIdSubscribers.remove(hashCode);
+    streamController.close();
+    var eventIdSubscribers = _eventChannelSubscribers[eventId];
+    eventIdSubscribers?.remove(hashCode);
     await invokeMethod(methodBaseCoreListener, <String, dynamic>{argumentAdd: false, argumentEventId: eventId});
   }
 
