@@ -42,6 +42,13 @@
 
 import Foundation
 
+enum CacheIdentifier: String {
+    case chat = "chat"
+    case chatList = "chatList"
+    case chatMessage = "chatMessage"
+    case contact = "contact"
+}
+
 class Cache<T> {
     
     var items: [UInt32: T] = [:]

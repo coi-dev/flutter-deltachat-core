@@ -50,7 +50,6 @@ class ChatListCallHandler: MethodCallHandling {
     fileprivate let chatListCache: IncrementalCache<DcChatlist> = IncrementalCache()
     
     fileprivate var chatList: DcChatlist!
-    fileprivate var args: MethodCallParameters = [:]
     
     // MARK: - Initialization
     
@@ -62,8 +61,6 @@ class ChatListCallHandler: MethodCallHandling {
     // MARK: - Protocol MethodCallHandling
     
     func handle(_ call: FlutterMethodCall, result: FlutterResult) {
-        self.args = call.parameters
-
         if call.method != Method.ChatList.INTERNAL_SETUP {
             let cacheId = call.intValue(for: Argument.CACHE_ID, result: result)
             guard let chatList = chatListCache.value(for: UInt32(cacheId)) else {

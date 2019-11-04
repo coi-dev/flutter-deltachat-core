@@ -214,15 +214,15 @@ class MessageCallHandler: MethodCallHandling {
     }
     
     private func isStarred(methodCall: FlutterMethodCall, result: FlutterResult) {
-        let msg = getMessage(methodCall: methodCall, result: result, update: true)
+        let msg = getMessage(methodCall: methodCall, result: result)
         result(NSNumber(value: msg.isStarred))
     }
     
     // MARK: - Private Helper
     
-    private func getMessage(methodCall: FlutterMethodCall, result: FlutterResult, update: Bool = false) -> DcMsg {
+    private func getMessage(methodCall: FlutterMethodCall, result: FlutterResult) -> DcMsg {
         let id = methodCall.intValue(for: Argument.ID, result: result)
-        let message = contextCallHandler.loadAndCacheChatMessage(with: UInt32(id), update: update)
+        let message = contextCallHandler.loadAndCacheChatMessage(with: UInt32(id))
 
         return message;
     }

@@ -142,15 +142,15 @@ class ContactCallHandler: MethodCallHandling {
     }
     
     fileprivate func isVerified(methodCall: FlutterMethodCall, result: FlutterResult) {
-        let contact = getContact(methodCall: methodCall, result: result, update: true)
+        let contact = getContact(methodCall: methodCall, result: result)
         result(contact.isVerified)
     }
     
     // MARK: - Private Helper
     
-    fileprivate func getContact(methodCall: FlutterMethodCall, result: FlutterResult, update: Bool = false) -> DcContact {
+    fileprivate func getContact(methodCall: FlutterMethodCall, result: FlutterResult) -> DcContact {
         let id = methodCall.intValue(for: Argument.ID, result: result)
-        let contact = contextCallHandler.loadAndCacheContact(with: UInt32(id), update: update)
+        let contact = contextCallHandler.loadAndCacheContact(with: UInt32(id))
         
         return contact
     }

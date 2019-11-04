@@ -17,9 +17,9 @@ extension FlutterMethodCall {
     
     // MARK: - Computed Properties
     
-    var parameters: MethodCallParameters {
+    var parameters: MethodCallParameters? {
         guard let arguments: MethodCallParameters = arguments as? MethodCallParameters else {
-            fatalError("No arguments found for method: \(method)")
+            return nil
         }
         return arguments
     }
@@ -29,8 +29,16 @@ extension FlutterMethodCall {
     }
 
     // MARK: - Helper
-
+    
+    func contains(key: String) -> Bool {
+        return contains(keys: [key])
+    }
+    
     func contains(keys: [String]) -> Bool {
+        guard let parameters = parameters else {
+            return false
+        }
+        
         for key in keys {
             if (!parameters.keys.contains(key)) {
                 return false
@@ -42,6 +50,10 @@ extension FlutterMethodCall {
     // MARK: - Parameter Values
     
     func intValue(for key: String, defaultValue: Int32 = 0, result: FlutterResult) -> Int32 {
+        guard let parameters = parameters else {
+            return defaultValue
+        }
+
         if !contains(keys: [key]) {
             Method.Error.missingArgument(result: result)
             return defaultValue
@@ -56,6 +68,10 @@ extension FlutterMethodCall {
     }
     
     func boolValue(for key: String, defaultValue: Bool = false, result: FlutterResult) -> Bool {
+        guard let parameters = parameters else {
+            return defaultValue
+        }
+
         if !contains(keys: [key]) {
             Method.Error.missingArgument(result: result)
             return defaultValue
@@ -75,7 +91,8 @@ extension FlutterMethodCall {
             return nil
         }
         
-        guard let value: String = parameters[key] as? String else {
+        guard let parameters = parameters,
+            let value: String = parameters[key] as? String else {
             return nil
         }
 
@@ -83,11 +100,15 @@ extension FlutterMethodCall {
     }
     
     func intArrayValue(for key: String, result: FlutterResult) -> [UInt32]? {
+        guard let parameters = parameters else {
+            return nil
+        }
+
         if !contains(keys: [key]) {
             Method.Error.missingArgument(result: result)
             return nil
         }
-        
+
         guard let value: [UInt32] = parameters[key] as? [UInt32] else {
             Method.Error.noInt(for: key, result: result)
             return nil
@@ -95,8 +116,12 @@ extension FlutterMethodCall {
 
         return value
     }
-    
+
     func value(for key: String, result: FlutterResult) -> Any? {
+        guard let parameters = parameters else {
+            return nil
+        }
+
         if contains(keys: [key]) {
             return parameters[key] as Any?
         }
