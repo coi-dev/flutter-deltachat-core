@@ -11,6 +11,7 @@ DCC_PATH="delta_chat_core"
 DCC_TARGET_PATH="target/universal/release"
 DCC_PRODUCT_NAME="libdeltachat.a"
 DCC_PRODUCT_PATH="${DCC_TARGET_PATH}/${DCC_PRODUCT_NAME}"
+DCC_BRANCH="coi-metadata"
 
 # Rust
 CARGO_NEEDED_TARGETS="aarch64-apple-ios armv7-apple-ios armv7s-apple-ios x86_64-apple-ios i386-apple-ios"
@@ -23,7 +24,7 @@ COL_GREEN='\033[0;32m'
 COL_YELLOW='\033[0;33m'
 
 # trap ctrl-c and call ctrl_c()
-trap ctrl_c EXIT
+trap trap_int INT
 
 # /////////////////////////////////////////////////////////////////////////////
 # Generic Functions
@@ -54,14 +55,6 @@ EOT
     echo -e "$COL_YELLOW$_STR $COL_RESET"
 }
 
-function ctrl_c() {
-    echo && echo
-    show_error "Aborting. Cleaning up..."
-    cargo clean > /dev/null 2>&1
-    cd "${PWD}" && echo
-    exit 130
-}
-
 # /////////////////////////////////////////////////////////////////////////////
 # Test Functions
 # /////////////////////////////////////////////////////////////////////////////
@@ -73,7 +66,7 @@ function test_rust_toolchain() {
         show_header "➜ Rust toolchain is missing. Installing..."
         echo
         curl https://sh.rustup.rs -sSf | sh -s -- -y 2>&1
-        source $HOME/.cargo/env > /dev/null 2>&1
+        source $HOME/.cargo/env >/dev/null 2>&1
     fi
 }
 
@@ -95,7 +88,7 @@ function test_cargo_targets() {
         if [ -z $TARGET_IS_INSTALLED ]
         then
             show_header "➜ Installing target: $COL_RESET$target"
-            rustup target add $target > /dev/null 2>&1
+            rustup target add $target >/dev/null 2>&1
         fi
     done
 }
@@ -106,7 +99,8 @@ function test_cargo_targets() {
 
 function update_dcc() {
     show_header "Updating DeltaChat-Core plugin from GitHub..."
-    git pull > /dev/null 2>&1
+    git checkout $DCC_BRANCH >/dev/null 2>&1
+    git pull >/dev/null 2>&1
 }
 
 function build_and_install_deltachat() {
@@ -115,12 +109,24 @@ function build_and_install_deltachat() {
     cargo lipo --release -p deltachat_ffi 2>&1
     
     show_header "Copying '${DCC_PRODUCT_NAME}' to destination..."
-    mv "./${DCC_PRODUCT_PATH}" "../" > /dev/null 2>&1
+    mv "./${DCC_PRODUCT_PATH}" "../" >/dev/null 2>&1
 }
 
 function clean() {
     show_header "Cleaning up..."
-    cargo clean 2>&1
+    cargo clean >/dev/null 2>&1
+    cd "${PWD}" && echo
+}
+
+# /////////////////////////////////////////////////////////////////////////////
+# Exceptions
+# /////////////////////////////////////////////////////////////////////////////
+
+function trap_int() {
+    echo && echo
+    show_error "Aborting!"
+    clean
+    exit 130
 }
 
 
@@ -130,13 +136,13 @@ function clean() {
 
 cd "${DCC_PATH}"
 
-show_version;
-update_dcc;
-test_rust_toolchain;
-test_cargo_lipo;
-test_cargo_targets;
-build_and_install_deltachat;
-clean;
+show_version
+update_dcc
+test_rust_toolchain
+test_cargo_lipo
+test_cargo_targets
+build_and_install_deltachat
+clean
 
 cd "${PWD}"
 
@@ -146,7 +152,6 @@ cd "${PWD}"
 
 echo
 show_header "🎉🚀🤘🏻 Hooray... Build and installation of Deltachat-Core successfully finished! 👏"
-echo
-echo
+echo & echo
 
 exit 0
