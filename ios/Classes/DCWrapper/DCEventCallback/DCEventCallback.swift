@@ -70,7 +70,7 @@ public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsi
             log.info(logMessage)
             if let coreStrings = CoreStrings.sharedInstance.strings {
                 if let str = coreStrings[UInt32(data1)]  {
-                    return UnsafePointer(strdup(str))
+                    return UnsafePointer(str)
                 }
             }
         
