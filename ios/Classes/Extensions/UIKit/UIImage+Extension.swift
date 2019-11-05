@@ -43,7 +43,7 @@
 import Foundation
 
 extension UIImage {
-    
+
     var sizeInPixel: CGSize {
         let heightInPoints = size.height
         let heightInPixels = heightInPoints * scale
@@ -51,8 +51,8 @@ extension UIImage {
         let widthInPixels = widthInPoints * scale
         return CGSize(width: widthInPixels, height: heightInPixels)
     }
-    
-    func dcCompress(toMax target: Float = 1280) -> UIImage? {
+
+    func dcCompress(toMax target: Float = 1_280) -> UIImage? {
         return resize(toMax: target)
     }
 

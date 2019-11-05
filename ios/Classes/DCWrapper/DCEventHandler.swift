@@ -56,15 +56,15 @@ class DCEventHandler {
     fileprivate var smtpBackgroundTask: UIBackgroundTaskIdentifier = .invalid
 
     // MARK: - Public API
-    
+
     func start(_ completion: (() -> Void)? = nil) {
         if state == .running { return }
-        
+
         state = .running
 
         DispatchQueue.global(qos: .background).async { [weak self] in
             guard let self = self else { return }
-            
+
             self.beginIMAPBackgroundTask()
             while self.state == .running {
                 dc_perform_imap_jobs(DcContext.contextPointer)
@@ -77,10 +77,10 @@ class DCEventHandler {
                 self.endIMAPBackgroundTask()
             }
         }
-        
+
         DispatchQueue.global(qos: .utility).async { [weak self] in
             guard let self = self else { return }
-            
+
             self.beginSMTPBackgroundTask()
             while self.state == .running {
                 dc_perform_smtp_jobs(DcContext.contextPointer)
@@ -91,26 +91,26 @@ class DCEventHandler {
                 self.endSMTPBackgroundTask()
             }
         }
-        
+
         DispatchQueue.global(qos: .background).async { [weak self] in
             guard let self = self else { return }
-            
+
             while self.state == .running {
                 dc_perform_sentbox_fetch(DcContext.contextPointer)
                 dc_perform_sentbox_idle(DcContext.contextPointer)
             }
         }
-        
+
         DispatchQueue.global(qos: .background).async { [weak self] in
             guard let self = self else { return }
-            
+
             while self.state == .running {
                 dc_perform_mvbox_fetch(DcContext.contextPointer)
                 dc_perform_mvbox_idle(DcContext.contextPointer)
             }
         }
     }
-    
+
     func stop() {
         state = .background
 
@@ -121,7 +121,7 @@ class DCEventHandler {
     }
 
     // MARK: - BackgroundTask
-    
+
     fileprivate func beginIMAPBackgroundTask() {
         log.info(">> begin IMAP background task")
         imapBackgroundTask = UIApplication.shared.beginBackgroundTask { [weak self] in
@@ -129,13 +129,13 @@ class DCEventHandler {
             self.endIMAPBackgroundTask()
         }
     }
-    
+
     fileprivate func endIMAPBackgroundTask() {
         log.info(">> end IMAP background task")
         UIApplication.shared.endBackgroundTask(imapBackgroundTask)
         imapBackgroundTask = .invalid
     }
-    
+
     fileprivate func beginSMTPBackgroundTask() {
         log.info(">> begin SMTP background task")
         smtpBackgroundTask = UIApplication.shared.beginBackgroundTask { [weak self] in
@@ -143,7 +143,7 @@ class DCEventHandler {
             self.endSMTPBackgroundTask()
         }
     }
-    
+
     fileprivate func endSMTPBackgroundTask() {
         log.info(">> end SMTP background task")
         UIApplication.shared.endBackgroundTask(smtpBackgroundTask)

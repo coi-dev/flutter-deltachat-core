@@ -45,49 +45,49 @@ import AVFoundation
 
 class DcContext {
     static private(set) var contextPointer: OpaquePointer?
-    
+
     /// Returns the file path of the DeltaChat SQLite database.
     var userDatabasePath: String {
         let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
         return "\(paths)/messenger.db"
     }
-    
+
     init() {
         DcContext.contextPointer = dc_context_new(dc_event_callback, nil, UIApplication.name)
     }
-    
+
     deinit {
         dc_context_unref(DcContext.contextPointer)
     }
-    
+
     // MARK: - User Database
-    
+
     func openUserDataBase() -> Bool {
         let result = NSNumber(value: dc_open(DcContext.contextPointer, userDatabasePath, nil))
 
         return Bool(truncating: result)
     }
-    
+
     func closeUserDataBase() {
         dc_close(DcContext.contextPointer)
         DcContext.contextPointer = nil
     }
-    
+
     // MARK: - Chats
-    
+
     func getChatlist(flags: Int32, queryString: String?, queryId: Int) -> DcChatlist {
         let chatlistPointer = dc_get_chatlist(DcContext.contextPointer, flags, queryString, UInt32(queryId))
         return DcChatlist(chatListPointer: chatlistPointer)
     }
-    
+
     func getChat(with id: UInt32) -> DcChat {
         return DcChat(id: id)
     }
-    
+
     func getChatByContactId(contactId: UInt32) -> UInt32 {
         return dc_get_chat_id_by_contact_id(DcContext.contextPointer, contactId)
     }
-    
+
     /**
     Delete a chat.
 
@@ -116,72 +116,72 @@ class DcContext {
     func deleteChat(chatId: UInt32) {
         dc_delete_chat(DcContext.contextPointer, UInt32(chatId))
     }
-    
+
     func archiveChat(chatId: UInt32, archive: Bool) {
         dc_archive_chat(DcContext.contextPointer, UInt32(chatId), Int32(archive ? 1 : 0))
     }
-    
+
     func createChatByMessageId(messageId: UInt32) -> DcChat {
         let chatId = dc_create_chat_by_msg_id(DcContext.contextPointer, messageId)
         return DcChat(id: chatId)
     }
-    
+
     func createChatByContactId(contactId: UInt32) -> DcChat {
         let chatId = dc_create_chat_by_contact_id(DcContext.contextPointer, contactId)
         let chat = DcChat(id: chatId)
-        
+
         return chat
     }
-    
+
     func setChatName(_ chatName: String, forChatId chatId: UInt32) -> Int32 {
         return dc_set_chat_name(DcContext.contextPointer, chatId, chatName)
     }
-    
+
     /// Sets the profile image for the chat with given chat ID
     /// - Parameter imagePath: The full file path where to find the profile image for that chat.
     /// - Parameter chatId: The chat ID of the chat whose image should be set.
     func setChatProfileImage(withPath imagePath: String, forChatId chatId: UInt32) -> Int32 {
         return dc_set_chat_profile_image(DcContext.contextPointer, chatId, imagePath)
     }
-    
+
     /// Creates a Group Chat
     /// - Parameter chatName: The name of the chat.
     /// - Parameter isVerified: Flag which determines whether this is a verified chat. Only secure verified members are allowed in this chat.
     func createGroupChat(with chatName: String, isVerified: Bool) -> UInt32 {
         return dc_create_group_chat(DcContext.contextPointer, (isVerified ? 1 : 0), chatName)
     }
-    
+
     func removeContact(with contactId: UInt32, fromChat chatId: UInt32) -> Int32 {
         return dc_remove_contact_from_chat(DcContext.contextPointer, chatId, contactId)
     }
-    
+
     func markNoticedChat(with chatId: UInt32) {
         dc_marknoticed_chat(DcContext.contextPointer, chatId)
     }
-    
+
     func addContact(with contactId: UInt32, toChat chatId: UInt32) -> Int32 {
         return dc_add_contact_to_chat(DcContext.contextPointer, chatId, contactId)
     }
 
     // MARK: - Contacts
-    
+
     /// Returns an array of contact id's belonging to a chat with the given chat id.
     /// - Parameter chatId: The chat id whose members should be returned.
     /// - Returns: An array of contact id's belonging to the chat with the given chat id.
     func getChatContacts(for chatId: Int32) -> [UInt32] {
         let dcContacts = dc_get_chat_contacts(DcContext.contextPointer, UInt32(chatId))
         let contactIds = Utils.copyAndFreeArray(inputArray: dcContacts)
-        
+
         return contactIds
     }
-    
+
     /// Returns a DcChat object for the given contact id
     /// - Parameter id: The contact id whose DcContact object should be returned
     /// - Returns: The DcChat object for the given chat id
     func getContact(with id: UInt32) -> DcContact {
         return DcContact(id: id)
     }
-    
+
     /**
     Returns an array of all unblocked and known contact id's.
     - Parameter flags: A combination of flags:
@@ -194,39 +194,39 @@ class DcContext {
     func getContacts(flags: Int32, query: String?) -> [UInt32] {
         let dcContacts = dc_get_contacts(DcContext.contextPointer, UInt32(flags), query)
         let contacts = Utils.copyAndFreeArray(inputArray: dcContacts)
-        
+
         return contacts
     }
-    
+
     func blockContact(contactId: UInt32, block: Bool) {
         dc_block_contact(DcContext.contextPointer, contactId, (block ? 1 : 0))
     }
-    
+
     func getBlockedContacts() -> [UInt32] {
         let blockedIds = dc_get_blocked_contacts(DcContext.contextPointer)
         return Utils.copyAndFreeArray(inputArray: blockedIds)
     }
-    
+
     func deleteContact(contactId: UInt32) -> Bool {
         return 1 == dc_delete_contact(DcContext.contextPointer, contactId)
     }
-    
+
     func createContact(name: String, emailAddress: String) -> UInt32 {
         return dc_create_contact(DcContext.contextPointer, name, emailAddress)
     }
-    
+
     // MARK: - Addressbook
-    
+
     func addAddressBook(addressBook: String) -> Int32 {
         return dc_add_address_book(DcContext.contextPointer, addressBook)
     }
 
     // MARK: - Messages
-    
+
     func getMsg(with id: UInt32) -> DcMsg {
         return DcMsg(id: id)
     }
-    
+
     func getMsgInfo(msgId: Int) -> String {
         if let cString = dc_get_msg_info(DcContext.contextPointer, UInt32(msgId)) {
             let swiftString = String(cString: cString)
@@ -236,61 +236,61 @@ class DcContext {
 
         return "ErrGetMsgInfo"
     }
-    
+
     func getMessageIds(for chatId: UInt32, flags: UInt32, marker1before: UInt32) -> [UInt32] {
         let messageIds = dc_get_chat_msgs(DcContext.contextPointer, chatId, flags, marker1before)
         let ids = Utils.copyAndFreeArray(inputArray: messageIds)
-        
+
         return ids
     }
-    
+
     func getFreshMessageCount(for chatId: UInt32) -> Int32 {
         return dc_get_fresh_msg_cnt(DcContext.contextPointer, chatId)
     }
-    
+
     func sendText(_ text: String, forChatId chatId: UInt32) -> UInt32 {
         let msg = dc_msg_new(DcContext.contextPointer, DC_MSG_TEXT)
         dc_msg_set_text(msg, text.cString(using: .utf8))
         let messageId = dc_send_msg(DcContext.contextPointer, chatId, msg)
         dc_msg_unref(msg)
-        
+
         return messageId
     }
-    
+
     func sendAttachment(fromPath path: String, withType type: Int32, mimeType: String, text: String?, forChatId chatId: UInt32) throws -> UInt32 {
         guard Int(type).isValidAttachmentType else {
             throw DcContextError(kind: .wrongAttachmentType(type))
         }
-        
+
         let msg = dc_msg_new(DcContext.contextPointer, type)
-        
+
         switch type {
             case DC_MSG_IMAGE, DC_MSG_GIF:
                 guard let image = UIImage(contentsOfFile: path) else {
                     throw DcContextError(kind: .missingImageAtPath(path))
                 }
-                
+
                 let pixelSize = image.sizeInPixel
                 let width = Int32(exactly: pixelSize.width)!
                 let height = Int32(exactly: pixelSize.height)!
                 dc_msg_set_dimension(msg, width, height)
                 break
-            
+
             case DC_MSG_AUDIO:
                 break
-            
+
             case DC_MSG_VOICE:
                 break
-            
+
             case DC_MSG_VIDEO:
                 break
-            
+
             case DC_MSG_FILE:
                 break
-            
+
             default: break
         }
-        
+
         dc_msg_set_file(msg, path, mimeType)
 
         if let text = text {
@@ -298,35 +298,35 @@ class DcContext {
         }
         let messageId = dc_send_msg(DcContext.contextPointer, chatId, msg)
         dc_msg_unref(msg)
-        
+
         return messageId
     }
-    
+
     func getFreshMessageIds() -> [UInt32] {
         let messageIds = dc_get_fresh_msgs(DcContext.contextPointer)
         let ids = Utils.copyAndFreeArray(inputArray: messageIds)
-        
+
         return ids
     }
-    
+
     func markSeenMessages(messageIds: [UInt32]) {
         dc_markseen_msgs(DcContext.contextPointer, UnsafePointer(messageIds), Int32(messageIds.count))
     }
-    
+
     func starMessages(messageIds: [UInt32], star: Int32) {
         dc_star_msgs(DcContext.contextPointer, UnsafePointer(messageIds), Int32(messageIds.count), star)
     }
-    
+
     func deleteMessages(messageIds: [UInt32]) {
         dc_delete_msgs(DcContext.contextPointer, UnsafePointer(messageIds), Int32(messageIds.count))
     }
-    
+
     func forwardMessages(messageIds: [UInt32], chatId: UInt32) {
         dc_forward_msgs(DcContext.contextPointer, UnsafePointer(messageIds), Int32(messageIds.count), chatId)
     }
 
     // MARK: - General
-    
+
     func getSecurejoinQr(chatId: UInt32) -> String? {
         if let cString = dc_get_securejoin_qr(DcContext.contextPointer, chatId) {
             let swiftString = String(cString: cString)
@@ -336,19 +336,19 @@ class DcContext {
 
         return nil
     }
-    
+
     func joinSecurejoin (qrCode: String) -> UInt32 {
         return dc_join_securejoin(DcContext.contextPointer, qrCode)
     }
-    
+
     func checkQR(qrCode: String) -> DcLot {
         return DcLot(dc_check_qr(DcContext.contextPointer, qrCode))
     }
-    
+
     func stopOngoingProcess() {
         dc_stop_ongoing_process(DcContext.contextPointer)
     }
-    
+
     func initiateKeyTransfer() -> String? {
         if let cString = dc_initiate_key_transfer(DcContext.contextPointer) {
             let swiftString = String(cString: cString)
@@ -359,25 +359,25 @@ class DcContext {
 
         return nil
     }
-    
+
     func continueKeyTransfer(msgId: UInt32, setupCode: String) -> Bool {
         return 1 == dc_continue_key_transfer(DcContext.contextPointer, msgId, setupCode)
     }
-    
+
     // MARK: - COI related Stuff
-    
+
     func isCoiSupported() -> Int32 {
         return dc_is_coi_supported(DcContext.contextPointer)
     }
-    
+
     func isCoiEnabled() -> Int32 {
         return dc_is_coi_enabled(DcContext.contextPointer)
     }
-    
+
     func isWebPushSupported() -> Int32 {
         return dc_is_webpush_supported(DcContext.contextPointer)
     }
-    
+
     func getWebPushVapidKey() -> String? {
         if let cString = dc_get_webpush_vapid_key(DcContext.contextPointer) {
             let swiftString = String(cString: cString)
@@ -386,33 +386,33 @@ class DcContext {
         }
         return nil
     }
-    
+
     func subscribeWebPush(uid: String, json: String, id: Int32) {
         dc_subscribe_webpush(DcContext.contextPointer, uid, json, id)
     }
-    
+
     func getWebPushSubscription(uid: String, id: Int32) {
         dc_get_webpush_subscription(DcContext.contextPointer, uid, id)
     }
-    
+
     func setCoiEnabled(enable: Int32, id: Int32) {
         dc_set_coi_enabled(DcContext.contextPointer, enable, id)
     }
-    
+
     func setCoiMessageFilter(mode: Int32, id: Int32) {
         dc_set_coi_message_filter(DcContext.contextPointer, mode, id)
     }
-    
+
     func validateWebPush(uid: String, message: String, id: Int32) {
         dc_validate_webpush(DcContext.contextPointer, uid, message, id)
     }
-    
+
     // MARK: - IMAP
-    
+
     func interruptImapIdle() {
         dc_interrupt_imap_idle(DcContext.contextPointer)
     }
-    
+
     func interruptMvboxIdle() {
         dc_interrupt_mvbox_idle(DcContext.contextPointer)
     }
@@ -452,9 +452,9 @@ class DcContext {
             dc_configure(DcContext.contextPointer)
         }
     }
-    
+
     var isConfigured: Bool {
         return 1 == dc_is_configured(DcContext.contextPointer)
     }
-    
+
 }

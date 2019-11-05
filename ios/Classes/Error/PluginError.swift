@@ -43,18 +43,18 @@
 import Foundation
 
 struct PluginError {
-    
+
     struct DataBase {
         static let COULD_NOT_OPEN = "couldNotOpenUserDatabase"
     }
-    
+
 }
 
 class DCPluginError: FlutterError {
-    
+
     static func couldNotOpenDataBase() -> FlutterError {
         let error = FlutterError(code: PluginError.DataBase.COULD_NOT_OPEN, message: nil, details: nil)
         return error
     }
-    
+
 }

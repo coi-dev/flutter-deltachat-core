@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 struct Argument {
 
     static let ID                      = "id"
@@ -48,7 +47,7 @@ struct Argument {
         static let NO_INT        = "4"
         static let NO_BOOL       = "5"
     }
-    
+
 }
 
 enum ArgumentType: String {

@@ -47,7 +47,7 @@ import UIKit
 let log = SwiftyBeaver.self
 
 public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
-    
+
     fileprivate let registrar: FlutterPluginRegistrar!
 
     fileprivate let dcContext: DcContext!
@@ -67,7 +67,7 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
 
     init(registrar: FlutterPluginRegistrar) {
         self.registrar = registrar
-        
+
         self.dcContext = DcContext()
         self.dcEventHandler = DCEventHandler()
         
@@ -80,14 +80,14 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         let ech = EventChannelHandler.sharedInstance
         ech.messenger = registrar.messenger()
     }
-    
+
     // This is our entry point
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "deltaChatCore", binaryMessenger: registrar.messenger())
         let delegate = SwiftDeltaChatCorePlugin(registrar: registrar)
         registrar.addMethodCallDelegate(delegate, channel: channel)
     }
-    
+
     // MARK: - FlutterPlugin
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -116,7 +116,7 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         }
 
     }
- 
+
     func handleBaseCalls(with call: FlutterMethodCall, result: FlutterResult) {
         switch (call.method) {
         case Method.Base.INIT:
@@ -124,9 +124,9 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         case Method.Base.SYSTEM_INFO:
             systemInfo(result: result)
         case Method.Base.CORE_LISTENER:
-            coreListener(methodCall: call, result: result);
+            coreListener(methodCall: call, result: result)
         case Method.Base.SET_CORE_STRINGS:
-            setCoreStrings(methodCall: call, result: result);
+            setCoreStrings(methodCall: call, result: result)
         default:
             log.error("Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
@@ -159,7 +159,7 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
     }
     
     // MARK: - Handle Base Calls
-    
+
     fileprivate func baseInit(result: FlutterResult) {
         if dcContext.openUserDataBase() {
             dcEventHandler.start()
@@ -169,15 +169,15 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         log.error("Couldn't open user database at path: \(dcContext.userDatabasePath)")
         result(DCPluginError.couldNotOpenDataBase())
     }
-    
+
     fileprivate func systemInfo(result: FlutterResult) {
         result(UIApplication.version)
     }
-    
+
     fileprivate func coreListener(methodCall: FlutterMethodCall, result: FlutterResult) {
         let eventId = methodCall.intValue(for: Argument.EVENT_ID, result: result)
         let add = methodCall.boolValue(for: Argument.ADD, result: result)
-        
+
         // Add a new Listener
         if true == add {
             EventChannelHandler.sharedInstance.addListener(eventId: eventId)
@@ -187,10 +187,10 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
 
         // Remove a given Listener
         EventChannelHandler.sharedInstance.removeListener(eventId: eventId)
-        
+
         result(nil)
     }
-    
+
     fileprivate func setCoreStrings(methodCall: FlutterMethodCall, result: FlutterResult) {
         if let coreStrings: CoreStrings.CoreStringsDictionary = methodCall.arguments as? CoreStrings.CoreStringsDictionary {
             CoreStrings.sharedInstance.strings = coreStrings
