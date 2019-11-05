@@ -53,9 +53,9 @@ class DcMsg: MessageType {
     deinit {
         dc_msg_unref(messagePointer)
     }
-    
+
     // MARK: - Debugging
-    
+
     func debugDescription() -> String {
         return "[id: \(id)] '\(String(describing: text))'"
     }
@@ -78,8 +78,8 @@ class DcMsg: MessageType {
         if isInfoMessage {
             let text = NSAttributedString(string: self.text, attributes: [
                 NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: UIFont.systemFontSize),
-                NSAttributedString.Key.foregroundColor: UIColor.darkGray,
-                ])
+                NSAttributedString.Key.foregroundColor: UIColor.darkGray
+            ])
             return MessageKind.attributedText(text)
         }
 
@@ -252,7 +252,7 @@ class DcMsg: MessageType {
     }
 
     var timestamp: Int64 {
-        return dc_msg_get_timestamp(messagePointer) * 1000
+        return dc_msg_get_timestamp(messagePointer) * 1_000
     }
 
     func summary(chars: Int32) -> String {
@@ -266,31 +266,31 @@ class DcMsg: MessageType {
         let chatId = dc_create_chat_by_msg_id(DcContext.contextPointer, UInt32(id))
         return DcChat(id: chatId)
     }
-    
+
     var isSetupMessage: Bool {
         return dc_msg_is_setupmessage(messagePointer) == 1
     }
-    
+
     var isInfoMessage: Bool {
         return dc_msg_is_info(messagePointer) == 1
     }
-    
+
     var isOutgoing: Bool {
         return fromContactId == DC_CONTACT_ID_SELF
     }
-    
+
     var hasFile: Bool {
         return !self.file.isEmpty
     }
-    
+
     var showPadLock: Int32 {
         return dc_msg_get_showpadlock(messagePointer)
     }
-    
+
     var isStarred: Bool {
         return dc_msg_is_starred(messagePointer) == 1
     }
-    
+
     var setupCodeBegin: String {
         if let cString = dc_msg_get_setupcodebegin(messagePointer) {
             let str = String(cString: cString)
@@ -303,14 +303,14 @@ class DcMsg: MessageType {
 }
 
 enum MessageViewType: Int {
-    case text  = 10
+    case text = 10
     case image = 20
-    case gif   = 21
+    case gif = 21
     case audio = 40
     case voice = 41
     case video = 50
-    case file  = 60
-    
+    case file = 60
+
     var description: String {
         switch self {
         // Use Internationalization, as appropriate.
@@ -328,14 +328,14 @@ enum MessageViewType: Int {
 // MARK: - Attachment Type
 
 extension Int {
-    
+
     var isValidAttachmentType: Bool {
         return DC_MSG_IMAGE == self
-            || DC_MSG_GIF   == self
+            || DC_MSG_GIF == self
             || DC_MSG_AUDIO == self
             || DC_MSG_VOICE == self
             || DC_MSG_VIDEO == self
-            || DC_MSG_FILE  == self
+            || DC_MSG_FILE == self
     }
-    
+
 }

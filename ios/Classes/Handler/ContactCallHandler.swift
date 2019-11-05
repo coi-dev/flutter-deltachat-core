@@ -43,12 +43,12 @@
 import Foundation
 
 class ContactCallHandler: MethodCallHandling {
-    
+
     fileprivate let context: DcContext!
     fileprivate let contextCallHandler: ContextCallHandler!
-    
+
     // MARK: - Initialization
-    
+
     init(context: DcContext, contextCallHandler: ContextCallHandler) {
         self.context = context
         self.contextCallHandler = contextCallHandler
@@ -59,99 +59,99 @@ class ContactCallHandler: MethodCallHandling {
     func handle(_ call: FlutterMethodCall, result: FlutterResult) {
         switch (call.method) {
         case Method.Contact.GET_ID:
-            getId(methodCall: call, result: result);
+            getId(methodCall: call, result: result)
             break
         case Method.Contact.GET_NAME:
-            getName(methodCall: call, result: result);
+            getName(methodCall: call, result: result)
             break
         case Method.Contact.GET_DISPLAY_NAME:
-            getDisplayName(methodCall: call, result: result);
+            getDisplayName(methodCall: call, result: result)
             break
         case Method.Contact.GET_FIRST_NAME:
-            getFirstName(methodCall: call, result: result);
+            getFirstName(methodCall: call, result: result)
             break
         case Method.Contact.GET_ADDRESS:
-            getAddress(methodCall: call, result: result);
+            getAddress(methodCall: call, result: result)
             break
         case Method.Contact.GET_NAME_AND_ADDRESS:
-            getNameAndAddress(methodCall: call, result: result);
+            getNameAndAddress(methodCall: call, result: result)
             break
         case Method.Contact.GET_PROFILE_IMAGE:
-            getProfileImage(methodCall: call, result: result);
+            getProfileImage(methodCall: call, result: result)
             break
         case Method.Contact.GET_COLOR:
-            getColor(methodCall: call, result: result);
+            getColor(methodCall: call, result: result)
             break
         case Method.Contact.IS_BLOCKED:
-            isBlocked(methodCall: call, result: result);
+            isBlocked(methodCall: call, result: result)
             break
         case Method.Contact.IS_VERIFIED:
-            isVerified(methodCall: call, result: result);
+            isVerified(methodCall: call, result: result)
             break
         default:
             log.error("Context: Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
         }
     }
-    
+
     // MARK: - Private Helper
-    
+
     fileprivate func getId(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
         result(contact.id)
     }
-    
+
     fileprivate func getName(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
         result(contact.name)
     }
-    
+
     fileprivate func getDisplayName(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
         result(contact.displayName)
     }
-    
+
     fileprivate func getFirstName(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
         result(contact.firstName)
     }
-    
+
     fileprivate func getAddress(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
         result(contact.email)
     }
-    
+
     fileprivate func getNameAndAddress(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
         result(contact.nameAndAddress)
     }
-    
+
     fileprivate func getProfileImage(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
         result(contact.profileImageFilePath)
     }
-    
+
     fileprivate func getColor(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
         result(contact.color)
     }
-    
+
     fileprivate func isBlocked(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
         result(contact.isBlocked)
     }
-    
+
     fileprivate func isVerified(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contact = getContact(methodCall: methodCall, result: result)
         result(contact.isVerified)
     }
-    
+
     // MARK: - Private Helper
-    
-    fileprivate func getContact(methodCall: FlutterMethodCall, result: FlutterResult) -> DcContact {
+
+    fileprivate func getContact(methodCall: FlutterMethodCall, result: FlutterResult, update: Bool = false) -> DcContact {
         let id = methodCall.intValue(for: Argument.ID, result: result)
-        let contact = contextCallHandler.loadAndCacheContact(with: UInt32(id))
-        
+        let contact = contextCallHandler.loadAndCacheContact(with: UInt32(id), update: update)
+
         return contact
     }
 }
