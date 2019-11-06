@@ -70,13 +70,13 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
 
         self.dcContext = DcContext()
         self.dcEventHandler = DCEventHandler()
-
-        self.contextCallHandler = ContextCallHandler(context: self.dcContext, contactCache: self.contactCache, messageCache: self.messageCache, chatCache: self.chatCache)
-        self.chatCallHandler = ChatCallHandler(contextCalHandler: self.contextCallHandler)
-        self.chatListCallHandler = ChatListCallHandler(context: self.dcContext, chatCache: self.chatCache)
-        self.contactCallHandler = ContactCallHandler(context: self.dcContext, contextCallHandler: self.contextCallHandler)
-        self.messageCallHandler = MessageCallHandler(context: self.dcContext, contextCallHandler: self.contextCallHandler)
-
+        
+        self.contextCallHandler  = ContextCallHandler(context: dcContext, contactCache: contactCache, messageCache: messageCache, chatCache: chatCache)
+        self.chatCallHandler     = ChatCallHandler(contextCalHandler: contextCallHandler)
+        self.chatListCallHandler = ChatListCallHandler(context: dcContext, chatCache: chatCache)
+        self.contactCallHandler  = ContactCallHandler(context: dcContext, contextCallHandler: contextCallHandler)
+        self.messageCallHandler  = MessageCallHandler(context: dcContext, contextCallHandler: contextCallHandler)
+        
         let ech = EventChannelHandler.sharedInstance
         ech.messenger = registrar.messenger()
     }
@@ -92,6 +92,10 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         log.debug("Dart MethodCall: \(call.method)")
+        
+        if call.contains(key: Argument.REMOVE_CACHE_IDENTIFIER) {
+            removeFromCache(with: call, result: result)
+        }
 
         switch (call.methodPrefix) {
         case Method.Prefix.CONTEXT:
@@ -128,7 +132,32 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
             result(FlutterMethodNotImplemented)
         }
     }
-
+    
+    // MARK: - Cache Handling
+    
+    fileprivate func removeFromCache(with call: FlutterMethodCall, result: FlutterResult) {
+        guard let identifier = call.stringValue(for: Argument.REMOVE_CACHE_IDENTIFIER, result: result),
+            let cacheIdentifier = CacheIdentifier(rawValue: identifier) else {
+                return
+        }
+        
+        let id = UInt32(call.intValue(for: Argument.ID, result: result))
+        
+        switch cacheIdentifier {
+            case .chat:
+                _ = chatCache.removeValue(for: id)
+            case .chatMessage:
+                if let msg = messageCache.removeValue(for: id) {
+                    log.info("removed message: \(msg.type)")
+                }
+            case .contact:
+                _ = contactCache.removeValue(for: id)
+            default:
+                break
+        }
+        
+    }
+    
     // MARK: - Handle Base Calls
 
     fileprivate func baseInit(result: FlutterResult) {
