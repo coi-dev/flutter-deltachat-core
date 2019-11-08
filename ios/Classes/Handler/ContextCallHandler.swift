@@ -62,160 +62,108 @@ class ContextCallHandler: MethodCallHandling {
         switch (call.method) {
         case Method.Context.CONFIG_SET:
             setConfig(methodCall: call, result: result)
-            break
         case Method.Context.CONFIG_GET:
             getConfig(methodCall: call, result: result, type: .string)
-            break
         case Method.Context.CONFIG_GET_INT:
             getConfig(methodCall: call, result: result, type: .int)
-            break
         case Method.Context.CONFIGURE:
             configure(result: result)
-            break
         case Method.Context.IS_CONFIGURED:
             result(context.isConfigured)
-            break
         case Method.Context.ADD_ADDRESS_BOOK:
             addAddressBook(methodCall: call, result: result)
-            break
         case Method.Context.CREATE_CONTACT:
             createContact(methodCall: call, result: result)
-            break
         case Method.Context.DELETE_CONTACT:
             deleteContact(methodCall: call, result: result)
-            break
         case Method.Context.BLOCK_CONTACT:
             blockUnblockContact(methodCall: call, result: result, block: true)
-            break
         case Method.Context.UNBLOCK_CONTACT:
             blockUnblockContact(methodCall: call, result: result, block: false)
-            break
         case Method.Context.CREATE_CHAT_BY_CONTACT_ID:
             createChatByContactId(methodCall: call, result: result)
-            break
         case Method.Context.CREATE_CHAT_BY_MESSAGE_ID:
             createChatByMessageId(methodCall: call, result: result)
-            break
         case Method.Context.CREATE_GROUP_CHAT:
             createGroupChat(methodCall: call, result: result)
-            break
         case Method.Context.GET_CONTACT:
             getContact(methodCall: call, result: result)
-            break
         case Method.Context.GET_CONTACTS:
             getContacts(methodCall: call, result: result)
-            break
         case Method.Context.GET_CHAT_CONTACTS:
             getChatContacts(methodCall: call, result: result)
-            break
         case Method.Context.GET_CHAT:
             getChat(methodCall: call, result: result)
-            break
         case Method.Context.GET_CHAT_MESSAGES:
             getChatMessages(methodCall: call, result: result)
-            break
         case Method.Context.CREATE_CHAT_MESSAGE:
             createChatMessage(methodCall: call, result: result)
-            break
         case Method.Context.CREATE_CHAT_ATTACHMENT_MESSAGE:
             createChatAttachmentMessage(methodCall: call, result: result)
-            break
         case Method.Context.ADD_CONTACT_TO_CHAT:
             addContactToChat(methodCall: call, result: result)
-            break
         case Method.Context.GET_CHAT_BY_CONTACT_ID:
             getChatByContactId(methodCall: call, result: result)
-            break
         case Method.Context.GET_BLOCKED_CONTACTS:
             getBlockedContacts(result: result)
-            break
         case Method.Context.GET_FRESH_MESSAGE_COUNT:
             getFreshMessageCount(methodCall: call, result: result)
-            break
         case Method.Context.MARK_NOTICED_CHAT:
             markNoticedChat(methodCall: call, result: result)
-            break
         case Method.Context.DELETE_CHAT:
             deleteChat(methodCall: call, result: result)
-            break
         case Method.Context.REMOVE_CONTACT_FROM_CHAT:
             removeContactFromChat(methodCall: call, result: result)
-            break
         case Method.Context.EXPORT_KEYS:
-            //exportImportKeys(methodCall, result, DcContext.DC_IMEX_EXPORT_SELF_KEYS)
-            break
+            exportImportKeys(methodCall: call, result: result, type: DC_IMEX_EXPORT_SELF_KEYS)
         case Method.Context.IMPORT_KEYS:
-            //exportImportKeys(methodCall, result, DcContext.DC_IMEX_IMPORT_SELF_KEYS)
-            break
+            exportImportKeys(methodCall: call, result: result, type: DC_IMEX_IMPORT_SELF_KEYS)
         case Method.Context.GET_FRESH_MESSAGES:
             getFreshMessages(result: result)
-            break
         case Method.Context.FORWARD_MESSAGES:
             forwardMessages(methodCall: call, result: result)
-            break
         case Method.Context.MARK_SEEN_MESSAGES:
             markSeenMessages(methodCall: call, result: result)
-            break
         case Method.Context.INITIATE_KEY_TRANSFER:
             initiateKeyTransfer(result: result)
-            break
         case Method.Context.CONTINUE_KEY_TRANSFER:
             continueKeyTransfer(methodCall: call, result: result)
-            break
         case Method.Context.GET_SECUREJOIN_QR:
             getSecurejoinQr(methodCall: call, result: result)
-            break
         case Method.Context.JOIN_SECUREJOIN:
             joinSecurejoin(methodCall: call, result: result)
-            break
         case Method.Context.CHECK_QR:
             checkQr(methodCall: call, result: result)
-            break
         case Method.Context.STOP_ONGOING_PROCESS:
             stopOngoingProcess(result: result)
-            break
         case Method.Context.DELETE_MESSAGES:
             deleteMessages(methodCall: call, result: result)
-            break
         case Method.Context.STAR_MESSAGES:
             starMessages(methodCall: call, result: result)
-            break
         case Method.Context.SET_CHAT_NAME:
             setChatName(methodCall: call, result: result)
-            break
         case Method.Context.SET_CHAT_PROFILE_IMAGE:
             setChatProfileImage(methodCall: call, result: result)
-            break
         case Method.Context.INTERRUPT_IDLE_FOR_INCOMING_MESSAGES:
             interruptIdleForIncomingMessages(result: result)
-            break
         case Method.Context.IS_COI_SUPPORTED:
             isCoiSupported(result: result)
-            break
         case Method.Context.IS_COI_ENABLED:
             isCoiEnabled(result: result)
-            break
         case Method.Context.IS_WEB_PUSH_SUPPORTED:
             isWebPushSupported(result: result)
-            break
         case Method.Context.GET_WEB_PUSH_VAPID_KEY:
             getWebPushVapidKey(result: result)
-            break
         case Method.Context.SUBSCRIBE_WEB_PUSH:
             subscribeWebPush(methodCall: call, result: result)
-            break
         case Method.Context.GET_WEB_PUSH_SUBSCRIPTION:
             getWebPushSubscription(methodCall: call, result: result)
-            break
         case Method.Context.SET_COI_ENABLED:
             setCoiEnabled(methodCall: call, result: result)
-            break
         case Method.Context.SET_COI_MESSAGE_FILTER:
             setCoiMessageFilter(methodCall: call, result: result)
-            break
         case Method.Context.VALIDATE_WEB_PUSH:
             validateWebPush(methodCall: call, result: result)
-            break
         default:
             log.error("Context: Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
@@ -475,6 +423,20 @@ class ContextCallHandler: MethodCallHandling {
         let removed = context.removeContact(with: contactId, fromChat: chatId)
 
         result(NSNumber(value: removed))
+    }
+    
+    fileprivate func exportImportKeys(methodCall: FlutterMethodCall, result: FlutterResult, type: Int32) {
+        guard let path = methodCall.stringValue(for: Argument.PATH, result: result) else {
+            return
+        }
+        
+        if path.isEmpty {
+            Method.Error.missingArgumentValue(for: Argument.PATH, result: result)
+            return
+        }
+        
+        context.imex(type: type, path: path)
+        result(nil)
     }
 
     fileprivate func setChatName(methodCall: FlutterMethodCall, result: FlutterResult) {

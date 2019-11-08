@@ -456,5 +456,11 @@ class DcContext {
     var isConfigured: Bool {
         return 1 == dc_is_configured(DcContext.contextPointer)
     }
+    
+    // MARK: - Keys Import/Export
+    
+    func imex(type: Int32, path: String) {
+        dc_imex(DcContext.contextPointer, type, path, nil)
+    }
 
 }
