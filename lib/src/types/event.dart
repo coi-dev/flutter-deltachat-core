@@ -44,6 +44,8 @@ class Event {
   static const int info = 100;
   static const int warning = 300;
   static const int error = 400;
+  static const int errorNoNetwork = 401;
+  static const int errorNotInGroup = 410;
   static const int msgsChanged = 2000;
   static const int incomingMsg = 2005;
   static const int msgDelivered = 2010;
@@ -51,6 +53,7 @@ class Event {
   static const int msgRead = 2015;
   static const int chatModified = 2020;
   static const int contactsChanged = 2030;
+  static const int locationChanged = 2035;
   static const int configureProgress = 2041;
   static const int imexProgress = 2051;
   static const int imexFileWrite = 2052;
@@ -62,6 +65,7 @@ class Event {
   static const int getString = 2091;
   static const int getQuantityString = 2092;
   static const int httpGet = 2100;
+  static const int httpPost = 2110;
 
   static const indexEventId = 0;
   static const indexData1 = 1;

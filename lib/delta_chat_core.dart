@@ -63,13 +63,10 @@ class DeltaChatCore {
   static const String channelDeltaChatCoreEvents = 'deltaChatCoreEvents';
 
   static const String methodBaseInit = 'base_init';
-  static const String methodBaseCoreListener = "base_coreListener";
   static const String methodBaseSetCoreStrings = "base_setCoreStrings";
   static const String methodBaseStart = "base_start";
   static const String methodBaseStop = "base_stop";
 
-  static const String argumentAdd = "add";
-  static const String argumentEventId = "eventId";
   static const String argumentDBName = "dbName";
 
   static DeltaChatCore _instance;
@@ -141,7 +138,6 @@ class DeltaChatCore {
     if (eventId == null || streamController == null) {
       return;
     }
-    await invokeMethod(methodBaseCoreListener, <String, dynamic>{argumentAdd: true, argumentEventId: eventId});
     var eventIdSubscribers = _eventChannelSubscribers[eventId];
     if (eventIdSubscribers == null) {
       eventIdSubscribers = Map();
@@ -153,7 +149,7 @@ class DeltaChatCore {
   delegateEventToSubscribers(Event event) {
     var logMessage = "Event - id: ${event.eventId}, data1: ${event.data1}, data2: ${event.data2}";
     _logger.fine(logMessage);
-    _eventChannelSubscribers[event.eventId].forEach((_, streamController) {
+    _eventChannelSubscribers[event.eventId]?.forEach((_, streamController) {
       streamController.add(event);
     });
   }
@@ -168,7 +164,6 @@ class DeltaChatCore {
     streamController.close();
     var eventIdSubscribers = _eventChannelSubscribers[eventId];
     eventIdSubscribers?.remove(hashCode);
-    await invokeMethod(methodBaseCoreListener, <String, dynamic>{argumentAdd: false, argumentEventId: eventId});
   }
 
   // Manually adds events to the core stream. This shouldn't be required normally, as those events should be produced / captured by the
