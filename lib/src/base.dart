@@ -99,13 +99,13 @@ abstract class Base {
 
   Future<void> loadValues({List<String> keys, Map<String, Map<String, dynamic>> keysAndArguments}) async {
     if (keys != null && keys.isNotEmpty) {
-      Future.forEach(keys, (key) async {
+      await Future.forEach(keys, (key) async {
         await loadValue(key);
       });
     } else if (keysAndArguments != null && keysAndArguments.isNotEmpty) {
-      for (int index = 0; index < keysAndArguments.length; index++) {
-        await loadValue(keysAndArguments.keys.elementAt(index), arguments: keysAndArguments.values.elementAt(index));
-      }
+      await Future.forEach(keysAndArguments.entries, (keysAndArgument) async {
+        await loadValue(keysAndArgument.key, arguments: keysAndArgument.value);
+      });
     }
   }
 
@@ -126,7 +126,6 @@ abstract class Base {
 
   Future<void> reloadValue(String key, {Map<String, dynamic> arguments, bool removeFromJavaCache = true}) async {
     var value = get(key);
-    remove(key);
     var reloadArguments = arguments ?? getDefaultArguments();
     if (removeFromJavaCache) {
       reloadArguments.addAll(_getRemoveCacheIdentifierArguments());
@@ -134,6 +133,7 @@ abstract class Base {
         throw ArgumentError("$argumentId or $argumentRemoveCacheIdentifier is missing. Add required parameters to the reloadValue() call");
       }
     }
+    _loadedValues.remove(key);
     var newValue = await loadAndGetValue(key, arguments: reloadArguments);
     if (value != newValue) {
       setLastUpdate();
