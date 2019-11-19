@@ -48,14 +48,6 @@ public func isData2AString(for event: CInt) -> Bool {
 
 @_silgen_name("handleDeltaChatEvent")
 public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsignedLong, data1String: UnsafePointer<Int8>, data2String: UnsafePointer<Int8>) -> UnsafePointer<Int8>? {
-    var logMessage = "Received DCC event [\(event)]"
-
-    if isData2AString(for: event) {
-        logMessage = "\(logMessage): \(String(cString: data2String))"
-    }
-
-    log.info(logMessage)
     EventChannelHandler.sharedInstance.handle(Int32(event), data1: data1, data2: data2)
-
     return nil
 }

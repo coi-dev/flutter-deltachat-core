@@ -103,6 +103,7 @@ class EventChannelHandler: NSObject, FlutterStreamHandler {
     func handle(_ eventId: Int32, data1: Any, data2: Any) {
         if !isDelegateEvent(eventId: eventId) { return }
 
+        log.info("Handle event [\(eventId)]: data1 (\(data1)), data2 (\(data2))")
         let result = [eventId, data1, data2]
         self.eventSink?(result)
     }
