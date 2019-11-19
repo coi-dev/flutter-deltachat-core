@@ -68,7 +68,7 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.flutter.view.FlutterNativeView;
 
 public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.ViewDestroyListener {
-    public static final String TAG = "coi";
+    static final String TAG = "coi";
 
     private static final String LIBRARY_NAME = "native-utils";
     private static final String CHANNEL_DELTA_CHAT_CORE = "deltaChatCore";
@@ -83,13 +83,10 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
 
     private static final String METHOD_BASE_INIT = "base_init";
     private static final String METHOD_BASE_SYSTEM_INFO = "base_systemInfo";
-    private static final String METHOD_BASE_CORE_LISTENER = "base_coreListener";
     private static final String METHOD_BASE_SET_CORE_STRINGS = "base_setCoreStrings";
     private static final String METHOD_BASE_START = "base_start";
     private static final String METHOD_BASE_STOP = "base_stop";
 
-    private static final String ARGUMENT_ADD = "add";
-    private static final String ARGUMENT_EVENT_ID = "eventId";
     private static final String ARGUMENT_REMOVE_CACHE_IDENTIFIER = "removeCacheIdentifier";
     private static final String ARGUMENT_DB_NAME = "dbName";
 
@@ -111,6 +108,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
     private ContactCallHandler contactCallHandler;
     private ContextCallHandler contextCallHandler;
     private MessageCallHandler messageCallHandler;
+    @SuppressWarnings("FieldCanBeLocal")
     private EventChannelHandler eventChannelHandler;
 
     private DeltaChatCorePlugin(Registrar registrar) {
@@ -189,9 +187,6 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
             case METHOD_BASE_SYSTEM_INFO:
                 systemInfo(result);
                 break;
-            case METHOD_BASE_CORE_LISTENER:
-                coreListener(methodCall, result);
-                break;
             case METHOD_BASE_SET_CORE_STRINGS:
                 setCoreStrings(methodCall, result);
                 break;
@@ -230,21 +225,6 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
 
     private void systemInfo(Result result) {
         result.success(android.os.Build.VERSION.RELEASE);
-    }
-
-    private void coreListener(MethodCall methodCall, Result result) {
-        Boolean add = methodCall.argument(ARGUMENT_ADD);
-        Integer eventId = methodCall.argument(ARGUMENT_EVENT_ID);
-        if (eventId == null || add == null) {
-            return;
-        }
-        if (add) {
-            eventChannelHandler.addListener(eventId);
-            result.success(null);
-        } else {
-            eventChannelHandler.removeListener(eventId);
-            result.success(null);
-        }
     }
 
     private void start(Result result) {

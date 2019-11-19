@@ -42,8 +42,7 @@
 
 package com.openxchange.deltachatcore.handlers;
 
-import android.util.SparseIntArray;
-
+import com.b44t.messenger.DcContext;
 import com.openxchange.deltachatcore.Utils;
 
 import java.util.Arrays;
@@ -55,8 +54,32 @@ import io.flutter.plugin.common.EventChannel;
 public class EventChannelHandler implements EventChannel.StreamHandler {
 
     private static final String CHANNEL_DELTA_CHAT_CORE_EVENTS = "deltaChatCoreEvents";
+    // Must match all events listed in android/src/main/java/com/b44t/messenger/DcContext.java (DC_EVENT_*)
+    private final static List<Integer> DELEGATE_EVENTS = Arrays.asList(DcContext.DC_EVENT_INFO,
+            DcContext.DC_EVENT_WARNING,
+            DcContext.DC_EVENT_ERROR,
+            DcContext.DC_EVENT_ERROR_NETWORK,
+            DcContext.DC_EVENT_ERROR_SELF_NOT_IN_GROUP,
+            DcContext.DC_EVENT_MSGS_CHANGED,
+            DcContext.DC_EVENT_INCOMING_MSG,
+            DcContext.DC_EVENT_MSG_DELIVERED,
+            DcContext.DC_EVENT_MSG_FAILED,
+            DcContext.DC_EVENT_MSG_READ,
+            DcContext.DC_EVENT_CHAT_MODIFIED,
+            DcContext.DC_EVENT_CONTACTS_CHANGED,
+            DcContext.DC_EVENT_LOCATION_CHANGED,
+            DcContext.DC_EVENT_CONFIGURE_PROGRESS,
+            DcContext.DC_EVENT_IMEX_PROGRESS,
+            DcContext.DC_EVENT_IMEX_FILE_WRITTEN,
+            DcContext.DC_EVENT_SECUREJOIN_INVITER_PROGRESS,
+            DcContext.DC_EVENT_SECUREJOIN_JOINER_PROGRESS,
+            DcContext.DC_EVENT_IS_OFFLINE,
+            DcContext.DC_EVENT_GET_STRING,
+            DcContext.DC_EVENT_GET_QUANTITIY_STRING,
+            DcContext.DC_EVENT_HTTP_GET,
+            DcContext.DC_EVENT_HTTP_POST);
+
     private EventChannel.EventSink eventSink;
-    private SparseIntArray listeners = new SparseIntArray();
 
     public EventChannelHandler(BinaryMessenger messenger) {
         EventChannel eventChannel = new EventChannel(messenger, CHANNEL_DELTA_CHAT_CORE_EVENTS);
@@ -65,40 +88,16 @@ public class EventChannelHandler implements EventChannel.StreamHandler {
 
     public void handleEvent(int eventId, Object data1, Object data2) {
         List<Object> result = Arrays.asList(eventId, data1, data2);
-        if (!hasListenersForId(eventId)) {
+        if (!isDelegateEvent(eventId)) {
             return;
         }
         Utils.runOnMain(() -> {
             try {
                 eventSink.success(result);
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         });
-    }
-
-    public void addListener(Integer eventId) {
-        if (eventId == null) {
-            return;
-        }
-        int counter = listeners.get(eventId) + 1;
-        updateListenerCounter(eventId, counter);
-    }
-
-    public void removeListener(Integer eventId) {
-        if (eventId == null) {
-            return;
-        }
-        int counter = listeners.get(eventId) - 1;
-        updateListenerCounter(eventId, counter);
-    }
-
-    private void updateListenerCounter(Integer eventId, int counter) {
-        if (counter < 0) {
-            counter = 0;
-        }
-        listeners.put(eventId, counter);
     }
 
     @Override
@@ -118,7 +117,7 @@ public class EventChannelHandler implements EventChannel.StreamHandler {
         eventSink = null;
     }
 
-    private boolean hasListenersForId(int eventId) {
-        return eventId != 0 && listeners.get(eventId) > 0;
+    private boolean isDelegateEvent(int eventId) {
+        return DELEGATE_EVENTS.contains(eventId);
     }
 }
