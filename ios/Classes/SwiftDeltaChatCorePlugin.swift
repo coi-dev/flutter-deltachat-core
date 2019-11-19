@@ -123,8 +123,6 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
             baseInit(result: result)
         case Method.Base.SYSTEM_INFO:
             systemInfo(result: result)
-        case Method.Base.CORE_LISTENER:
-            coreListener(methodCall: call, result: result)
         case Method.Base.SET_CORE_STRINGS:
             setCoreStrings(methodCall: call, result: result)
         default:
@@ -174,27 +172,21 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         result(UIApplication.version)
     }
 
-    fileprivate func coreListener(methodCall: FlutterMethodCall, result: FlutterResult) {
-        let eventId = methodCall.intValue(for: Argument.EVENT_ID, result: result)
-        let add = methodCall.boolValue(for: Argument.ADD, result: result)
-
-        // Add a new Listener
-        if true == add {
-            EventChannelHandler.sharedInstance.addListener(eventId: eventId)
-            result(nil)
-            return
-        }
-
-        // Remove a given Listener
-        EventChannelHandler.sharedInstance.removeListener(eventId: eventId)
-
-        result(nil)
-    }
-
     fileprivate func setCoreStrings(methodCall: FlutterMethodCall, result: FlutterResult) {
         if let coreStrings: CoreStrings.CoreStringsDictionary = methodCall.arguments as? CoreStrings.CoreStringsDictionary {
             CoreStrings.sharedInstance.strings = coreStrings
         }
         result(nil)
     }
+}
+
+// MARK: - Core Strings
+
+class CoreStrings {
+
+    typealias CoreStringsDictionary = [UInt32: String]
+
+    static let sharedInstance: CoreStrings = CoreStrings()
+    var strings: CoreStringsDictionary?
+
 }

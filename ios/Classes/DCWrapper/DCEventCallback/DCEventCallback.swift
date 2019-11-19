@@ -54,41 +54,8 @@ public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsi
         logMessage = "\(logMessage): \(String(cString: data2String))"
     }
 
-    switch Int32(event) {
-        case DC_EVENT_INFO:
-            log.info(logMessage)
-
-        case DC_EVENT_WARNING:
-            log.warning(logMessage)
-
-        case DC_EVENT_ERROR,
-             DC_EVENT_ERROR_NETWORK,
-             DC_EVENT_ERROR_SELF_NOT_IN_GROUP:
-            log.error(logMessage)
-
-        case DC_EVENT_GET_STRING:
-            log.info(logMessage)
-            if let coreStrings = CoreStrings.sharedInstance.strings {
-                if let str = coreStrings[UInt32(data1)]  {
-                    return UnsafePointer(str)
-                }
-            }
-
-        default:
-            log.info(logMessage)
-            EventChannelHandler.sharedInstance.handle(Int32(event), data1: data1, data2: data2)
-    }
+    log.info(logMessage)
+    EventChannelHandler.sharedInstance.handle(Int32(event), data1: data1, data2: data2)
 
     return nil
-}
-
-// MARK: - Core Strings
-
-class CoreStrings {
-
-    typealias CoreStringsDictionary = [UInt32: String]
-
-    static let sharedInstance: CoreStrings = CoreStrings()
-    var strings: CoreStringsDictionary?
-
 }

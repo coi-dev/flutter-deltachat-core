@@ -44,15 +44,32 @@ import Foundation
 
 class EventChannelHandler: NSObject, FlutterStreamHandler {
 
-    fileprivate enum ListenersCountUpdateMethod {
-        case inc
-        case dec
-    }
-
     fileprivate let CHANNEL_DELTA_CHAT_CORE_EVENTS = "deltaChatCoreEvents"
     fileprivate var eventSink: FlutterEventSink?
-    fileprivate var listeners: [Int32: Int32] = [:]
     fileprivate var eventChannel: FlutterEventChannel!
+    
+    fileprivate let delegateEvents: [Int32] = [
+        DC_EVENT_INFO,
+        DC_EVENT_WARNING,
+        DC_EVENT_ERROR,
+        DC_EVENT_ERROR_NETWORK,
+        DC_EVENT_ERROR_SELF_NOT_IN_GROUP,
+        DC_EVENT_MSGS_CHANGED,
+        DC_EVENT_INCOMING_MSG,
+        DC_EVENT_MSG_DELIVERED,
+        DC_EVENT_MSG_FAILED,
+        DC_EVENT_MSG_READ,
+        DC_EVENT_CHAT_MODIFIED,
+        DC_EVENT_CONTACTS_CHANGED,
+        DC_EVENT_LOCATION_CHANGED,
+        DC_EVENT_CONFIGURE_PROGRESS,
+        DC_EVENT_IMEX_PROGRESS,
+        DC_EVENT_IMEX_FILE_WRITTEN,
+        DC_EVENT_SECUREJOIN_INVITER_PROGRESS,
+        DC_EVENT_SECUREJOIN_JOINER_PROGRESS,
+        DC_EVENT_IS_OFFLINE,
+        DC_EVENT_GET_STRING,
+    ]
 
     var messenger: FlutterBinaryMessenger? {
         didSet {
@@ -67,17 +84,6 @@ class EventChannelHandler: NSObject, FlutterStreamHandler {
 
     override init() {
         super.init()
-    }
-
-    // MARK: - Public API
-
-    func addListener(eventId: Int32) {
-        updateListenersCount(for: eventId, updateBy: .inc)
-        return
-    }
-
-    func removeListener(eventId: Int32) {
-        updateListenersCount(for: eventId, updateBy: .dec)
     }
 
     // MARK: - FlutterStreamHandler
@@ -95,31 +101,16 @@ class EventChannelHandler: NSObject, FlutterStreamHandler {
     }
 
     func handle(_ eventId: Int32, data1: Any, data2: Any) {
-        if !hasListeners(for: eventId) { return }
+        if !isDelegateEvent(eventId: eventId) { return }
 
-        log.info("Begin handle event [\(eventId)]: data1 (\(data1)), data2 (\(data2))")
         let result = [eventId, data1, data2]
         self.eventSink?(result)
-        log.info("End handle event [\(eventId)]: result (\(result))")
     }
 
     // MARK: - Private Helper
-
-    fileprivate func hasListeners(for eventId: Int32) -> Bool {
-        if let listenersCount = listeners[eventId] {
-            return listenersCount > 0
-        }
-        return false
-    }
-
-    fileprivate func updateListenersCount(for eventId: Int32, updateBy: ListenersCountUpdateMethod) {
-        switch updateBy {
-            case .inc:
-                listeners[eventId] = (listeners[eventId] ?? 0) + 1
-
-            case .dec:
-                listeners[eventId] = (listeners[eventId] ?? 1) - 1
-        }
+    
+    fileprivate func isDelegateEvent(eventId: Int32) -> Bool {
+        return delegateEvents.contains(eventId)
     }
 
 }
