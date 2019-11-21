@@ -24,7 +24,7 @@
 
 
 #include <jni.h>
-#include "deltachat-core-rust/deltachat-ffi/deltachat.h"
+#include "../../delta_chat_core/deltachat-ffi/deltachat.h"
 
 
 static dc_msg_t* get_dc_msg(JNIEnv *env, jobject obj);
