@@ -106,8 +106,8 @@ function update_dcc() {
 function build_and_install_deltachat() {
     show_header "Building DeltaChat Core..."
     echo
-    cargo lipo --release -p deltachat_ffi 2>&1
-    
+    cargo lipo --release --manifest-path 'deltachat-ffi/Cargo.toml' --no-default-features --features nightly -p deltachat_ffi 2>&1
+
     show_header "Copying '${DCC_PRODUCT_NAME}' to destination..."
     mv "./${DCC_PRODUCT_PATH}" "../" >/dev/null 2>&1
 }

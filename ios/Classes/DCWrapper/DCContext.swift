@@ -248,21 +248,20 @@ class DcContext {
         return dc_get_fresh_msg_cnt(DcContext.contextPointer, chatId)
     }
 
-    func sendText(_ text: String, forChatId chatId: UInt32) -> UInt32 {
-        let msg = dc_msg_new(DcContext.contextPointer, DC_MSG_TEXT)
-        dc_msg_set_text(msg, text.cString(using: .utf8))
-        let messageId = dc_send_msg(DcContext.contextPointer, chatId, msg)
-        dc_msg_unref(msg)
+    func send(text: String, forChatId chatId: UInt32) -> UInt32 {
+        let msg = DcMsg(type: DC_MSG_TEXT)
+        msg.text = text
+        let messageId = send(message: msg, forChat: chatId)
 
         return messageId
     }
 
-    func sendAttachment(fromPath path: String, withType type: Int32, mimeType: String, text: String?, forChatId chatId: UInt32) throws -> UInt32 {
+    func sendAttachment(fromPath path: String, withType type: Int32, mimeType: String, text: String?, duration: Int32?, forChatId chatId: UInt32) throws -> UInt32 {
         guard Int(type).isValidAttachmentType else {
             throw DcContextError(kind: .wrongAttachmentType(type))
         }
-
-        let msg = dc_msg_new(DcContext.contextPointer, type)
+        
+        let msg = DcMsg(type: type)
 
         switch type {
             case DC_MSG_IMAGE, DC_MSG_GIF:
@@ -273,7 +272,7 @@ class DcContext {
                 let pixelSize = image.sizeInPixel
                 let width = Int32(exactly: pixelSize.width)!
                 let height = Int32(exactly: pixelSize.height)!
-                dc_msg_set_dimension(msg, width, height)
+                msg.setDimension(width: width, height: height)
                 break
 
             case DC_MSG_AUDIO:
@@ -283,6 +282,9 @@ class DcContext {
                 break
 
             case DC_MSG_VIDEO:
+                if let duration = duration {
+                    msg.duration = duration
+                }
                 break
 
             case DC_MSG_FILE:
@@ -291,15 +293,19 @@ class DcContext {
             default: break
         }
 
-        dc_msg_set_file(msg, path, mimeType)
+        msg.setFile(path: path, mimeType: mimeType)
 
         if let text = text {
-            dc_msg_set_text(msg, text.cString(using: .utf8))
+            msg.text = text
         }
-        let messageId = dc_send_msg(DcContext.contextPointer, chatId, msg)
-        dc_msg_unref(msg)
+        
+        let messageId = send(message: msg, forChat: chatId)
 
         return messageId
+    }
+    
+    private func send(message: DcMsg, forChat chatId: UInt32) -> UInt32 {
+        return dc_send_msg(DcContext.contextPointer, chatId, message.messagePointer)
     }
 
     func getFreshMessageIds() -> [UInt32] {

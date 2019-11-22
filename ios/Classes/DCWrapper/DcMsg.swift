@@ -44,7 +44,11 @@ import Foundation
 import MessageKit
 
 class DcMsg: MessageType {
-    private var messagePointer: OpaquePointer?
+    var messagePointer: OpaquePointer?
+    
+    init(type: Int32) {
+        messagePointer = dc_msg_new(DcContext.contextPointer, type)
+    }
 
     init(id: UInt32) {
         messagePointer = dc_get_msg(DcContext.contextPointer, id)
@@ -131,10 +135,15 @@ class DcMsg: MessageType {
     }
 
     var text: String {
-        guard let cString = dc_msg_get_text(messagePointer) else { return "" }
-        let swiftString = String(cString: cString)
-        free(cString)
-        return swiftString
+        get {
+            guard let cString = dc_msg_get_text(messagePointer) else { return "" }
+            let swiftString = String(cString: cString)
+            free(cString)
+            return swiftString
+        }
+        set {
+            dc_msg_set_text(messagePointer, newValue.cString(using: .utf8))
+        }
     }
 
     var viewtype: MessageViewType? {
@@ -192,6 +201,10 @@ class DcMsg: MessageType {
         }
 
         return ""
+    }
+    
+    func setFile(path: String, mimeType: String) {
+        dc_msg_set_file(messagePointer, path, mimeType)
     }
 
     var filemime: String {
@@ -298,6 +311,27 @@ class DcMsg: MessageType {
             return str
         }
         return ""
+    }
+    
+    var duration: Int32 {
+        get {
+            return dc_msg_get_duration(messagePointer)
+        }
+        set {
+            dc_msg_set_duration(messagePointer, newValue)
+        }
+    }
+    
+    func setDimension(width: Int32, height: Int32) {
+        dc_msg_set_dimension(messagePointer, width, height)
+    }
+    
+    var width: Int32 {
+        return dc_msg_get_width(messagePointer)
+    }
+    
+    var height: Int32 {
+        return dc_msg_get_height(messagePointer)
     }
 
 }

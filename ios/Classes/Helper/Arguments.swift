@@ -39,6 +39,7 @@ struct Argument {
     static let MESSAGE                 = "message"
     static let MIME_TYPE               = "mimeType"
     static let REMOVE_CACHE_IDENTIFIER = "removeCacheIdentifier"
+    static let DURATION                = "duration"
 
     struct Error {
         static let MISSING       = "1"
