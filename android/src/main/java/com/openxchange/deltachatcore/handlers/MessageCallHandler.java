@@ -146,6 +146,9 @@
                 case METHOD_MESSAGE_IS_STARRED:
                     isStarred(methodCall, result);
                     break;
+                case METHOD_MESSAGE_GET_DURATION:
+                    getDuration(methodCall, result);
+                    break;
                 default:
                     result.notImplemented();
             }
@@ -330,6 +333,15 @@
                 return;
             }
             result.success(message.isStarred());
+        }
+
+        private void getDuration(MethodCall methodCall, MethodChannel.Result result) {
+            DcMsg message = getMessage(methodCall, result);
+            if (message == null) {
+                resultErrorGeneric(methodCall, result);
+                return;
+            }
+            result.success(message.getDuration());
         }
 
         private DcMsg getMessage(MethodCall methodCall, MethodChannel.Result result) {

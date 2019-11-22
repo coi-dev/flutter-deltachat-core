@@ -623,7 +623,7 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
     }
 
     private void createChatAttachmentMessage(MethodCall methodCall, MethodChannel.Result result) {
-        if (!hasArgumentKeys(methodCall, ARGUMENT_CHAT_ID, ARGUMENT_TYPE, ARGUMENT_PATH, ARGUMENT_MIME_TYPE, ARGUMENT_TEXT)) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_CHAT_ID, ARGUMENT_TYPE, ARGUMENT_PATH, ARGUMENT_MIME_TYPE, ARGUMENT_DURATION, ARGUMENT_TEXT)) {
             resultErrorArgumentMissing(result);
             return;
         }
@@ -637,10 +637,12 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
 
         String text = methodCall.argument(ARGUMENT_TEXT);
         String mimeType = methodCall.argument(ARGUMENT_MIME_TYPE);
+        int duration = methodCall.argument(ARGUMENT_DURATION);
 
         DcMsg newMsg = new DcMsg(dcContext, type);
         newMsg.setFile(path, mimeType);
         newMsg.setText(text);
+        newMsg.setDuration(duration);
         int messageId = dcContext.sendMsg(chatId, newMsg);
         result.success(messageId);
     }
