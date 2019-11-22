@@ -60,60 +60,44 @@ class MessageCallHandler: MethodCallHandling {
         switch (call.method) {
         case Method.Message.GET_ID:
             getId(methodCall: call, result: result)
-            break
         case Method.Message.GET_TEXT:
             getText(methodCall: call, result: result)
-            break
         case Method.Message.GET_TIMESTAMP:
             getTimestamp(methodCall: call, result: result)
-            break
         case Method.Message.GET_CHAT_ID:
             getChatId(methodCall: call, result: result)
-            break
         case Method.Message.GET_FROM_ID:
             getFromId(methodCall: call, result: result)
-            break
         case Method.Message.IS_OUTGOING:
             isOutgoing(methodCall: call, result: result)
-            break
         case Method.Message.HAS_FILE:
             hasFile(methodCall: call, result: result)
-            break
         case Method.Message.GET_TYPE:
             getType(methodCall: call, result: result)
-            break
         case Method.Message.GET_FILE:
             getFile(methodCall: call, result: result)
-            break
         case Method.Message.GET_FILE_BYTES:
             getFileBytes(methodCall: call, result: result)
-            break
         case Method.Message.GET_FILENAME:
             getFileName(methodCall: call, result: result)
-            break
         case Method.Message.GET_FILE_MIME:
             getFileMime(methodCall: call, result: result)
-            break
         case Method.Message.GET_SUMMARY_TEXT:
             getSummaryText(methodCall: call, result: result)
-            break
         case Method.Message.GET_STATE:
             getState(methodCall: call, result: result)
-            break
         case Method.Message.IS_SETUP_MESSAGE:
             isSetupMessage(methodCall: call, result: result)
-            break
         case Method.Message.IS_INFO:
             isInfo(methodCall: call, result: result)
-            break
         case Method.Message.GET_SETUP_CODE_BEGIN:
             getSetupCodeBegin(methodCall: call, result: result)
         case Method.Message.SHOW_PADLOCK:
             showPadlock(methodCall: call, result: result)
-            break
         case Method.Message.IS_STARRED:
             isStarred(methodCall: call, result: result)
-            break
+        case Method.Message.GET_DURATION:
+            getDuration(methodCall: call, result: result)
         default:
             log.error("Context: Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
@@ -210,10 +194,15 @@ class MessageCallHandler: MethodCallHandling {
         let msg = getMessage(methodCall: methodCall, result: result)
         result(NSNumber(value: msg.showPadLock))
     }
-
+    
     private func isStarred(methodCall: FlutterMethodCall, result: FlutterResult) {
         let msg = getMessage(methodCall: methodCall, result: result)
         result(NSNumber(value: msg.isStarred))
+    }
+    
+    private func getDuration(methodCall: FlutterMethodCall, result: FlutterResult) {
+        let msg = getMessage(methodCall: methodCall, result: result)
+        result(NSNumber(value: msg.duration))
     }
 
     // MARK: - Private Helper

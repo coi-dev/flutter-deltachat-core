@@ -183,6 +183,10 @@ class ChatMsg extends Base {
     return await loadAndGetValue(methodMessageIsStarred);
   }
 
+  Future<int> getDuration() async {
+    return await loadAndGetValue(methodMessageGetDuration);
+  }
+
   @override
   getDefaultArguments() => <String, dynamic>{Base.argumentId: _id};
 
