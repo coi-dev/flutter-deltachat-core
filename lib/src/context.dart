@@ -100,6 +100,8 @@ class Context {
   static const String methodGetWebPushSubscription = "context_getWebPushSubscription";
   static const String methodSetCoiEnabled = "context_setCoiEnabled";
   static const String methodSetCoiMessageFilter = "context_setCoiMessageFilter";
+  static const String methodGetMessageInfo = "context_getMessageInfo";
+  static const String methodRetrySendingPendingMessages = "context_retrySendingPendingMessages";
 
   static const String configAddress = "addr";
   static const String configMailServer = "mail_server";
@@ -374,6 +376,14 @@ class Context {
     return await core.invokeMethod(methodSetCoiMessageFilter, getSetCoiMessageFilter(mode, id));
   }
 
+  Future<String> getMessageInfo(int msgId) async {
+    return await core.invokeMethod(methodGetMessageInfo, getMessageIdArguments(msgId));
+  }
+
+  Future<void> retrySendingPendingMessages() async {
+    return await core.invokeMethod(methodRetrySendingPendingMessages);
+  }
+
   Map<String, dynamic> getKeyArguments(String key) => <String, dynamic>{Base.argumentKey: key};
 
   Map<String, dynamic> getConfigArguments(String type, String key, value) =>
@@ -385,6 +395,8 @@ class Context {
     <String, dynamic>{Base.argumentName: name, Base.argumentAddress: address};
 
   Map<String, dynamic> getIdArguments(int id) => <String, dynamic>{Base.argumentId: id};
+
+  Map<String, dynamic> getMessageIdArguments(int msgId) => <String, dynamic>{Base.argumentMessageId: msgId};
 
   Map<String, dynamic> getMessageIdsArguments(List<int> msgIds) => <String, dynamic>{Base.argumentMessageIds: msgIds};
 
