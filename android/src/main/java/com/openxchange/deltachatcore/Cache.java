@@ -45,7 +45,7 @@ package com.openxchange.deltachatcore;
 import android.util.SparseArray;
 
 public abstract class Cache<T> {
-    SparseArray<T> items = new SparseArray<>();
+    final SparseArray<T> items = new SparseArray<>();
 
     public T get(int id) {
         return items.get(id);

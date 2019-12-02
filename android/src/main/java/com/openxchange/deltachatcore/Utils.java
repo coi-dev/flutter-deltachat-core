@@ -50,7 +50,7 @@ import androidx.annotation.NonNull;
 
 public class Utils {
 
-    private static Handler handler = new Handler(Looper.getMainLooper());
+    private static final Handler handler = new Handler(Looper.getMainLooper());
 
     public static void runOnMain(final @NonNull Runnable runnable) {
         handler.post(runnable);

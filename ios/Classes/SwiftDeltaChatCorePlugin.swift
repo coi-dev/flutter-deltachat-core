@@ -123,8 +123,6 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
             baseInit(result: result)
         case Method.Base.SYSTEM_INFO:
             systemInfo(result: result)
-        case Method.Base.SET_CORE_STRINGS:
-            setCoreStrings(methodCall: call, result: result)
         default:
             log.error("Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
@@ -172,12 +170,6 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         result(UIApplication.version)
     }
 
-    fileprivate func setCoreStrings(methodCall: FlutterMethodCall, result: FlutterResult) {
-        if let coreStrings: CoreStrings.CoreStringsDictionary = methodCall.arguments as? CoreStrings.CoreStringsDictionary {
-            CoreStrings.sharedInstance.strings = coreStrings
-        }
-        result(nil)
-    }
 }
 
 // MARK: - Core Strings

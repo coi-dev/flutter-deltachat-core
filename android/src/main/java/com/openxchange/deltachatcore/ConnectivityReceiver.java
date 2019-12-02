@@ -11,7 +11,7 @@ import static com.openxchange.deltachatcore.DeltaChatCorePlugin.TAG;
 
 public class ConnectivityReceiver extends BroadcastReceiver {
 
-    NativeInteractionManager nativeInteractionManager;
+    private final NativeInteractionManager nativeInteractionManager;
 
     ConnectivityReceiver(NativeInteractionManager nativeInteractionManager) {
         this.nativeInteractionManager = nativeInteractionManager;

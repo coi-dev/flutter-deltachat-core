@@ -66,9 +66,9 @@ public class ChatListCallHandler extends AbstractCallHandler {
     private static final String METHOD_CHAT_LIST_GET_MSG = "chatList_getMsg";
     private static final String METHOD_CHAT_LIST_GET_SUMMARY = "chatList_getSummary";
 
-    private IncrementalCache<DcChatlist> chatListCache = new IncrementalCache<>();
+    private final IncrementalCache<DcChatlist> chatListCache = new IncrementalCache<>();
 
-    private IdCache<DcChat> chatCache;
+    private final IdCache<DcChat> chatCache;
 
     public ChatListCallHandler(DcContext dcContext, IdCache<DcChat> chatCache) {
         super(dcContext);

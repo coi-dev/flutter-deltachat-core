@@ -106,6 +106,7 @@ abstract public class AbstractCallHandler {
         result.error(ERROR_ARGUMENT_MISSING_VALUE, "Argument value is missing or null", null);
     }
 
+    @SuppressWarnings("WeakerAccess")
     void resultErrorArgumentNoInt(MethodChannel.Result result, String argument) {
         result.error(ERROR_ARGUMENT_NO_INT, "Argument is no integer: " + argument, null);
     }

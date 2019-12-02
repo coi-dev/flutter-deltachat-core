@@ -9,14 +9,7 @@ import android.util.Log;
 import com.b44t.messenger.DcContext;
 import com.openxchange.deltachatcore.handlers.EventChannelHandler;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Map;
 import java.util.Objects;
 
 import static com.openxchange.deltachatcore.DeltaChatCorePlugin.TAG;
@@ -27,8 +20,11 @@ public class NativeInteractionManager extends DcContext {
     private static final String COI_MVBOX_WAKE_LOCK = "coi:mvboxWakeLock";
     private static final String COI_SENT_BOX_WAKE_LOCK = "coi:sentBoxWakeLock";
     private static final String COI_SMTP_WAKE_LOCK = "coi:smtpWakeLock";
-    private static final int EVENT_ERROR = 400;
     private static final int INTERRUPT_IDLE = 0x01; // interrupt idle if the thread is already running
+
+    private final long wakeLockTimeout = 10 * 60 * 1000L; /*10 minutes*/
+    private final String dbPath;
+    private final EventChannelHandler eventChannelHandler;
 
     private final Object threadsSynchronized = new Object();
     private final Object imapThreadSynchronized = new Object();
@@ -43,14 +39,10 @@ public class NativeInteractionManager extends DcContext {
     private PowerManager.WakeLock sentBoxWakeLock = null;
     private Thread smtpThread = null;
     private PowerManager.WakeLock smtpWakeLock = null;
-    private long wakeLockTimeout = 10 * 60 * 1000L; /*10 minutes*/
-    private Map<Long, String> coreStrings;
-    private String dbPath;
     private boolean imapThreadStarted;
     private boolean mvboxThreadStarted;
     private boolean sentBoxThreadStarted;
     private boolean smtpThreadStarted;
-    private EventChannelHandler eventChannelHandler;
 
     NativeInteractionManager(Context context, String dbName, EventChannelHandler eventChannelHandler) {
         super("Android " + BuildConfig.VERSION_NAME);
@@ -83,7 +75,7 @@ public class NativeInteractionManager extends DcContext {
         context.registerReceiver(connectivityReceiverReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
-    public void start() {
+    void start() {
         Log.d(TAG, "Starting threads");
         startThreads(INTERRUPT_IDLE);
         waitForThreadsRunning();
@@ -119,7 +111,7 @@ public class NativeInteractionManager extends DcContext {
         }
     }
 
-    public void stop() {
+    void stop() {
         Log.d(TAG, "Stopping threads");
         stopThreads();
         interruptImapIdle();
@@ -130,10 +122,6 @@ public class NativeInteractionManager extends DcContext {
         mvboxThread = null;
         sentBoxThread = null;
         smtpThread = null;
-    }
-
-    void setCoreStrings(Map<Long, String> coreStrings) {
-        this.coreStrings = coreStrings;
     }
 
     private void startThreads(@SuppressWarnings("SameParameterValue") int flags) {
@@ -318,8 +306,8 @@ public class NativeInteractionManager extends DcContext {
     }
 
     @Override
-    public long handleEvent(final int event, long data1, long data2) {
-        switch (event) {
+    public long handleEvent(final int eventId, long data1, long data2) {
+        switch (eventId) {
             case DC_EVENT_INFO:
                 Log.i(TAG, dataToString(data2));
                 break;
@@ -329,107 +317,34 @@ public class NativeInteractionManager extends DcContext {
                 break;
 
             case DC_EVENT_ERROR:
-                handleError(event, dataToString(data2));
-                break;
-
+                // Intended fall through
             case DC_EVENT_ERROR_NETWORK:
-                handleError(event, dataToString(data2));
-                break;
-
+                // Intended fall through
             case DC_EVENT_ERROR_SELF_NOT_IN_GROUP:
-                handleError(event, dataToString(data2));
+                delegateError(eventId, data1, dataToString(data2));
                 break;
-
-            case DC_EVENT_HTTP_GET:
-                // calling this from the main thread may result in NetworkOnMainThreadException error
-                String httpContent = null;
-                try {
-                    URL url = new URL(dataToString(data1));
-                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                    try {
-                        urlConnection.setConnectTimeout(10 * 1000);
-                        InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
-
-                        BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
-
-                        StringBuilder total = new StringBuilder();
-                        String line;
-                        while ((line = r.readLine()) != null) {
-                            total.append(line).append('\n');
-                        }
-                        httpContent = total.toString();
-                    } finally {
-                        urlConnection.disconnect();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return stringToData(httpContent);
-
-            case DC_EVENT_HTTP_POST:
-                // calling this from the main thread may result in NetworkOnMainThreadException error
-                String postContent = null;
-                try {
-                    String urlStr = dataToString(data1);
-                    String paramStr = "";
-                    if (urlStr.contains("?")) {
-                        paramStr = urlStr.substring(urlStr.indexOf("?") + 1);
-                        urlStr = urlStr.substring(0, urlStr.indexOf("?"));
-                    }
-                    byte[] bytes = paramStr.getBytes();
-
-                    URL url = new URL(urlStr);
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    try {
-                        conn.setConnectTimeout(15 * 1000);
-                        conn.setReadTimeout(15 * 1000);
-                        conn.setDoOutput(true);
-                        conn.setRequestMethod("POST");
-                        conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                        conn.setRequestProperty("Content-Length", String.valueOf(bytes.length));
-                        conn.getOutputStream().write(bytes);
-
-                        int responseCode = conn.getResponseCode();
-                        BufferedReader br = new BufferedReader(new InputStreamReader(new BufferedInputStream(conn.getInputStream())));
-                        StringBuilder total = new StringBuilder();
-                        String line;
-                        while ((line = br.readLine()) != null) {
-                            total.append(line).append('\n');
-                        }
-                        if (responseCode == HttpURLConnection.HTTP_OK) {
-                            postContent = total.toString();
-                        } else {
-                            Log.i(TAG, String.format("DC_EVENT_HTTP_POST error: %s", total.toString()));
-                        }
-                    } finally {
-                        conn.disconnect();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return stringToData(postContent);
-
-            case DC_EVENT_GET_STRING:
-                String coreString = null;
-                if (coreStrings != null && !coreStrings.isEmpty()) {
-                    coreString = coreStrings.get(data1);
-                }
-                return stringToData(coreString);
-
-            default: {
-                final Object data1obj = data1IsString(event) ? dataToString(data1) : data1;
-                final Object data2obj = data2IsString(event) ? dataToString(data2) : data2;
-                if (eventChannelHandler != null) {
-                    eventChannelHandler.handleEvent(event, data1obj, data2obj);
-                }
-            }
-            break;
+            default:
+                delegateEvent(eventId, data1, data2);
+                break;
         }
         return 0;
     }
 
-    private void handleError(int event, String error) {
-        eventChannelHandler.handleEvent(EVENT_ERROR, event, error);
+    private void delegateEvent(int eventId, long data1, long data2) {
+        final Object data1Object = getDataObject(eventId, data1);
+        final Object data2Object = getDataObject(eventId, data2);
+        if (eventChannelHandler != null) {
+            eventChannelHandler.handleEvent(eventId, data1Object, data2Object);
+        }
+    }
+
+    private Object getDataObject(int eventId, long data) {
+        return data1IsString(eventId) ? dataToString(data) : data;
+    }
+
+    private void delegateError(int eventId, long data1, String error) {
+        final Object data1Object = getDataObject(eventId, data1);
+        eventChannelHandler.handleEvent(eventId, data1Object, error);
     }
 
     String getDbPath() {

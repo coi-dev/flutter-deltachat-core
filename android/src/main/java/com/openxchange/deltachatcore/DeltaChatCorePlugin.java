@@ -56,7 +56,6 @@ import com.openxchange.deltachatcore.handlers.ContextCallHandler;
 import com.openxchange.deltachatcore.handlers.EventChannelHandler;
 import com.openxchange.deltachatcore.handlers.MessageCallHandler;
 
-import java.util.Map;
 import java.util.Objects;
 
 import io.flutter.plugin.common.MethodCall;
@@ -83,7 +82,6 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
 
     private static final String METHOD_BASE_INIT = "base_init";
     private static final String METHOD_BASE_SYSTEM_INFO = "base_systemInfo";
-    private static final String METHOD_BASE_SET_CORE_STRINGS = "base_setCoreStrings";
     private static final String METHOD_BASE_START = "base_start";
     private static final String METHOD_BASE_STOP = "base_stop";
 
@@ -95,14 +93,13 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
     private static final String CACHE_IDENTIFIER_CHAT_MESSAGE = "chatMessage";
     private static final String CACHE_IDENTIFIER_CONTACT = "contact";
 
+    private final Registrar registrar;
 
-    private Registrar registrar;
+    private final IdCache<DcChat> chatCache = new IdCache<>();
+    private final IdCache<DcContact> contactCache = new IdCache<>();
+    private final IdCache<DcMsg> messageCache = new IdCache<>();
+
     private NativeInteractionManager nativeInteractionManager;
-
-    private IdCache<DcChat> chatCache = new IdCache<>();
-    private IdCache<DcContact> contactCache = new IdCache<>();
-    private IdCache<DcMsg> messageCache = new IdCache<>();
-
     private ChatCallHandler chatCallHandler;
     private ChatListCallHandler chatListCallHandler;
     private ContactCallHandler contactCallHandler;
@@ -187,9 +184,6 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
             case METHOD_BASE_SYSTEM_INFO:
                 systemInfo(result);
                 break;
-            case METHOD_BASE_SET_CORE_STRINGS:
-                setCoreStrings(methodCall, result);
-                break;
             case METHOD_BASE_START:
                 start(result);
                 break;
@@ -215,12 +209,6 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
         contactCallHandler = new ContactCallHandler(nativeInteractionManager, contextCallHandler);
         chatCallHandler = new ChatCallHandler(nativeInteractionManager, contextCallHandler);
         result.success(nativeInteractionManager.getDbPath());
-    }
-
-    private void setCoreStrings(MethodCall methodCall, Result result) {
-        Map<Long, String> coreStrings = methodCall.arguments();
-        nativeInteractionManager.setCoreStrings(coreStrings);
-        result.success(null);
     }
 
     private void systemInfo(Result result) {
