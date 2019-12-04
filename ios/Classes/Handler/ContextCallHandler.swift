@@ -710,9 +710,9 @@ class ContextCallHandler: MethodCallHandling {
     
     fileprivate func getMessageInfo(methodCall: FlutterMethodCall, result: FlutterResult) {
         let messageId = UInt32(methodCall.intValue(for: Argument.MESSAGE_ID, result: result))
-        let messegeInfo = context.getMsgInfo(msgId: messageId)
+        let messageInfo = context.getMsgInfo(msgId: messageId)
         
-        result(messegeInfo)
+        result(messageInfo)
     }
     
     fileprivate func retrySendingPendingMessages(result: FlutterResult) {
