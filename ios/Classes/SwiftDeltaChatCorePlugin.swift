@@ -171,14 +171,3 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
     }
 
 }
-
-// MARK: - Core Strings
-
-class CoreStrings {
-
-    typealias CoreStringsDictionary = [UInt32: String]
-
-    static let sharedInstance: CoreStrings = CoreStrings()
-    var strings: CoreStringsDictionary?
-
-}
