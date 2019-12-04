@@ -77,20 +77,20 @@ fileprivate struct EventParameters {
     var data2String: UnsafePointer<Int8>
     
     var data1Object: Any {
-        return data1IsString ? String(cString: data1String) : data1
+        data1IsString ? String(cString: data1String) : data1
     }
     
     var data2Object: Any {
-        return data2IsString ? String(cString: data2String) : data2
+        data2IsString ? String(cString: data2String) : data2
     }
 
     var data1IsString: Bool {
         // according to deltachat.h
-        return (eventId == DC_EVENT_IMEX_FILE_WRITTEN || eventId == DC_EVENT_FILE_COPIED)
+        (eventId == DC_EVENT_IMEX_FILE_WRITTEN || eventId == DC_EVENT_FILE_COPIED)
     }
 
     var data2IsString: Bool {
         // according to deltachat.h
-        return ((eventId >= 100 && eventId <= 499) || eventId == DC_EVENT_METADATA)
+        ((eventId >= 100 && eventId <= 499) || eventId == DC_EVENT_METADATA)
     }
 }
