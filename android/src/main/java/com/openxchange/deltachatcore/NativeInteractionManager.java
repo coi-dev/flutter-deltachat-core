@@ -331,19 +331,23 @@ public class NativeInteractionManager extends DcContext {
     }
 
     private void delegateEvent(int eventId, long data1, long data2) {
-        final Object data1Object = getDataObject(eventId, data1);
-        final Object data2Object = getDataObject(eventId, data2);
+        final Object data1Object = getData1Object(eventId, data1);
+        final Object data2Object = getData2Object(eventId, data2);
         if (eventChannelHandler != null) {
             eventChannelHandler.handleEvent(eventId, data1Object, data2Object);
         }
     }
 
-    private Object getDataObject(int eventId, long data) {
-        return data1IsString(eventId) ? dataToString(data) : data;
+    private Object getData1Object(int eventId, long data1) {
+        return data1IsString(eventId) ? dataToString(data1) : data1;
+    }
+
+    private Object getData2Object(int eventId, long data2) {
+        return data2IsString(eventId) ? dataToString(data2) : data2;
     }
 
     private void delegateError(int eventId, long data1, String error) {
-        final Object data1Object = getDataObject(eventId, data1);
+        final Object data1Object = getData1Object(eventId, data1);
         eventChannelHandler.handleEvent(eventId, data1Object, error);
     }
 
