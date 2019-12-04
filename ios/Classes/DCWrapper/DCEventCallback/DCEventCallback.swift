@@ -43,7 +43,7 @@
 import Foundation
 
 @_silgen_name("handleDeltaChatEvent")
-private func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsignedLong, data1String: UnsafePointer<Int8>, data2String: UnsafePointer<Int8>) -> UnsafePointer<Int8>? {
+func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsignedLong, data1String: UnsafePointer<Int8>, data2String: UnsafePointer<Int8>) -> UnsafePointer<Int8>? {
     let parameters = EventParameters(eventId: Int32(event), data1: data1, data2: data2, data1String: data1String, data2String: data2String)
     var logMessage = "Received DCC event [\(parameters.eventId)]"
 
@@ -69,7 +69,7 @@ private func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUns
     return nil
 }
 
-private struct EventParameters {
+fileprivate struct EventParameters {
     var eventId: Int32
     var data1: CUnsignedLong
     var data2: CUnsignedLong
