@@ -66,7 +66,6 @@ extension Method {
         static let INIT                                 = "base_init"
         static let SYSTEM_INFO                          = "base_systemInfo"
         static let CORE_LISTENER                        = "base_coreListener"
-        static let SET_CORE_STRINGS                     = "base_setCoreStrings"
     }
 
 }

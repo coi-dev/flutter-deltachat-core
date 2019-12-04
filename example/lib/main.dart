@@ -41,6 +41,7 @@
  */
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:delta_chat_core/delta_chat_core.dart';
 import 'package:flutter/material.dart';
@@ -155,6 +156,9 @@ class _MyAppState extends State<MyApp> {
         var chatCntAfterDeletingChat = await chatList.getChatCnt();
         await chatList.tearDown();
         _addListItem(text: "deleteChat", assertion: 0, result: chatCntAfterDeletingChat);
+        core.stop();
+        var dbFile = File(core.dbPath);
+        dbFile.deleteSync();
       }
     } on PlatformException {
       throw StateError("Test suite failed, forbidden state entered");

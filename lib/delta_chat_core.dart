@@ -63,7 +63,6 @@ class DeltaChatCore {
   static const String channelDeltaChatCoreEvents = 'deltaChatCoreEvents';
 
   static const String methodBaseInit = 'base_init';
-  static const String methodBaseSetCoreStrings = "base_setCoreStrings";
   static const String methodBaseStart = "base_start";
   static const String methodBaseStop = "base_stop";
 
@@ -128,10 +127,6 @@ class DeltaChatCore {
 
   tearDown() {
     _eventChannelSubscription.cancel();
-  }
-
-  Future<void> setCoreStrings(Map<int, String> coreStrings) async {
-    await _methodChannel.invokeMethod(methodBaseSetCoreStrings, coreStrings);
   }
 
   Future<void> listen(int eventId, StreamController streamController) async {

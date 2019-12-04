@@ -42,12 +42,55 @@
 
 import Foundation
 
-public func isData2AString(for event: CInt) -> Bool {
-    return (event >= 100 && event <= 499)
+@_silgen_name("handleDeltaChatEvent")
+func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsignedLong, data1String: UnsafePointer<Int8>, data2String: UnsafePointer<Int8>) -> UnsafePointer<Int8>? {
+    let parameters = EventParameters(eventId: Int32(event), data1: data1, data2: data2, data1String: data1String, data2String: data2String)
+    var logMessage = "Received DCC event [\(parameters.eventId)]"
+
+    if parameters.data2IsString {
+        logMessage = "\(logMessage): \(parameters.data2Object)"
+    }
+
+    switch parameters.eventId {
+        case DC_EVENT_INFO:
+            log.info(logMessage)
+
+        case DC_EVENT_ERROR,
+             DC_EVENT_ERROR_NETWORK,
+             DC_EVENT_ERROR_SELF_NOT_IN_GROUP:
+            log.error(logMessage)
+            EventChannelHandler.sharedInstance.handle(parameters.eventId, data1: parameters.data1Object, data2: parameters.data2Object)
+
+        default:
+            log.info(logMessage)
+            EventChannelHandler.sharedInstance.handle(parameters.eventId, data1: parameters.data1Object, data2: parameters.data2Object)
+    }
+
+    return nil
 }
 
-@_silgen_name("handleDeltaChatEvent")
-public func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsignedLong, data1String: UnsafePointer<Int8>, data2String: UnsafePointer<Int8>) -> UnsafePointer<Int8>? {
-    EventChannelHandler.sharedInstance.handle(Int32(event), data1: data1, data2: data2)
-    return nil
+fileprivate struct EventParameters {
+    var eventId: Int32
+    var data1: CUnsignedLong
+    var data2: CUnsignedLong
+    var data1String: UnsafePointer<Int8>
+    var data2String: UnsafePointer<Int8>
+    
+    var data1Object: Any {
+        data1IsString ? String(cString: data1String) : data1
+    }
+    
+    var data2Object: Any {
+        data2IsString ? String(cString: data2String) : data2
+    }
+
+    var data1IsString: Bool {
+        // according to deltachat.h
+        (eventId == DC_EVENT_IMEX_FILE_WRITTEN || eventId == DC_EVENT_FILE_COPIED)
+    }
+
+    var data2IsString: Bool {
+        // according to deltachat.h
+        ((eventId >= 100 && eventId <= 499) || eventId == DC_EVENT_METADATA)
+    }
 }
