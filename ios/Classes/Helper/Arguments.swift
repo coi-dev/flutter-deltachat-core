@@ -61,6 +61,7 @@ struct Argument {
     static let PATH                    = "path"
     static let TEXT                    = "text"
     static let COUNT                   = "count"
+    static let MESSAGE_ID              = "messageId"
     static let MESSAGE_IDS             = "messageIds"
     static let SETUP_CODE              = "setupCode"
     static let QR_TEXT                 = "qrText"

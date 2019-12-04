@@ -211,6 +211,8 @@ extension Method {
         static let GET_WEB_PUSH_SUBSCRIPTION            = "context_getWebPushSubscription"
         static let SET_COI_ENABLED                      = "context_setCoiEnabled"
         static let SET_COI_MESSAGE_FILTER               = "context_setCoiMessageFilter"
+        static let GET_MESSAGE_INFO                     = "context_getMessageInfo"
+        static let RETRY_SENDING_PENDING_MESSAGES       = "context_retrySendingPendingMessages"
     }
 
 }

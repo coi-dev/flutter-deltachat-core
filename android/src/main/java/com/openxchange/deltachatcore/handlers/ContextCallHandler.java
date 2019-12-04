@@ -109,6 +109,8 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
     private static final String METHOD_GET_WEB_PUSH_SUBSCRIPTION = "context_getWebPushSubscription";
     private static final String METHOD_SET_COI_ENABLED = "context_setCoiEnabled";
     private static final String METHOD_SET_COI_MESSAGE_FILTER = "context_setCoiMessageFilter";
+    private static final String METHOD_GET_MESSAGE_INFO = "context_getMessageInfo";
+    private static final String METHOD_RETRY_SENDING_PENDING_MESSAGES = "context_retrySendingPendingMessages";
 
     private static final String TYPE_INT = "int";
     private static final String TYPE_STRING = "String";
@@ -285,6 +287,12 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
                 break;
             case METHOD_VALIDATE_WEB_PUSH:
                 validateWebPush(methodCall, result);
+                break;
+            case METHOD_GET_MESSAGE_INFO:
+                getMessageInfo(methodCall, result);
+                break;
+            case METHOD_RETRY_SENDING_PENDING_MESSAGES:
+                retrySendingPendingMessages(result);
                 break;
             default:
                 result.notImplemented();
@@ -1085,6 +1093,26 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
             return;
         }
         dcContext.getWebPushSubscription(uid, id);
+        result.success(null);
+    }
+
+    private void getMessageInfo(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_MESSAGE_ID)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        Integer messageId = methodCall.argument(ARGUMENT_MESSAGE_ID);
+        if (messageId == null) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+
+        String messageInfo = dcContext.getMsgInfo(messageId);
+        result.success(messageInfo);
+    }
+
+    private void retrySendingPendingMessages(MethodChannel.Result result) {
+        dcContext.maybeNetwork();
         result.success(null);
     }
 }

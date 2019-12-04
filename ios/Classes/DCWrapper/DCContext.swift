@@ -227,8 +227,8 @@ class DcContext {
         return DcMsg(id: id)
     }
 
-    func getMsgInfo(msgId: Int) -> String {
-        if let cString = dc_get_msg_info(DcContext.contextPointer, UInt32(msgId)) {
+    func getMsgInfo(msgId: UInt32) -> String {
+        if let cString = dc_get_msg_info(DcContext.contextPointer, msgId) {
             let swiftString = String(cString: cString)
             free(cString)
             return swiftString
@@ -358,7 +358,6 @@ class DcContext {
     func initiateKeyTransfer() -> String? {
         if let cString = dc_initiate_key_transfer(DcContext.contextPointer) {
             let swiftString = String(cString: cString)
-            log.debug("AutoCrypt setup message code: \(swiftString)")
             free(cString)
             return swiftString
         }
@@ -426,7 +425,6 @@ class DcContext {
     // MARK: - Config
 
     func setConfig(value: String, forKey key: String) -> Int32 {
-        log.debug("setConfig value: '\(value)', for key: '\(key)'")
         return dc_set_config(DcContext.contextPointer, key, value)
     }
 
@@ -435,7 +433,6 @@ class DcContext {
     }
 
     func getConfig(for key: String) -> String? {
-        log.debug("getConfig for key: '\(key)'")
         let value = dc_get_config(DcContext.contextPointer, key)
         if let cString = value {
             let str = String(cString: cString)
@@ -467,6 +464,12 @@ class DcContext {
     
     func imex(type: Int32, path: String) {
         dc_imex(DcContext.contextPointer, type, path, nil)
+    }
+    
+    // MARK: - Network
+    
+    func maybeNetwork() {
+        dc_maybe_network(DcContext.contextPointer)
     }
 
 }

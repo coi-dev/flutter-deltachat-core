@@ -73,6 +73,7 @@ abstract public class AbstractCallHandler {
     static final String ARGUMENT_PATH = "path";
     static final String ARGUMENT_TEXT = "text";
     static final String ARGUMENT_COUNT = "count";
+    static final String ARGUMENT_MESSAGE_ID = "messageId";
     static final String ARGUMENT_MESSAGE_IDS = "messageIds";
     static final String ARGUMENT_SETUP_CODE = "setupCode";
     static final String ARGUMENT_QR_TEXT = "qrText";
