@@ -164,6 +164,10 @@ class ContextCallHandler: MethodCallHandling {
             setCoiMessageFilter(methodCall: call, result: result)
         case Method.Context.VALIDATE_WEB_PUSH:
             validateWebPush(methodCall: call, result: result)
+        case Method.Context.GET_MESSAGE_INFO:
+            getMessageInfo(methodCall: call, result: result)
+        case Method.Context.RETRY_SENDING_PENDING_MESSAGES:
+            retrySendingPendingMessages(result: result)
         default:
             log.error("Context: Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
@@ -701,6 +705,18 @@ class ContextCallHandler: MethodCallHandling {
         }
 
         context.validateWebPush(uid: uid, message: message, id: id)
+        result(nil)
+    }
+    
+    fileprivate func getMessageInfo(methodCall: FlutterMethodCall, result: FlutterResult) {
+        let messageId = UInt32(methodCall.intValue(for: Argument.MESSAGE_ID, result: result))
+        let messegeInfo = context.getMsgInfo(msgId: messageId)
+        
+        result(messegeInfo)
+    }
+    
+    fileprivate func retrySendingPendingMessages(result: FlutterResult) {
+        context.maybeNetwork()
         result(nil)
     }
 
