@@ -41,6 +41,7 @@
  */
 
 import Foundation
+import AVFoundation
 import MessageKit
 
 class DcMsg: MessageType {
@@ -96,6 +97,10 @@ class DcMsg: MessageType {
             return MessageKind.photo(Media(image: image))
         case .video:
             return MessageKind.video(Media(url: fileURL))
+        case .audio, .voice:
+            let audioAsset = AVURLAsset(url: fileURL!)
+            let seconds = Float(CMTimeGetSeconds(audioAsset.duration))
+            return MessageKind.audio(Audio(url: fileURL!, duration: seconds))
         default:
             // TODO: custom views for audio, etc
             if !self.filename.isEmpty {

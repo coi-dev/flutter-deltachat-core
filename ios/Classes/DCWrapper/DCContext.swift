@@ -42,6 +42,7 @@
 
 import Foundation
 import AVFoundation
+import MessageKit
 
 class DcContext {
     static private(set) var contextPointer: OpaquePointer?
@@ -263,6 +264,14 @@ class DcContext {
         
         let msg = DcMsg(type: type)
 
+        if let duration = duration {
+            msg.duration = duration
+        }
+        
+        if let text = text {
+            msg.text = text
+        }
+
         switch type {
             case DC_MSG_IMAGE, DC_MSG_GIF:
                 guard let image = UIImage(contentsOfFile: path) else {
@@ -274,7 +283,7 @@ class DcContext {
                 let height = Int32(exactly: pixelSize.height)!
                 msg.setDimension(width: width, height: height)
                 break
-
+            
             case DC_MSG_AUDIO:
                 break
 
@@ -282,9 +291,6 @@ class DcContext {
                 break
 
             case DC_MSG_VIDEO:
-                if let duration = duration {
-                    msg.duration = duration
-                }
                 break
 
             case DC_MSG_FILE:
@@ -294,11 +300,6 @@ class DcContext {
         }
 
         msg.setFile(path: path, mimeType: mimeType)
-
-        if let text = text {
-            msg.text = text
-        }
-        
         let messageId = send(message: msg, forChat: chatId)
 
         return messageId

@@ -40,25 +40,18 @@
  * for more details.
  */
 
-import CoreLocation
 import Foundation
 import MessageKit
 
-struct Media: MediaItem {
-    var url: URL?
-    var image: UIImage?
-    var placeholderImage: UIImage = UIImage(named: "ic_attach_file_36pt")!
-    
-    var size: CGSize {
-        if let image = image {
-            return image.size
-        } else {
-            return placeholderImage.size
-        }
-    }
-    
-    init(url: URL? = nil, image: UIImage? = nil) {
+struct Audio: AudioItem {
+    var size: CGSize = CGSize(width: 250, height: 50)
+    var url: URL
+    var duration: Float
+    var text: NSAttributedString?
+
+    init(url: URL, duration: Float, text: NSAttributedString? = nil) {
         self.url = url
-        self.image = image
+        self.duration = duration
+        self.text = text
     }
 }
