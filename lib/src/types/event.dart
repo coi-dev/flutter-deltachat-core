@@ -67,6 +67,8 @@ class Event {
   static const int httpGet = 2100;
   static const int httpPost = 2110;
 
+  static const allErrorsList = [error, errorNoNetwork, errorNotInGroup];
+
   static const indexEventId = 0;
   static const indexData1 = 1;
   static const indexData2 = 2;

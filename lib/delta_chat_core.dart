@@ -44,6 +44,7 @@ import 'dart:async';
 
 import 'package:delta_chat_core/src/log.dart';
 import 'package:delta_chat_core/src/types/event.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 
@@ -119,29 +120,11 @@ class DeltaChatCore {
   _setupEventChannelListener() {
     _eventChannelSubscription = _eventChannel.receiveBroadcastStream().listen((dynamic data) {
       Event event = Event.fromStream(data);
-      delegateEventToSubscribers(event);
-    }, onError: (dynamic error) {
-      delegateErrorToSubscribers(error);
+      _delegateEventToSubscribers(event);
     });
   }
 
-  tearDown() {
-    _eventChannelSubscription.cancel();
-  }
-
-  Future<void> listen(int eventId, StreamController streamController) async {
-    if (eventId == null || streamController == null) {
-      return;
-    }
-    var eventIdSubscribers = _eventChannelSubscribers[eventId];
-    if (eventIdSubscribers == null) {
-      eventIdSubscribers = Map();
-      _eventChannelSubscribers[eventId] = eventIdSubscribers;
-    }
-    eventIdSubscribers[streamController.hashCode] = streamController;
-  }
-
-  delegateEventToSubscribers(Event event) {
+  _delegateEventToSubscribers(Event event) {
     var logMessage = "Event - id: ${event.eventId}, data1: ${event.data1}, data2: ${event.data2}";
     _logger.fine(logMessage);
     _eventChannelSubscribers[event.eventId]?.forEach((_, streamController) {
@@ -149,21 +132,66 @@ class DeltaChatCore {
     });
   }
 
-  delegateErrorToSubscribers(error) {}
+  tearDown() {
+    _eventChannelSubscription.cancel();
+  }
 
-  removeListener(int eventId, StreamController streamController) async {
-    if (eventId == null || streamController == null) {
-      return;
+  void addListener({int eventId, List<int> eventIdList, @required StreamController streamController}) {
+    if (streamController == null || (eventId == null && eventIdList == null)) {
+      throw ArgumentError("Either eventId or eventIdList must be set and a stream controller must be not null");
     }
-    int hashCode = streamController.hashCode;
-    streamController.close();
+    if (eventId != null && eventIdList != null) {
+      throw ArgumentError("Either eventId or eventIdList must be set, dont't set both");
+    }
+    var streamControllerId = streamController.hashCode;
+    if (_isAlreadyListening(streamControllerId)) {
+      throw ArgumentError("Stream controller is already listening to events (use eventIdList to listen to multiple events with one listener)");
+    }
+    if (eventId != null) {
+      _addEventIdSubscriber(eventId, streamController, streamControllerId);
+    } else {
+      for (eventId in eventIdList) {
+        _addEventIdSubscriber(eventId, streamController, streamControllerId);
+      }
+    }
+  }
+
+  bool _isAlreadyListening(int streamControllerId) {
+    bool _isAlreadyListening = false;
+    _eventChannelSubscribers.forEach((_, eventIdSubscribers) {
+      if (_isAlreadyListening) {
+        return;
+      }
+      if (eventIdSubscribers.containsKey(streamControllerId)) {
+        _isAlreadyListening = true;
+      }
+    });
+    return _isAlreadyListening;
+  }
+
+  void _addEventIdSubscriber(int eventId, StreamController streamController, int streamControllerId) {
     var eventIdSubscribers = _eventChannelSubscribers[eventId];
-    eventIdSubscribers?.remove(hashCode);
+    if (eventIdSubscribers == null) {
+      eventIdSubscribers = Map();
+      _eventChannelSubscribers[eventId] = eventIdSubscribers;
+    }
+    eventIdSubscribers[streamControllerId] = streamController;
+  }
+
+  void removeListener(StreamController streamController) {
+    if (streamController == null) {
+      throw ArgumentError("Stream controller must be not null");
+    }
+    var streamControllerId = streamController.hashCode;
+    streamController.close();
+    _eventChannelSubscribers.forEach((_, eventIdSubscribers) {
+      eventIdSubscribers.remove(streamControllerId);
+    });
   }
 
   // Manually adds events to the core stream. This shouldn't be required normally, as those events should be produced / captured by the
   // event channel listening to the DCC
   void addStreamEvent(Event event) {
-    delegateEventToSubscribers(event);
+    _delegateEventToSubscribers(event);
   }
 }
