@@ -391,7 +391,7 @@ class ContextCallHandler: MethodCallHandling {
             Method.Error.missingArgumentValue(for: Argument.PATH, result: result)
             return
         }
-
+        
         do {
             let messageId = try context.sendAttachment(fromPath: path, withType: type, mimeType: mimeType, text: text, duration: duration, forChatId: UInt32(chatId))
             result(NSNumber(value: messageId))
