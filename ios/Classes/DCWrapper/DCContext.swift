@@ -49,7 +49,7 @@ class DcContext {
 
     /// Returns the file path of the DeltaChat SQLite database.
     var userDatabasePath: String {
-        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
+        let paths = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!
         return "\(paths)/messenger.db"
     }
 
