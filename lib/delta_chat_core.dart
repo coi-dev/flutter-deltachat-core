@@ -183,7 +183,7 @@ class DeltaChatCore {
       throw ArgumentError("Stream controller must be not null");
     }
     var streamControllerId = streamController.hashCode;
-    streamController?.close();
+    streamController.close();
     _eventChannelSubscribers.forEach((_, eventIdSubscribers) {
       eventIdSubscribers.remove(streamControllerId);
     });
