@@ -130,9 +130,11 @@ function moveAndroid {
 }
 
 function moveIos {
+	mkdir -p "../${IOS_DCC_LIBRARY_FOLDER}"
+
     for i in "${!DCC_IOS_ARCHITECTURES[@]}"; do
         currentTarget="${DCC_IOS_ARCHITECTURES[$i]}"
-        moveFromTarget ${currentTarget} "../${IOS_DCC_LIBRARY_FOLDER}"
+        moveFromTarget ${currentTarget} "../${IOS_DCC_LIBRARY_FOLDER}/"
     done
 }
 
@@ -205,7 +207,7 @@ fi
 
 echo "-- Finishing + hints --"
 if isIos; then
-    echo "NOTE: Don't forget to run: cd ../ox-coi/ios && rm Podfile.lock && pod install"
+    echo "NOTE: Don't forget to run: cd ../ox-coi/ios && rm -f Podfile.lock && pod install"
 fi
 
 echo "-- Build succeeded --"
