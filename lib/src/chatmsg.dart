@@ -187,6 +187,10 @@ class ChatMsg extends Base {
     return await loadAndGetValue(methodMessageGetDuration);
   }
 
+  Future<bool> isForwarded() async {
+    return await loadAndGetValue(methodMessageIsForwarded);
+  }
+  
   @override
   getDefaultArguments() => <String, dynamic>{Base.argumentId: _id};
 
