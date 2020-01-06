@@ -149,13 +149,21 @@ function movePlatforms {
 }
 
 function changeDirectory {
+    echo "Changing directory to $(pwd)"
     cd $1 || exit 1
-    echo "Changed directory to $(pwd)"
 }
 
-function clean {
-    changeDirectory "../../$BASE_DCC"
-    cargo clean
+function adjustAndroidBuild {
+    echo "Applying temporary rpgp work around"
+    search='.*pgp =.*'
+    replace='pgp = { version = "0.2", default-features = false }'
+    sed -i "s/$search/$replace/g" Cargo.toml
+}
+
+function postCompileAndroid {
+    echo "Resetting Cargo.toml and Cargo.lock changes"
+    git checkout Cargo.lock
+    git checkout Cargo.toml
 }
 
 # Execution
@@ -186,13 +194,23 @@ fi
 changeDirectory ${BASE_DCC}
 checkTargets
 
-echo "-- Compiling --"
+echo "-- Applying platform specific fixes --"
+if isAndroid; then
+    adjustAndroidBuild
+fi
+
+echo "-- Compiling Rust core --"
 buildPlatforms
+
+echo "-- Performing post Rust compile steps --"
+if isAndroid; then
+    postCompileAndroid
+fi
 
 echo "-- Moving files --"
 movePlatforms
 
-echo "-- Perform post build steps --"
+echo "-- Performing additional build steps --"
 if isAndroid; then
     changeDirectory "../${BASE_ANDROID}"
     echo "Building via ndk-build"
@@ -200,7 +218,7 @@ if isAndroid; then
 fi
 
 if isIos; then
-    echo "adjusting symlink"
+    echo "Adjusting symlinks"
     changeDirectory "../$IOS_DCC_LIBRARY_FOLDER"
     ln -sf "../../$BASE_DCC/deltachat-ffi/deltachat.h" .
 fi
