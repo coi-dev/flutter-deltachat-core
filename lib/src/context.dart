@@ -386,7 +386,7 @@ class Context {
     return await core.invokeMethod(methodRetrySendingPendingMessages);
   }
 
-  Future<bool> getContactIdByAddress(String address) async {
+  Future<int> getContactIdByAddress(String address) async {
     return await core.invokeMethod(methodGetContactIdByAddress, getContactIdByAddressArguments(address));
   }
 
