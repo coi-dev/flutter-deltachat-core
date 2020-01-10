@@ -294,8 +294,11 @@ class ContextCallHandler: MethodCallHandling {
     }
     
     fileprivate func getContactIdByAddress(methodCall: FlutterMethodCall, result: FlutterResult) {
-        let address = methodCall.stringValue(for: Argument.ADDRESS, result: result)
-        let contactID = context.lookupContactIdByAddr(addr: address!)
+        guard let address = methodCall.stringValue(for: Argument.ADDRESS, result: result) else {
+            Method.Error.missingArgumentValue(for: Argument.ADDRESS, result: result)
+            return
+        }
+        let contactID = context.lookupContactIdByAddr(addr: address)
         
         result(contactID)
     }
