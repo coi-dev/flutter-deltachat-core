@@ -215,6 +215,10 @@ class DcContext {
     func createContact(name: String, emailAddress: String) -> UInt32 {
         return dc_create_contact(DcContext.contextPointer, name, emailAddress)
     }
+    
+    func lookupContactIdByAddr(addr: String) -> UInt32 {
+        return dc_lookup_contact_id_by_addr(DcContext.contextPointer,  addr)
+    }
 
     // MARK: - Addressbook
 
