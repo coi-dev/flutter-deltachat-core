@@ -168,6 +168,8 @@ class ContextCallHandler: MethodCallHandling {
             getMessageInfo(methodCall: call, result: result)
         case Method.Context.RETRY_SENDING_PENDING_MESSAGES:
             retrySendingPendingMessages(result: result)
+        case Method.Context.GET_CONTACT_ID_BY_ADDRESS:
+            getContactIdByAddress(methodCall: call, result: result)
         default:
             log.error("Context: Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
@@ -289,6 +291,13 @@ class ContextCallHandler: MethodCallHandling {
         let buffer = contactIds.withUnsafeBufferPointer { Data(buffer: $0) }
 
         result(FlutterStandardTypedData(int32: buffer))
+    }
+    
+    fileprivate func getContactIdByAddress(methodCall: FlutterMethodCall, result: FlutterResult) {
+        let address = methodCall.stringValue(for: Argument.ADDRESS, result: result)
+        let contactID = context.lookupContactIdByAddr(addr: address!)
+        
+        result(contactID)
     }
 
     // MARK: - Chat Related

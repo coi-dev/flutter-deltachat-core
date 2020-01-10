@@ -102,7 +102,7 @@ class Context {
   static const String methodSetCoiMessageFilter = "context_setCoiMessageFilter";
   static const String methodGetMessageInfo = "context_getMessageInfo";
   static const String methodRetrySendingPendingMessages = "context_retrySendingPendingMessages";
-  static const String methodIsKnownContact = "context_isKnownContact";
+  static const String methodGetContactIdByAddress = "context_getContactIdByAddress";
 
 
   static const String configAddress = "addr";
@@ -386,8 +386,8 @@ class Context {
     return await core.invokeMethod(methodRetrySendingPendingMessages);
   }
 
-  Future<bool> isKnownContact(String address) async {
-    return await core.invokeMethod(methodIsKnownContact, getContactKnownArguments(address));
+  Future<bool> getContactIdByAddress(String address) async {
+    return await core.invokeMethod(methodGetContactIdByAddress, getContactIdByAddressArguments(address));
   }
 
   Map<String, dynamic> getKeyArguments(String key) => <String, dynamic>{Base.argumentKey: key};
@@ -454,5 +454,5 @@ class Context {
 
   Map<String, dynamic> getSetCoiMessageFilter(int mode, int id) => <String, dynamic>{Base.argumentMode: mode, Base.argumentId: id};
 
-  Map<String, dynamic> getContactKnownArguments(String address) => <String, dynamic>{Base.argumentAddress: address};
+  Map<String, dynamic> getContactIdByAddressArguments(String address) => <String, dynamic>{Base.argumentAddress: address};
 }
