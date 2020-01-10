@@ -111,6 +111,7 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
     private static final String METHOD_SET_COI_MESSAGE_FILTER = "context_setCoiMessageFilter";
     private static final String METHOD_GET_MESSAGE_INFO = "context_getMessageInfo";
     private static final String METHOD_RETRY_SENDING_PENDING_MESSAGES = "context_retrySendingPendingMessages";
+    private static final String METHOD_GET_CONTACT_ID_BY_ADDRESS = "context_getContactIdByAddress";
 
     private static final String TYPE_INT = "int";
     private static final String TYPE_STRING = "String";
@@ -293,6 +294,9 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
                 break;
             case METHOD_RETRY_SENDING_PENDING_MESSAGES:
                 retrySendingPendingMessages(result);
+                break;
+            case METHOD_GET_CONTACT_ID_BY_ADDRESS:
+                getContactIdByAddress(methodCall, result);
                 break;
             default:
                 result.notImplemented();
@@ -1109,6 +1113,17 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
 
         String messageInfo = dcContext.getMsgInfo(messageId);
         result.success(messageInfo);
+    }
+
+    private void getContactIdByAddress(MethodCall methodCall, MethodChannel.Result result) {
+        String address = methodCall.argument(ARGUMENT_ADDRESS);
+        if (address == null || address.isEmpty()) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+
+        int contactId = dcContext.lookupContactIdByAddr(address);
+        result.success(contactId);
     }
 
     private void retrySendingPendingMessages(MethodChannel.Result result) {
