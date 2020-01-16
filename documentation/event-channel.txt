@@ -1,26 +1,23 @@
 digraph G {
 	node [	
-		shape = polygon,
-		sides = 4,
-		style = filled,
-		fontname = "Helvetica-Outline" 
+            shape = box,
+            style = filled,
+            fontname=Arial,
+            fontsize=14
 		];
-    "App (EventChannel)" 			[fillcolor=lightgrey] 
-    "Flutter" 						[fillcolor=lightgrey] 
-    "Plugin Dart" 					[fillcolor=cadetblue1]
-    "Plugin Java" 					[fillcolor=cadetblue3]
-    "Event Channel Handler Java"	[fillcolor=cadetblue3]
-    "DCC" 							[fillcolor=lightpink2]
-    
-    "App (EventChannel)" -> "Plugin Dart" [label=" Add / remove listener "]
-    "Plugin Dart" -> "Flutter" [label=" Add / remove listener "]
-    "Plugin Dart" -> "Plugin Java" [label=" Add / remove listener via MethodChannel "]
+	edge [
+	    fontname=Courier
+	    ];
+    "App" 			    [fillcolor=lightgrey]
+    "Plugin Dart" 		[fillcolor=cadetblue1]
+    "Plugin native" 	[fillcolor=cadetblue3]
+    "DCC" 				[fillcolor=lightpink2]
+
+    "App" -> "Plugin Dart" [label=" Add / remove listener "]
+    "Plugin Dart" -> "Plugin native" [label=" Listen to EventChannel "]
     "Plugin Dart" -> "Plugin Dart" [label=" Manage listeners "]
-    "Plugin Java" -> "Event Channel Handler Java" [label=" Delegate Add / remove listener "]
-    "Event Channel Handler Java" -> "DCC" [label=" Add / remove listener via JNI "]
-    "DCC" -> "Event Channel Handler Java" [label=" Event via JNI "]
-    "Event Channel Handler Java" -> "Event Channel Handler Java" [label=" Manage listeners "]
-    "Event Channel Handler Java" -> "Flutter" [label=" Send event via EventChannel "]
-    "Flutter" -> "Plugin Dart" [label=" Send new events to registered listeners "]
-    "Plugin Dart" -> "App (EventChannel)" [label=" Send event via callback method "]
+    "Plugin native" -> "DCC" [label=" Add / remove listener "]
+    "DCC" -> "Plugin native" [label=" Send event "]
+    "Plugin native" -> "Plugin Dart" [label=" Send event via EventChannel "]
+    "Plugin Dart" -> "App" [label=" Send event via stream "]
 }

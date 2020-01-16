@@ -1,24 +1,26 @@
 digraph G {
 	node [	
-		shape = polygon,
-		sides = 4,
-		style = filled,
-		fontname = "Helvetica-Outline" 
+            shape = box,
+            style = filled,
+            fontname=Arial,
+            fontsize=14
 		];
-    "App (MethodChannel)" 		[fillcolor=lightgrey] 
+	edge [
+	    fontname=Courier
+	    ];
+    "App" 		                [fillcolor=lightgrey]
     "Plugin Dart" 				[fillcolor=cadetblue1]
     "Plugin Dart Sub Class" 	[fillcolor=cadetblue1]
     "Plugin Java" 				[fillcolor=cadetblue3]
     "Plugin Java Sub Class" 	[fillcolor=cadetblue3]
     "DCC" 						[fillcolor=lightpink2]
-    
-    "App (MethodChannel)" -> "Plugin Dart" [label=" Request data "]
+
+    "App" -> "Plugin Dart" [label=" Request data "]
     "Plugin Dart" -> "Plugin Dart Sub Class" [label=" Delegate request "]
     "Plugin Dart Sub Class" -> "Plugin Java" [label=" Request via MethodChannel "]
     "Plugin Java" -> "Plugin Java Sub Class" [label=" Delegate request "]
-    "Plugin Java Sub Class" -> "DCC" [label=" Request via JNI "]
-    "DCC" -> "Plugin Java Sub Class" [label=" Response via JNI "]
+    "Plugin Java Sub Class" -> "DCC" [label=" Request via JNI / Swift "]
+    "DCC" -> "Plugin Java Sub Class" [label=" Response via JNI / Swift "]
     "Plugin Java Sub Class" -> "Plugin Dart Sub Class" [label=" Response via MethodChannel "]
-    "Plugin Dart Sub Class" -> "App (MethodChannel)"  [label=" Response with data "]
-    
+    "Plugin Dart Sub Class" -> "App"  [label=" Response with data "]
 }
