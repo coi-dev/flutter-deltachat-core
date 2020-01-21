@@ -157,7 +157,8 @@ function adjustAndroidBuild {
     echo "Applying temporary rpgp work around"
     search='.*pgp =.*'
     replace='pgp = { version = "0.2", default-features = false }'
-    sed -i "s/$search/$replace/g" Cargo.toml
+    sed -i'.bak' "s/${search}/${replace}/g" Cargo.toml
+    rm Cargo.toml.bak
 }
 
 function postCompileAndroid {
