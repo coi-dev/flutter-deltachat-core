@@ -43,6 +43,9 @@
 package com.openxchange.deltachatcore;
 
 
+import android.content.Context;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.b44t.messenger.DcChat;
@@ -58,6 +61,10 @@ import com.openxchange.deltachatcore.handlers.MessageCallHandler;
 
 import java.util.Objects;
 
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import io.flutter.embedding.engine.plugins.activity.ActivityAware;
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
+import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -66,7 +73,7 @@ import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.flutter.view.FlutterNativeView;
 
-public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.ViewDestroyListener {
+public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.ViewDestroyListener, FlutterPlugin, ActivityAware {
     static final String TAG = "coi";
 
     private static final String LIBRARY_NAME = "native-utils";
@@ -93,7 +100,9 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
     private static final String CACHE_IDENTIFIER_CHAT_MESSAGE = "chatMessage";
     private static final String CACHE_IDENTIFIER_CONTACT = "contact";
 
-    private final Registrar registrar;
+    private Context context;
+    private BinaryMessenger messenger;
+    private MethodChannel channel;
 
     private final IdCache<DcChat> chatCache = new IdCache<>();
     private final IdCache<DcContact> contactCache = new IdCache<>();
@@ -108,15 +117,60 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
     @SuppressWarnings("FieldCanBeLocal")
     private EventChannelHandler eventChannelHandler;
 
-    private DeltaChatCorePlugin(Registrar registrar) {
-        this.registrar = registrar;
+    @SuppressWarnings("WeakerAccess")
+    public DeltaChatCorePlugin() {
+        // Required for Flutter plugin embedding v2
     }
 
+    // Flutter plugin v1 embedding
     public static void registerWith(Registrar registrar) {
-        final MethodChannel channel = new MethodChannel(registrar.messenger(), CHANNEL_DELTA_CHAT_CORE);
-        DeltaChatCorePlugin deltaChatCorePlugin = new DeltaChatCorePlugin(registrar);
-        channel.setMethodCallHandler(deltaChatCorePlugin);
-        registrar.addViewDestroyListener(deltaChatCorePlugin);
+        Log.d(TAG, "Attaching plugin via v1 embedding");
+        DeltaChatCorePlugin plugin = new DeltaChatCorePlugin();
+        plugin.onAttachedToEngine(registrar.context(), registrar.messenger());
+        registrar.addViewDestroyListener(plugin);
+    }
+
+    // Flutter plugin v2 embedding
+    @Override
+    public void onAttachedToEngine(FlutterPluginBinding binding) {
+        Log.d(TAG, "Attaching plugin via v2 embedding");
+        onAttachedToEngine(binding.getApplicationContext(), binding.getBinaryMessenger());
+    }
+
+    private void onAttachedToEngine(Context context, BinaryMessenger messenger) {
+        this.context = context;
+        this.messenger = messenger;
+        channel = new MethodChannel(messenger, CHANNEL_DELTA_CHAT_CORE);
+        channel.setMethodCallHandler(this);
+    }
+
+    @Override
+    public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+        Log.d(TAG, "Detaching plugin via v2 embedding");
+        channel.setMethodCallHandler(null);
+        channel = null;
+        eventChannelHandler.close();
+    }
+
+    @Override
+    public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
+        // No implementation required, as no activity context is used by the plugin
+    }
+
+    @Override
+    public void onDetachedFromActivityForConfigChanges() {
+        // No implementation required, as no activity context is used by the plugin
+    }
+
+    @Override
+    public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
+        // No implementation required, as no activity context is used by the plugin
+    }
+
+    @Override
+    public void onDetachedFromActivity() {
+        Log.d(TAG, "Stopping threads via v2 embedding");
+        stopNativeInteractionManager();
     }
 
     @Override
@@ -201,8 +255,8 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
             throw new IllegalArgumentException("No database name given, exiting.");
         }
         System.loadLibrary(LIBRARY_NAME);
-        eventChannelHandler = new EventChannelHandler(registrar.messenger());
-        nativeInteractionManager = new NativeInteractionManager(registrar.context(), dbName, eventChannelHandler);
+        eventChannelHandler = new EventChannelHandler(messenger);
+        nativeInteractionManager = new NativeInteractionManager(context, dbName, eventChannelHandler);
         contextCallHandler = new ContextCallHandler(nativeInteractionManager, contactCache, messageCache, chatCache);
         chatListCallHandler = new ChatListCallHandler(nativeInteractionManager, chatCache);
         messageCallHandler = new MessageCallHandler(nativeInteractionManager, contextCallHandler);
@@ -221,9 +275,14 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
     }
 
     private void stop(Result result) {
-        nativeInteractionManager.stop();
+        stopNativeInteractionManager();
         result.success(null);
     }
+
+    private void stopNativeInteractionManager() {
+        nativeInteractionManager.stop();
+    }
+
 
     private void handleContextCalls(MethodCall methodCall, Result result) {
         contextCallHandler.handleCall(methodCall, result);
@@ -247,7 +306,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
 
     @Override
     public boolean onViewDestroy(FlutterNativeView flutterNativeView) {
-        nativeInteractionManager.stop();
+        stopNativeInteractionManager();
         return false;
     }
 }

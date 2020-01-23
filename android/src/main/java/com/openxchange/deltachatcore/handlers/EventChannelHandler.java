@@ -80,9 +80,10 @@ public class EventChannelHandler implements EventChannel.StreamHandler {
             DcContext.DC_EVENT_HTTP_POST);
 
     private EventChannel.EventSink eventSink;
+    private EventChannel eventChannel;
 
     public EventChannelHandler(BinaryMessenger messenger) {
-        EventChannel eventChannel = new EventChannel(messenger, CHANNEL_DELTA_CHAT_CORE_EVENTS);
+        eventChannel = new EventChannel(messenger, CHANNEL_DELTA_CHAT_CORE_EVENTS);
         eventChannel.setStreamHandler(this);
     }
 
@@ -115,6 +116,11 @@ public class EventChannelHandler implements EventChannel.StreamHandler {
         }
         eventSink.endOfStream();
         eventSink = null;
+    }
+
+    public void close() {
+        eventChannel.setStreamHandler(null);
+        eventChannel = null;
     }
 
     private boolean isDelegateEvent(int eventId) {

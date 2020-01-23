@@ -2,9 +2,16 @@ package com.openxchange.deltachatcore;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.PowerManager;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import com.b44t.messenger.DcContext;
 import com.openxchange.deltachatcore.handlers.EventChannelHandler;
@@ -70,9 +77,45 @@ public class NativeInteractionManager extends DcContext {
             Log.e(TAG, "Cannot create wakeLocks");
         }
         start();
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                registerConnectivityReceiverAndroidN(connectivityManager);
+            } else {
+                registerConnectivityReceiver(context, connectivityManager);
+            }
+        }
+    }
 
-        BroadcastReceiver connectivityReceiverReceiver = new ConnectivityReceiver(this);
-        context.registerReceiver(connectivityReceiverReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
+    @SuppressWarnings("deprecation")
+    private void registerConnectivityReceiver(Context context, ConnectivityManager connectivityManager) {
+        context.registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+                boolean isConnected = networkInfo != null && networkInfo.isConnected();
+                if (isConnected) {
+                    startOnNetworkAvailable();
+                }
+            }
+        }, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    private void startOnNetworkAvailable() {
+        Log.i(TAG, "###################### Network is connected again. ######################");
+        start();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void registerConnectivityReceiverAndroidN(ConnectivityManager connectivityManager) {
+        if (connectivityManager != null) {
+            connectivityManager.registerDefaultNetworkCallback(new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(Network network) {
+                    startOnNetworkAvailable();
+                }
+            });
+        }
     }
 
     void start() {
