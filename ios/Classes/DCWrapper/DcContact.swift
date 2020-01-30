@@ -104,7 +104,7 @@ class DcContact {
         let path: URL = URL(fileURLWithPath: filePath, isDirectory: false)
 
         if path.isFileURL {
-            return path.absoluteString
+            return path.path
         }
 
         return nil
