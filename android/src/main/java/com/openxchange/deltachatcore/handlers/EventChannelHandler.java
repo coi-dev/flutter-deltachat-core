@@ -77,7 +77,8 @@ public class EventChannelHandler implements EventChannel.StreamHandler {
             DcContext.DC_EVENT_GET_STRING,
             DcContext.DC_EVENT_GET_QUANTITIY_STRING,
             DcContext.DC_EVENT_HTTP_GET,
-            DcContext.DC_EVENT_HTTP_POST);
+            DcContext.DC_EVENT_HTTP_POST,
+            DcContext.DC_EVENT_MISSING_KEY);
 
     private EventChannel.EventSink eventSink;
     private EventChannel eventChannel;
