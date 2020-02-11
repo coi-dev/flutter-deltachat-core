@@ -54,7 +54,10 @@ import io.flutter.plugin.common.EventChannel;
 public class EventChannelHandler implements EventChannel.StreamHandler {
 
     private static final String CHANNEL_DELTA_CHAT_CORE_EVENTS = "deltaChatCoreEvents";
-    // Must match all events listed in android/src/main/java/com/b44t/messenger/DcContext.java (DC_EVENT_*)
+    // Must match all events listed in android/src/main/java/com/b44t/messenger/DcContext.java (DC_EVENT_*) plus internal events (e.g. for metadata calls)
+    private static final int COI_EVENT_SET_METADATA_DONE = 2070;
+    private static final int COI_EVENT_WEB_PUSH_SUBSCRIPTION = 2071;
+
     private final static List<Integer> DELEGATE_EVENTS = Arrays.asList(DcContext.DC_EVENT_INFO,
             DcContext.DC_EVENT_WARNING,
             DcContext.DC_EVENT_ERROR,
@@ -78,7 +81,9 @@ public class EventChannelHandler implements EventChannel.StreamHandler {
             DcContext.DC_EVENT_GET_QUANTITIY_STRING,
             DcContext.DC_EVENT_HTTP_GET,
             DcContext.DC_EVENT_HTTP_POST,
-            DcContext.DC_EVENT_MISSING_KEY);
+            DcContext.DC_EVENT_MISSING_KEY,
+            COI_EVENT_SET_METADATA_DONE,
+            COI_EVENT_WEB_PUSH_SUBSCRIPTION);
 
     private EventChannel.EventSink eventSink;
     private EventChannel eventChannel;
