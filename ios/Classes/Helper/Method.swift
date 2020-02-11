@@ -213,7 +213,9 @@ extension Method {
         static let SET_COI_MESSAGE_FILTER               = "context_setCoiMessageFilter"
         static let GET_MESSAGE_INFO                     = "context_getMessageInfo"
         static let RETRY_SENDING_PENDING_MESSAGES       = "context_retrySendingPendingMessages"
-        static let GET_CONTACT_ID_BY_ADDRESS                     = "context_getContactIdByAddress"
+        static let GET_CONTACT_ID_BY_ADDRESS            = "context_getContactIdByAddress"
+        static let CLOSE                                = "context_close"
+        static let LOGOUT                               = "context_logout"
     }
 
 }

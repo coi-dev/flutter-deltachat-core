@@ -46,7 +46,7 @@ import UIKit
 
 let log = SwiftyBeaver.self
 
-public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
+public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin, DcContextDelegate {
 
     fileprivate let registrar: FlutterPluginRegistrar!
 
@@ -79,6 +79,10 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         
         let ech = EventChannelHandler.sharedInstance
         ech.messenger = registrar.messenger()
+        
+        super.init()
+
+        self.dcContext.delegate = self
     }
 
     // This is our entry point
@@ -168,6 +172,24 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
 
     fileprivate func systemInfo(result: FlutterResult) {
         result(UIApplication.version)
+    }
+    
+    // MARK: - DcContextDelegate
+    
+    func logout() throws {
+        let application = UIApplication.shared
+        let sel = Selector("suspend")
+
+        if application.responds(to: sel) {
+            do {
+                try FileManager.default.removeItem(atPath: dcContext.userDatabasePath)
+                UserDefaults.applicationShouldTerminate = true
+                application.perform(sel)
+
+            } catch {
+                throw DcContextError(kind: .unableToDeleteDatabase(dcContext.userDatabasePath))
+            }
+        }
     }
 
 }

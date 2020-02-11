@@ -103,6 +103,7 @@ class Context {
   static const String methodGetMessageInfo = "context_getMessageInfo";
   static const String methodRetrySendingPendingMessages = "context_retrySendingPendingMessages";
   static const String methodGetContactIdByAddress = "context_getContactIdByAddress";
+  static const String methodLogout = "context_logout";
 
 
   static const String configAddress = "addr";
@@ -340,6 +341,10 @@ class Context {
 
   Future<void> close() async {
     return await core.invokeMethod(methodClose);
+  }
+
+  Future<void> logout() async {
+    return await core.invokeMethod(methodLogout);
   }
 
   Future<int> isCoiSupported() async {

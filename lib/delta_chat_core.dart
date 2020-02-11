@@ -60,8 +60,8 @@ export 'src/contact.dart';
 export 'src/context.dart';
 
 class DeltaChatCore {
-  static const String channelDeltaChatCore = 'deltaChatCore';
-  static const String channelDeltaChatCoreEvents = 'deltaChatCoreEvents';
+  static const String _channelDeltaChatCore = 'deltaChatCore';
+  static const String _channelDeltaChatCoreEvents = 'deltaChatCoreEvents';
 
   static const String methodBaseInit = 'base_init';
   static const String methodBaseStart = "base_start";
@@ -73,10 +73,10 @@ class DeltaChatCore {
 
   final _logger = Logger("delta_chat_core");
   final MethodChannel _methodChannel;
-  final _eventChannel = EventChannel(channelDeltaChatCoreEvents);
+  final _eventChannel = EventChannel(_channelDeltaChatCoreEvents);
   final _eventChannelSubscribers = Map<int, Map<int, StreamController>>();
-  String _dbPath;
 
+  String _dbPath;
   String get dbPath => _dbPath;
 
   StreamSubscription _eventChannelSubscription;
@@ -84,8 +84,8 @@ class DeltaChatCore {
 
   factory DeltaChatCore() {
     if (_instance == null) {
-      final MethodChannel _methodChannel = MethodChannel(channelDeltaChatCore);
-      _instance = new DeltaChatCore._createInstance(_methodChannel);
+      final methodChannel = MethodChannel(_channelDeltaChatCore);
+      _instance = new DeltaChatCore._createInstance(methodChannel);
       setupLogger();
     }
     return _instance;
@@ -115,6 +115,16 @@ class DeltaChatCore {
 
   Future<void> stop() async {
     await _methodChannel.invokeMethod(methodBaseStop);
+  }
+
+  void reset() {
+    _eventChannelSubscription.cancel();
+    _eventChannelSubscription = null;
+
+    _instance = null;
+    _instance = DeltaChatCore();
+
+    _setupEventChannelListener();
   }
 
   _setupEventChannelListener() {
