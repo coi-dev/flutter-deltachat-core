@@ -66,6 +66,7 @@ extension Method {
         static let INIT                                 = "base_init"
         static let SYSTEM_INFO                          = "base_systemInfo"
         static let CORE_LISTENER                        = "base_coreListener"
+        static let LOGOUT                               = "base_logout"
     }
 
 }
@@ -213,7 +214,8 @@ extension Method {
         static let SET_COI_MESSAGE_FILTER               = "context_setCoiMessageFilter"
         static let GET_MESSAGE_INFO                     = "context_getMessageInfo"
         static let RETRY_SENDING_PENDING_MESSAGES       = "context_retrySendingPendingMessages"
-        static let GET_CONTACT_ID_BY_ADDRESS                     = "context_getContactIdByAddress"
+        static let GET_CONTACT_ID_BY_ADDRESS            = "context_getContactIdByAddress"
+        static let CLOSE                                = "context_close"
     }
 
 }

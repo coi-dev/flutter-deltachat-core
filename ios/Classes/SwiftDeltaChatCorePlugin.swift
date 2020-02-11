@@ -79,6 +79,8 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         
         let ech = EventChannelHandler.sharedInstance
         ech.messenger = registrar.messenger()
+        
+        super.init()
     }
 
     // This is our entry point
@@ -123,6 +125,8 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
             baseInit(result: result)
         case Method.Base.SYSTEM_INFO:
             systemInfo(result: result)
+        case Method.Base.LOGOUT:
+            logout(result: result)
         default:
             log.error("Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
@@ -168,6 +172,17 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
 
     fileprivate func systemInfo(result: FlutterResult) {
         result(UIApplication.version)
+    }
+    
+    func logout(result: FlutterResult) {
+        let application = UIApplication.shared
+        let sel = Selector(("suspend"))
+
+        if application.responds(to: sel) {
+            UserDefaults.applicationShouldTerminate = true
+            application.perform(sel)
+            result(nil)
+        }
     }
 
 }

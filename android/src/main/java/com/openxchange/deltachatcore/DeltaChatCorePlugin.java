@@ -91,6 +91,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
     private static final String METHOD_BASE_SYSTEM_INFO = "base_systemInfo";
     private static final String METHOD_BASE_START = "base_start";
     private static final String METHOD_BASE_STOP = "base_stop";
+    private static final String METHOD_BASE_LOGOUT = "base_logout";
 
     private static final String ARGUMENT_REMOVE_CACHE_IDENTIFIER = "removeCacheIdentifier";
     private static final String ARGUMENT_DB_NAME = "dbName";
@@ -242,6 +243,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
                 start(result);
                 break;
             case METHOD_BASE_STOP:
+            case METHOD_BASE_LOGOUT:
                 stop(result);
                 break;
             default:

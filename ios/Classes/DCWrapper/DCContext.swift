@@ -68,12 +68,7 @@ class DcContext {
 
         return Bool(truncating: result)
     }
-
-    func closeUserDataBase() {
-        dc_close(DcContext.contextPointer)
-        DcContext.contextPointer = nil
-    }
-
+    
     // MARK: - Chats
 
     func getChatlist(flags: Int32, queryString: String?, queryId: Int) -> DcChatlist {
