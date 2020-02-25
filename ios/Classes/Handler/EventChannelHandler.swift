@@ -69,6 +69,8 @@ class EventChannelHandler: NSObject, FlutterStreamHandler {
         DC_EVENT_SECUREJOIN_JOINER_PROGRESS,
         DC_EVENT_IS_OFFLINE,
         DC_EVENT_GET_STRING,
+        DC_EVENT_SET_METADATA_DONE,
+        DC_EVENT_METADATA
     ]
 
     var messenger: FlutterBinaryMessenger? {
