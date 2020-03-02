@@ -285,6 +285,15 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
 
 
     private void handleContextCalls(MethodCall methodCall, Result result) {
+        if(methodCall.method.equals("context_logout")){
+            boolean isDeleted = nativeInteractionManager.logout();
+            if(isDeleted){
+                result.success(null);
+            } else{
+                result.error(methodCall.method, "Database not deleted.", null);
+            }
+            return;
+        }
         contextCallHandler.handleCall(methodCall, result);
     }
 

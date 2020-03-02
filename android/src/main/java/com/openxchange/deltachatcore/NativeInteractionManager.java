@@ -394,6 +394,18 @@ public class NativeInteractionManager extends DcContext {
         eventChannelHandler.handleEvent(eventId, data1Object, error);
     }
 
+    boolean logout(){
+        boolean isDeleted;
+        File databaseFile = new File(getDbPath());
+        isDeleted = databaseFile.delete();
+        if(isDeleted){
+            stop();
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     String getDbPath() {
         return dbPath;
     }
