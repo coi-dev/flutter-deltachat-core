@@ -47,7 +47,6 @@ struct DcContextError: Error {
     enum ErrorKind {
         case missingImageAtPath(String)
         case wrongAttachmentType(Int32)
-        case unableToDeleteDatabase(String)
     }
 
     let kind: ErrorKind
