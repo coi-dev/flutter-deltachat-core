@@ -66,6 +66,7 @@ class DeltaChatCore {
   static const String methodBaseInit = 'base_init';
   static const String methodBaseStart = "base_start";
   static const String methodBaseStop = "base_stop";
+  static const String methodBaseLogout = "base_logout";
 
   static const String argumentDBName = "dbName";
 
@@ -117,14 +118,8 @@ class DeltaChatCore {
     await _methodChannel.invokeMethod(methodBaseStop);
   }
 
-  void reset() {
-    _eventChannelSubscription.cancel();
-    _eventChannelSubscription = null;
-
-    _instance = null;
-    _instance = DeltaChatCore();
-
-    _setupEventChannelListener();
+  Future<void> logout() async {
+    await _methodChannel.invokeMethod(methodBaseLogout);
   }
 
   _setupEventChannelListener() {

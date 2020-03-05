@@ -46,7 +46,7 @@ import UIKit
 
 let log = SwiftyBeaver.self
 
-public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin, DcContextDelegate {
+public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
 
     fileprivate let registrar: FlutterPluginRegistrar!
 
@@ -81,8 +81,6 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin, DcContextDelegat
         ech.messenger = registrar.messenger()
         
         super.init()
-
-        self.dcContext.delegate = self
     }
 
     // This is our entry point
@@ -127,6 +125,8 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin, DcContextDelegat
             baseInit(result: result)
         case Method.Base.SYSTEM_INFO:
             systemInfo(result: result)
+        case Method.Base.LOGOUT:
+            logout(result: result)
         default:
             log.error("Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
@@ -174,21 +174,14 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin, DcContextDelegat
         result(UIApplication.version)
     }
     
-    // MARK: - DcContextDelegate
-    
-    func logout() throws {
+    func logout(result: FlutterResult) {
         let application = UIApplication.shared
-        let sel = Selector("suspend")
+        let sel = Selector(("suspend"))
 
         if application.responds(to: sel) {
-            do {
-                try FileManager.default.removeItem(atPath: dcContext.userDatabasePath)
-                UserDefaults.applicationShouldTerminate = true
-                application.perform(sel)
-
-            } catch {
-                throw DcContextError(kind: .unableToDeleteDatabase(dcContext.userDatabasePath))
-            }
+            UserDefaults.applicationShouldTerminate = true
+            application.perform(sel)
+            result(nil)
         }
     }
 

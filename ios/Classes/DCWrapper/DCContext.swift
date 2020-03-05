@@ -44,14 +44,8 @@ import Foundation
 import AVFoundation
 import MessageKit
 
-protocol DcContextDelegate {
-    func logout() throws
-}
-
 class DcContext {
     static private(set) var contextPointer: OpaquePointer?
-    
-    var delegate: DcContextDelegate?
 
     /// Returns the file path of the DeltaChat SQLite database.
     var userDatabasePath: String {
@@ -73,12 +67,6 @@ class DcContext {
         let result = NSNumber(value: dc_open(DcContext.contextPointer, userDatabasePath, nil))
 
         return Bool(truncating: result)
-    }
-    
-    func logout() throws {
-        if let delegate = delegate {
-            try delegate.logout()
-        }
     }
     
     // MARK: - Chats

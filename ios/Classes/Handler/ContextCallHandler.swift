@@ -170,8 +170,6 @@ class ContextCallHandler: MethodCallHandling {
             retrySendingPendingMessages(result: result)
         case Method.Context.GET_CONTACT_ID_BY_ADDRESS:
             getContactIdByAddress(methodCall: call, result: result)
-        case Method.Context.LOGOUT:
-            logout(result: result)
         default:
             log.error("Context: Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
@@ -662,16 +660,6 @@ class ContextCallHandler: MethodCallHandling {
 
         context.setCoiMessageFilter(mode: mode, id: id)
         result(nil)
-    }
-    
-    fileprivate func logout(result: FlutterResult) {
-        do {
-            try context.logout()
-            result(nil)
-
-        } catch {
-            result(error)
-        }
     }
 
     // MARK: - Webpush Related
