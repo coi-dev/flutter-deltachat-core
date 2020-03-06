@@ -91,6 +91,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
     private static final String METHOD_BASE_SYSTEM_INFO = "base_systemInfo";
     private static final String METHOD_BASE_START = "base_start";
     private static final String METHOD_BASE_STOP = "base_stop";
+    private static final String METHOD_BASE_LOGOUT = "base_logout";
 
     private static final String ARGUMENT_REMOVE_CACHE_IDENTIFIER = "removeCacheIdentifier";
     private static final String ARGUMENT_DB_NAME = "dbName";
@@ -242,6 +243,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
                 start(result);
                 break;
             case METHOD_BASE_STOP:
+            case METHOD_BASE_LOGOUT:
                 stop(result);
                 break;
             default:
@@ -285,15 +287,6 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
 
 
     private void handleContextCalls(MethodCall methodCall, Result result) {
-        if(methodCall.method.equals("context_logout")){
-            boolean isDeleted = nativeInteractionManager.logout();
-            if(isDeleted){
-                result.success(null);
-            } else{
-                result.error(methodCall.method, "Database not deleted.", null);
-            }
-            return;
-        }
         contextCallHandler.handleCall(methodCall, result);
     }
 
