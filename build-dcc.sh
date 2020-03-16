@@ -153,14 +153,6 @@ function changeDirectory {
     cd $1 || exit 1
 }
 
-function adjustAndroidBuild {
-    echo "Applying temporary rpgp work around"
-    search='.*pgp =.*'
-    replace='pgp = { version = "0.2", default-features = false }'
-    sed -i'.bak' "s/${search}/${replace}/g" Cargo.toml
-    rm Cargo.toml.bak
-}
-
 function postCompileAndroid {
     echo "Resetting Cargo.toml and Cargo.lock changes"
     git checkout Cargo.lock
@@ -196,9 +188,6 @@ changeDirectory ${BASE_DCC}
 checkTargets
 
 echo "-- Applying platform specific fixes --"
-if isAndroid; then
-    adjustAndroidBuild
-fi
 
 echo "-- Compiling Rust core --"
 buildPlatforms
