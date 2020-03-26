@@ -209,7 +209,7 @@ class MessageCallHandler: MethodCallHandling {
     
     private func isForwarded(methodCall: FlutterMethodCall, result: FlutterResult) {
         let msg = getMessage(methodCall: methodCall, result: result)
-        result(NSNumber(value: msg.isForwaded))
+        result(NSNumber(value: msg.isForwarded))
     }
 
     // MARK: - Private Helper

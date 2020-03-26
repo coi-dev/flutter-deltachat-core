@@ -293,7 +293,7 @@ class DcMsg: MessageType {
         return dc_msg_is_info(messagePointer) == 1
     }
     
-    var isForwaded: Bool {
+    var isForwarded: Bool {
         return dc_msg_is_forwarded(messagePointer) == 1
     }
 
