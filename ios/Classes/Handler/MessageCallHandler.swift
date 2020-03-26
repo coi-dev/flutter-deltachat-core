@@ -98,6 +98,8 @@ class MessageCallHandler: MethodCallHandling {
             isStarred(methodCall: call, result: result)
         case Method.Message.GET_DURATION:
             getDuration(methodCall: call, result: result)
+        case Method.Message.IS_FORWARDED:
+            isForwarded(methodCall: call, result: result)
         default:
             log.error("Context: Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
@@ -203,6 +205,11 @@ class MessageCallHandler: MethodCallHandling {
     private func getDuration(methodCall: FlutterMethodCall, result: FlutterResult) {
         let msg = getMessage(methodCall: methodCall, result: result)
         result(NSNumber(value: msg.duration))
+    }
+    
+    private func isForwarded(methodCall: FlutterMethodCall, result: FlutterResult) {
+        let msg = getMessage(methodCall: methodCall, result: result)
+        result(NSNumber(value: msg.isForwaded))
     }
 
     // MARK: - Private Helper
