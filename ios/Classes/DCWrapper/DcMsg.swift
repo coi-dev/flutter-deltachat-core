@@ -288,9 +288,13 @@ class DcMsg: MessageType {
     var isSetupMessage: Bool {
         return dc_msg_is_setupmessage(messagePointer) == 1
     }
-
+    
     var isInfoMessage: Bool {
         return dc_msg_is_info(messagePointer) == 1
+    }
+    
+    var isForwarded: Bool {
+        return dc_msg_is_forwarded(messagePointer) == 1
     }
 
     var isOutgoing: Bool {

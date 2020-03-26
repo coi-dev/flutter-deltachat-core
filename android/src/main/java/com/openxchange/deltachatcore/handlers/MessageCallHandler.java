@@ -149,6 +149,9 @@
                 case METHOD_MESSAGE_GET_DURATION:
                     getDuration(methodCall, result);
                     break;
+                case METHOD_MESSAGE_IS_FORWARDED:
+                    isForwarded(methodCall, result);
+                    break;
                 default:
                     result.notImplemented();
             }
@@ -342,6 +345,15 @@
                 return;
             }
             result.success(message.getDuration());
+        }
+
+        private void isForwarded(MethodCall methodCall, MethodChannel.Result result) {
+            DcMsg message = getMessage(methodCall, result);
+            if (message == null) {
+                resultErrorGeneric(methodCall, result);
+                return;
+            }
+            result.success(message.isForwarded());
         }
 
         private DcMsg getMessage(MethodCall methodCall, MethodChannel.Result result) {
