@@ -170,6 +170,11 @@ class DcContext {
 
         return contactIds
     }
+    
+    func isContactWith(contactId: UInt32, inChat chatId: Int32) -> Bool {
+        let chatContacts = getChatContacts(for: chatId)
+        return chatContacts.contains(contactId)
+    }
 
     /// Returns a DcChat object for the given contact id
     /// - Parameter id: The contact id whose DcContact object should be returned

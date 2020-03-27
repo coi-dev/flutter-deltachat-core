@@ -248,10 +248,29 @@ class ContextCallHandler: MethodCallHandling {
 
     fileprivate func deleteContact(methodCall: FlutterMethodCall, result: FlutterResult) {
         let contactId = UInt32(methodCall.intValue(for: Argument.ID, result: result))
-        let deleted = context.deleteContact(contactId: contactId)
-        _ = contactCache.removeValue(for: contactId)
+        let chats = context.getChatlist(flags: DC_GCL_NO_SPECIALS, queryString: nil, queryId: Int(contactId))
+        let chatsCount = chats.length
+        var isDeletable: Bool = true
 
-        result(NSNumber(value: deleted))
+        if chatsCount > 0 {
+            var idx = UInt32(0)
+            while idx < chatsCount {
+                let chatId = Int32(chats.getChatId(index: idx))
+                isDeletable = !context.isContactWith(contactId: contactId, inChat: chatId)
+                if !isDeletable {
+                    result(false)
+                    return
+                }
+                idx += 1
+            }
+        }
+        
+        isDeletable = context.deleteContact(contactId: contactId)
+        if isDeletable {
+            _ = contactCache.removeValue(for: contactId)
+        }
+
+        result(NSNumber(value: isDeletable))
     }
 
     fileprivate func blockUnblockContact(methodCall: FlutterMethodCall, result: FlutterResult, block: Bool) {
