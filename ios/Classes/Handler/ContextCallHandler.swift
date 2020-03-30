@@ -396,14 +396,9 @@ class ContextCallHandler: MethodCallHandling {
         let chatId = methodCall.intValue(for: Argument.CHAT_ID, result: result)
         let type = methodCall.intValue(for: Argument.TYPE, result: result)
         let text = methodCall.stringValue(for: Argument.TEXT, result: result)
-        
-        guard let mimeType = methodCall.stringValue(for: Argument.MIME_TYPE, result: result) else {
-            Method.Error.missingArgument(result: result)
-            return
-        }
-        
+        var mimeType = methodCall.stringValue(for: Argument.MIME_TYPE, result: result)
         let duration = methodCall.intValue(for: Argument.DURATION, result: result)
-
+        
         guard let path = methodCall.stringValue(for: Argument.PATH, result: result) else {
             Method.Error.missingArgumentValue(for: Argument.PATH, result: result)
             return

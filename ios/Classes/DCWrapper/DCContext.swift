@@ -113,9 +113,9 @@ class DcContext {
         dc_delete_chat(DcContext.contextPointer, UInt32(chatId))
     }
 
-    func archiveChat(chatId: UInt32, archive: Bool) {
-        dc_archive_chat(DcContext.contextPointer, UInt32(chatId), Int32(archive ? 1 : 0))
-    }
+//    func archiveChat(chatId: UInt32, archive: Bool) {
+//        dc_archive_chat(DcContext.contextPointer, UInt32(chatId), Int32(archive ? 1 : 0))
+//    }
 
     func createChatByMessageId(messageId: UInt32) -> DcChat {
         let chatId = dc_create_chat_by_msg_id(DcContext.contextPointer, messageId)
@@ -256,7 +256,7 @@ class DcContext {
         return messageId
     }
 
-    func sendAttachment(fromPath path: String, withType type: Int32, mimeType: String, text: String?, duration: Int32?, forChatId chatId: UInt32) throws -> UInt32 {
+    func sendAttachment(fromPath path: String, withType type: Int32, mimeType: String?, text: String?, duration: Int32?, forChatId chatId: UInt32) throws -> UInt32 {
         guard Int(type).isValidAttachmentType else {
             throw DcContextError(kind: .wrongAttachmentType(type))
         }
