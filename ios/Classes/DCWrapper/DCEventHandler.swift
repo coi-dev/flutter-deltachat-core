@@ -41,6 +41,7 @@
  */
 
 import Foundation
+import SwiftyBeaver
 
 class DCEventHandler {
 
@@ -112,14 +113,14 @@ class DCEventHandler {
     // MARK: - BackgroundTask
 
     fileprivate func beginBackgroundTask() {
-        log.info(">> begin background task")
+        Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.info, message: ">> begin background task")
         backgroundTask = UIApplication.shared.beginBackgroundTask(expirationHandler: endBackgroundTask)
         assert(backgroundTask != .invalid)
     }
 
     fileprivate func endBackgroundTask() {
         guard backgroundTask != .invalid else { return }
-        log.info(">> end background task")
+        Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.info, message: ">> end background task")
         UIApplication.shared.endBackgroundTask(backgroundTask)
         backgroundTask = .invalid
     }

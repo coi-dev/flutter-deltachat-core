@@ -41,6 +41,7 @@
  */
 
 import Foundation
+import SwiftyBeaver
 
 @_silgen_name("handleDeltaChatEvent")
 func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsignedLong, data1String: UnsafePointer<Int8>, data2String: UnsafePointer<Int8>) -> UnsafePointer<Int8>? {
@@ -53,12 +54,12 @@ func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsignedLon
 
     switch parameters.eventId {
         case DC_EVENT_INFO:
-            log.info(logMessage)
+            Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.info, message: logMessage)
 
         case DC_EVENT_ERROR,
              DC_EVENT_ERROR_NETWORK,
              DC_EVENT_ERROR_SELF_NOT_IN_GROUP:
-            log.error(logMessage)
+            Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.error, message: logMessage)
             EventChannelHandler.sharedInstance.handle(parameters.eventId, data1: parameters.data1Object, data2: parameters.data2Object)
 
         case DC_EVENT_WARNING:
@@ -66,7 +67,7 @@ func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsignedLon
             EventChannelHandler.sharedInstance.handle(parameters.eventId, data1: parameters.data1Object, data2: parameters.data2Object)
 
         default:
-            log.info(logMessage)
+            Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.info, message: logMessage)
             EventChannelHandler.sharedInstance.handle(parameters.eventId, data1: parameters.data1Object, data2: parameters.data2Object)
     }
 

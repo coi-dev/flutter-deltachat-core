@@ -171,7 +171,7 @@ class ContextCallHandler: MethodCallHandling {
         case Method.Context.GET_CONTACT_ID_BY_ADDRESS:
             getContactIdByAddress(methodCall: call, result: result)
         default:
-            log.error("Context: Failing for \(call.method)")
+            Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.error, message: "Context: Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
         }
     }
@@ -428,11 +428,11 @@ class ContextCallHandler: MethodCallHandling {
             result(NSNumber(value: messageId))
 
         } catch DcContextError.ErrorKind.missingImageAtPath(let path) {
-            log.error("Can't find image at given path: \(path)")
+            Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.error, message: "Can't find image at given path: \(path)")
         } catch DcContextError.ErrorKind.wrongAttachmentType(let type) {
-            log.error("Wrong attachment type given: \(type)!")
+            Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.error, message: "Wrong attachment type given: \(type)!")
         } catch {
-            log.error("Unhandled error: \(error)")
+            Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.error, message: "Unhandled error: \(error)")
         }
     }
 

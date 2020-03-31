@@ -43,6 +43,7 @@
 import Foundation
 import AVFoundation
 import MessageKit
+import SwiftyBeaver
 
 class DcMsg: MessageType {
     var messagePointer: OpaquePointer?
@@ -224,7 +225,7 @@ class DcMsg: MessageType {
                     let image = UIImage(data: data)
                     return image
                 } catch {
-                    log.warning("failed to load image: \(path), \(error)")
+                    Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.warning, message: "failed to load image: \(path), \(error)")
                     return nil
                 }
             }
