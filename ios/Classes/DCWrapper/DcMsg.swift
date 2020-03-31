@@ -89,18 +89,16 @@ class DcMsg: MessageType {
         }
 
         if self.viewtype == nil {
-            return MessageKind.text(self.text)
+            return MessageKind.text(text)
         }
 
         switch self.viewtype! {
         case .image:
-            return MessageKind.photo(Media(image: image))
+            return createImageMessage(text: text)
         case .video:
-            return MessageKind.video(Media(url: fileURL))
+            return createVideoMessage(text: text)
         case .audio, .voice:
-            let audioAsset = AVURLAsset(url: fileURL!)
-            let seconds = Float(CMTimeGetSeconds(audioAsset.duration))
-            return MessageKind.audio(Audio(url: fileURL!, duration: seconds))
+            return createAudioMessage(text: text)
         default:
             // TODO: custom views for audio, etc
             if !self.filename.isEmpty {
@@ -109,6 +107,42 @@ class DcMsg: MessageType {
             return MessageKind.text(text)
         }
     }()
+    
+    internal func createVideoMessage(text: String) -> MessageKind {
+        if text.isEmpty {
+            return MessageKind.video(Media(url: fileURL, image: nil))
+        }
+        let attributedString = NSAttributedString(string: text)
+        return MessageKind.video(Media(url: fileURL, image: nil, text: attributedString))
+    }
+
+    internal func createImageMessage(text: String) -> MessageKind {
+        if text.isEmpty {
+            return MessageKind.photo(Media(image: image))
+        }
+        let attributedString = NSAttributedString(string: text)
+        return MessageKind.photo(Media(image: image, text: attributedString))
+    }
+
+    internal func createAudioMessage(text: String) -> MessageKind {
+        let audioAsset = AVURLAsset(url: fileURL!)
+        let seconds = Float(CMTimeGetSeconds(audioAsset.duration))
+        if !text.isEmpty {
+            let attributedString = NSAttributedString(string: text)
+            return MessageKind.audio(Audio(url: audioAsset.url, duration: seconds, text: attributedString))
+        }
+        return MessageKind.audio(Audio(url: fileURL!, duration: seconds))
+    }
+
+//    internal func createFileMessage(text: String) -> MessageKind {
+//        let fileString = "\(self.filename ?? "???") (\(self.filesize / 1024) kB)"
+//        let attributedFileString = NSMutableAttributedString(string: fileString)
+//        if !text.isEmpty {
+//            attributedFileString.append(NSAttributedString(string: "\n\n"))
+//            attributedFileString.append(NSAttributedString(string: text))
+//        }
+//        return MessageKind.file(Media(text: attributedFileString))
+//    }
 
     // MARK: - Helper
 
@@ -163,6 +197,8 @@ class DcMsg: MessageType {
             return .text
         case DC_MSG_IMAGE:
             return .image
+        case DC_MSG_STICKER:
+            return .image
         case DC_MSG_VIDEO:
             return .video
         case DC_MSG_VOICE:
@@ -208,7 +244,7 @@ class DcMsg: MessageType {
         return ""
     }
     
-    func setFile(path: String, mimeType: String) {
+    func setFile(path: String, mimeType: String?) {
         dc_msg_set_file(messagePointer, path, mimeType)
     }
 

@@ -61,6 +61,10 @@ func handleDeltaChatEvent(event: CInt, data1: CUnsignedLong, data2: CUnsignedLon
             log.error(logMessage)
             EventChannelHandler.sharedInstance.handle(parameters.eventId, data1: parameters.data1Object, data2: parameters.data2Object)
 
+        case DC_EVENT_WARNING:
+            log.warning(logMessage)
+            EventChannelHandler.sharedInstance.handle(parameters.eventId, data1: parameters.data1Object, data2: parameters.data2Object)
+
         default:
             log.info(logMessage)
             EventChannelHandler.sharedInstance.handle(parameters.eventId, data1: parameters.data1Object, data2: parameters.data2Object)

@@ -52,8 +52,7 @@ class DCEventHandler {
     }
 
     fileprivate var state: ApplicationState = .stopped
-    fileprivate var imapBackgroundTask: UIBackgroundTaskIdentifier = .invalid
-    fileprivate var smtpBackgroundTask: UIBackgroundTaskIdentifier = .invalid
+    fileprivate var backgroundTask: UIBackgroundTaskIdentifier = .invalid
 
     // MARK: - Public API
 
@@ -62,48 +61,38 @@ class DCEventHandler {
 
         state = .running
 
-        DispatchQueue.global(qos: .background).async { [weak self] in
-            guard let self = self else { return }
-
-            self.beginIMAPBackgroundTask()
+        DispatchQueue.global(qos: .background).async {
+            self.beginBackgroundTask()
             while self.state == .running {
                 dc_perform_imap_jobs(DcContext.contextPointer)
                 dc_perform_imap_fetch(DcContext.contextPointer)
                 dc_perform_imap_idle(DcContext.contextPointer)
             }
-
-            if self.imapBackgroundTask != .invalid {
+            if self.backgroundTask != .invalid {
                 completion?()
-                self.endIMAPBackgroundTask()
+                self.endBackgroundTask()
             }
         }
 
-        DispatchQueue.global(qos: .utility).async { [weak self] in
-            guard let self = self else { return }
-
-            self.beginSMTPBackgroundTask()
+        DispatchQueue.global(qos: .utility).async {
+            self.beginBackgroundTask()
             while self.state == .running {
                 dc_perform_smtp_jobs(DcContext.contextPointer)
                 dc_perform_smtp_idle(DcContext.contextPointer)
             }
-
-            if self.smtpBackgroundTask != .invalid {
-                self.endSMTPBackgroundTask()
+            if self.backgroundTask != .invalid {
+                self.endBackgroundTask()
             }
         }
 
-        DispatchQueue.global(qos: .background).async { [weak self] in
-            guard let self = self else { return }
-
+        DispatchQueue.global(qos: .background).async {
             while self.state == .running {
                 dc_perform_sentbox_fetch(DcContext.contextPointer)
                 dc_perform_sentbox_idle(DcContext.contextPointer)
             }
         }
 
-        DispatchQueue.global(qos: .background).async { [weak self] in
-            guard let self = self else { return }
-
+        DispatchQueue.global(qos: .background).async {
             while self.state == .running {
                 dc_perform_mvbox_fetch(DcContext.contextPointer)
                 dc_perform_mvbox_idle(DcContext.contextPointer)
@@ -122,32 +111,17 @@ class DCEventHandler {
 
     // MARK: - BackgroundTask
 
-    fileprivate func beginIMAPBackgroundTask() {
-        log.info(">> begin IMAP background task")
-        imapBackgroundTask = UIApplication.shared.beginBackgroundTask { [weak self] in
-            guard let self = self else { return }
-            self.endIMAPBackgroundTask()
-        }
+    fileprivate func beginBackgroundTask() {
+        log.info(">> begin background task")
+        backgroundTask = UIApplication.shared.beginBackgroundTask(expirationHandler: endBackgroundTask)
+        assert(backgroundTask != .invalid)
     }
 
-    fileprivate func endIMAPBackgroundTask() {
-        log.info(">> end IMAP background task")
-        UIApplication.shared.endBackgroundTask(imapBackgroundTask)
-        imapBackgroundTask = .invalid
-    }
-
-    fileprivate func beginSMTPBackgroundTask() {
-        log.info(">> begin SMTP background task")
-        smtpBackgroundTask = UIApplication.shared.beginBackgroundTask { [weak self] in
-            guard let self = self else { return }
-            self.endSMTPBackgroundTask()
-        }
-    }
-
-    fileprivate func endSMTPBackgroundTask() {
-        log.info(">> end SMTP background task")
-        UIApplication.shared.endBackgroundTask(smtpBackgroundTask)
-        smtpBackgroundTask = .invalid
+    fileprivate func endBackgroundTask() {
+        guard backgroundTask != .invalid else { return }
+        log.info(">> end background task")
+        UIApplication.shared.endBackgroundTask(backgroundTask)
+        backgroundTask = .invalid
     }
 
 }

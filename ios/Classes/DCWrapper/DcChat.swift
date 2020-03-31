@@ -111,9 +111,9 @@ class DcChat {
         return nil
     }()
 
-    var archived: Int32 {
-        return dc_chat_get_archived(chatPointer)
-    }
+//    var archived: Int32 {
+//        return dc_chat_get_archived(chatPointer)
+//    }
 
     var color: UInt32 {
         return dc_chat_get_color(chatPointer)

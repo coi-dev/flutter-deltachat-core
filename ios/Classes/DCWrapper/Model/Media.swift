@@ -47,6 +47,7 @@ import MessageKit
 struct Media: MediaItem {
     var url: URL?
     var image: UIImage?
+    var text: NSAttributedString?
     var placeholderImage: UIImage = UIImage(named: "ic_attach_file_36pt")!
     
     var size: CGSize {
@@ -57,8 +58,9 @@ struct Media: MediaItem {
         }
     }
     
-    init(url: URL? = nil, image: UIImage? = nil) {
+    init(url: URL? = nil, image: UIImage? = nil, text: NSAttributedString? = nil) {
         self.url = url
         self.image = image
+        self.text = text
     }
 }
