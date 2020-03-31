@@ -84,7 +84,7 @@ class ChatCallHandler: MethodCallHandling {
             isVerified(methodCall: call, result: result)
             break
         default:
-            log.error("Context: Failing for \(call.method)")
+            Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.error, message: "Context: Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
         }
     }

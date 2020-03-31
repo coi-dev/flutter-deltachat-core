@@ -49,7 +49,7 @@ let log = SwiftyBeaver.self
 public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
 
     fileprivate let registrar: FlutterPluginRegistrar!
-
+    
     fileprivate let dcContext: DcContext!
     fileprivate let dcEventHandler: DCEventHandler!
 
@@ -93,7 +93,7 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
     // MARK: - FlutterPlugin
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        log.debug("Dart MethodCall: \(call.method)")
+        Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.debug, message: "Dart MethodCall: \(call.method)")
         
         if call.contains(key: Argument.REMOVE_CACHE_IDENTIFIER) {
             removeFromCache(with: call, result: result)
@@ -113,7 +113,7 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         case Method.Prefix.MSG:
             messageCallHandler.handle(call, result: result)
         default:
-            log.debug("Failing for \(call.method)")
+            Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.debug, message: "Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
         }
 
@@ -128,7 +128,7 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         case Method.Base.LOGOUT:
             logout(result: result)
         default:
-            log.error("Failing for \(call.method)")
+            Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.error, message: "Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
         }
     }
@@ -148,7 +148,7 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
                 _ = chatCache.removeValue(for: id)
             case .chatMessage:
                 if let msg = messageCache.removeValue(for: id) {
-                    log.info("removed message: \(msg.type)")
+                    Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.info, message: "removed message: \(msg.type)")
                 }
             case .contact:
                 _ = contactCache.removeValue(for: id)
@@ -167,7 +167,7 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
             result(dcContext.userDatabasePath)
             return
         }
-        log.error("Couldn't open user database at path: \(dcContext.userDatabasePath)")
+        Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.error, message: "Couldn't open user database at path: \(dcContext.userDatabasePath)")
         result(DCPluginError.couldNotOpenDataBase())
     }
 

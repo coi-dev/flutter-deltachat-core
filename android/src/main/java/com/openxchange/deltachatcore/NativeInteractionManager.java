@@ -9,9 +9,6 @@ import android.net.Network;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.PowerManager;
-import android.util.Log;
-
-import androidx.annotation.RequiresApi;
 
 import com.b44t.messenger.DcContext;
 import com.openxchange.deltachatcore.handlers.EventChannelHandler;
@@ -19,7 +16,14 @@ import com.openxchange.deltachatcore.handlers.EventChannelHandler;
 import java.io.File;
 import java.util.Objects;
 
+import androidx.annotation.RequiresApi;
+
+import static android.util.Log.DEBUG;
+import static android.util.Log.ERROR;
+import static android.util.Log.INFO;
+import static android.util.Log.WARN;
 import static com.openxchange.deltachatcore.DeltaChatCorePlugin.TAG;
+import static com.openxchange.deltachatcore.Utils.logEventAndDelegate;
 
 public class NativeInteractionManager extends DcContext {
 
@@ -74,7 +78,7 @@ public class NativeInteractionManager extends DcContext {
             smtpWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, COI_SMTP_WAKE_LOCK);
             smtpWakeLock.setReferenceCounted(false); // if the idle-thread is killed for any reasons, it is better not to rely on reference counting
         } catch (Exception e) {
-            Log.e(TAG, "Cannot create wakeLocks");
+            logEventAndDelegate(eventChannelHandler, ERROR, TAG, "Cannot create wakeLocks");
         }
         start();
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -102,7 +106,7 @@ public class NativeInteractionManager extends DcContext {
     }
 
     private void startOnNetworkAvailable() {
-        Log.i(TAG, "###################### Network is connected again. ######################");
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, "###################### Network is connected again. ######################");
         start();
     }
 
@@ -119,7 +123,7 @@ public class NativeInteractionManager extends DcContext {
     }
 
     void start() {
-        Log.d(TAG, "Starting threads");
+        logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Starting threads");
         startThreads(INTERRUPT_IDLE);
         waitForThreadsRunning();
     }
@@ -155,7 +159,7 @@ public class NativeInteractionManager extends DcContext {
     }
 
     void stop() {
-        Log.d(TAG, "Stopping threads");
+        logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Stopping threads");
         stopThreads();
         interruptImapIdle();
         interruptMvboxIdle();
@@ -186,7 +190,7 @@ public class NativeInteractionManager extends DcContext {
                         imapThreadSynchronized.notifyAll();
                     }
 
-                    Log.i(TAG, "###################### IMAP-Thread " + Thread.currentThread().getId() + " started. ######################");
+                    logEventAndDelegate(eventChannelHandler, INFO, TAG, "###################### IMAP-Thread " + Thread.currentThread().getId() + " started. ######################");
 
 
                     while (true) {
@@ -195,7 +199,7 @@ public class NativeInteractionManager extends DcContext {
                                 imapThreadStarted = false;
                                 imapThreadSynchronized.notifyAll();
                             }
-                            Log.i(TAG, "###################### IMAP-Thread " + Thread.currentThread().getId() + " stopped. ######################");
+                            logEventAndDelegate(eventChannelHandler, INFO, TAG, "###################### IMAP-Thread " + Thread.currentThread().getId() + " stopped. ######################");
                             return;
                         }
                         imapWakeLock.acquire(wakeLockTimeout);
@@ -227,7 +231,7 @@ public class NativeInteractionManager extends DcContext {
                         mvboxThreadSynchronized.notifyAll();
                     }
 
-                    Log.i(TAG, "###################### MVBOX-Thread " + Thread.currentThread().getId() + " started. ######################");
+                    logEventAndDelegate(eventChannelHandler, INFO, TAG, "###################### MVBOX-Thread " + Thread.currentThread().getId() + " started. ######################");
 
 
                     while (true) {
@@ -236,7 +240,7 @@ public class NativeInteractionManager extends DcContext {
                                 mvboxThreadStarted = false;
                                 mvboxThreadSynchronized.notifyAll();
                             }
-                            Log.i(TAG, "###################### MVBOX-Thread " + Thread.currentThread().getId() + " stopped. ######################");
+                            logEventAndDelegate(eventChannelHandler, INFO, TAG, "###################### MVBOX-Thread " + Thread.currentThread().getId() + " stopped. ######################");
                             return;
                         }
                         mvboxWakeLock.acquire(wakeLockTimeout);
@@ -268,7 +272,7 @@ public class NativeInteractionManager extends DcContext {
                         sentBoxThreadSynchronized.notifyAll();
                     }
 
-                    Log.i(TAG, "###################### SENTBOX-Thread " + Thread.currentThread().getId() + " started. ######################");
+                    logEventAndDelegate(eventChannelHandler, INFO, TAG, "###################### SENTBOX-Thread " + Thread.currentThread().getId() + " started. ######################");
 
 
                     while (true) {
@@ -277,7 +281,7 @@ public class NativeInteractionManager extends DcContext {
                                 sentBoxThreadStarted = false;
                                 sentBoxThreadSynchronized.notifyAll();
                             }
-                            Log.i(TAG, "###################### SENTBOX-Thread " + Thread.currentThread().getId() + " stopped. ######################");
+                            logEventAndDelegate(eventChannelHandler, INFO, TAG, "###################### SENTBOX-Thread " + Thread.currentThread().getId() + " stopped. ######################");
                             return;
                         }
                         sentBoxWakeLock.acquire(wakeLockTimeout);
@@ -309,7 +313,7 @@ public class NativeInteractionManager extends DcContext {
                         smtpThreadSynchronized.notifyAll();
                     }
 
-                    Log.i(TAG, "###################### SMTP-Thread " + Thread.currentThread().getId() + " started. ######################");
+                    logEventAndDelegate(eventChannelHandler, INFO, TAG, "###################### SMTP-Thread " + Thread.currentThread().getId() + " started. ######################");
 
 
                     while (true) {
@@ -318,7 +322,7 @@ public class NativeInteractionManager extends DcContext {
                                 smtpThreadStarted = false;
                                 smtpThreadSynchronized.notifyAll();
                             }
-                            Log.i(TAG, "###################### SMTP-Thread " + Thread.currentThread().getId() + " stopped. ######################");
+                            logEventAndDelegate(eventChannelHandler, INFO, TAG, "###################### SMTP-Thread " + Thread.currentThread().getId() + " stopped. ######################");
                             return;
                         }
                         smtpWakeLock.acquire(wakeLockTimeout);
@@ -352,11 +356,11 @@ public class NativeInteractionManager extends DcContext {
     public long handleEvent(final int eventId, long data1, long data2) {
         switch (eventId) {
             case DC_EVENT_INFO:
-                Log.i(TAG, dataToString(data2));
+                logEventAndDelegate(eventChannelHandler, INFO, TAG, dataToString(data2));
                 break;
 
             case DC_EVENT_WARNING:
-                Log.w(TAG, dataToString(data2));
+                logEventAndDelegate(eventChannelHandler, WARN, TAG, dataToString(data2));
                 break;
 
             case DC_EVENT_ERROR:

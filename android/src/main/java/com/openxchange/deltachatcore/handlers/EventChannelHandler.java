@@ -100,7 +100,9 @@ public class EventChannelHandler implements EventChannel.StreamHandler {
         }
         Utils.runOnMain(() -> {
             try {
-                eventSink.success(result);
+                if (eventSink != null) {
+                    eventSink.success(result);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

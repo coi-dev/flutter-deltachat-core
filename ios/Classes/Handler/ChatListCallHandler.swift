@@ -99,7 +99,7 @@ class ChatListCallHandler: MethodCallHandling {
                 tearDown(methodCall: call, result: result)
                 break
             default:
-                log.error("ChatList: Failing for \(call.method)")
+                Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.error, message: "ChatList: Failing for \(call.method)")
                 result(FlutterMethodNotImplemented)
 
         }

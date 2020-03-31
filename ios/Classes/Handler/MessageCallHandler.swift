@@ -41,6 +41,7 @@
  */
 
 import Foundation
+import SwiftyBeaver
 
 class MessageCallHandler: MethodCallHandling {
 
@@ -101,7 +102,7 @@ class MessageCallHandler: MethodCallHandling {
         case Method.Message.IS_FORWARDED:
             isForwarded(methodCall: call, result: result)
         default:
-            log.error("Context: Failing for \(call.method)")
+            Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.error, message: "Context: Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
         }
     }

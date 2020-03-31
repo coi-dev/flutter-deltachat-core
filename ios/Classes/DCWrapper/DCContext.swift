@@ -43,6 +43,7 @@
 import Foundation
 import AVFoundation
 import MessageKit
+import SwiftyBeaver
 
 class DcContext {
     static private(set) var contextPointer: OpaquePointer?
@@ -75,9 +76,9 @@ class DcContext {
         if let cString = dc_get_info(DcContext.contextPointer) {
             let info = String(cString: cString)
             dc_str_unref(cString)
-            log.debug("*************** BEGIN: DCC Info ***************")
-            log.debug(info)
-            log.debug("**************** END: DCC Info ****************")
+            Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.debug, message: "*************** BEGIN: DCC Info ***************")
+            Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.debug, message: info)
+            Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.debug, message: "**************** END: DCC Info ****************")
             return info.components(separatedBy: "\n").map { val in
                 val.components(separatedBy: "=")
             }

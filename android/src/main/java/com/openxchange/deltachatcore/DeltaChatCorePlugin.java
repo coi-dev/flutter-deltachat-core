@@ -44,9 +44,6 @@ package com.openxchange.deltachatcore;
 
 
 import android.content.Context;
-import android.util.Log;
-
-import androidx.annotation.NonNull;
 
 import com.b44t.messenger.DcChat;
 import com.b44t.messenger.DcContact;
@@ -61,6 +58,7 @@ import com.openxchange.deltachatcore.handlers.MessageCallHandler;
 
 import java.util.Objects;
 
+import androidx.annotation.NonNull;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
@@ -72,6 +70,9 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.flutter.view.FlutterNativeView;
+
+import static android.util.Log.DEBUG;
+import static com.openxchange.deltachatcore.Utils.logEventAndDelegate;
 
 public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.ViewDestroyListener, FlutterPlugin, ActivityAware {
     static final String TAG = "coi";
@@ -125,7 +126,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
 
     // Flutter plugin v1 embedding
     public static void registerWith(Registrar registrar) {
-        Log.d(TAG, "Attaching plugin via v1 embedding");
+        logEventAndDelegate(null, DEBUG, TAG, "Attaching plugin via v1 embedding");
         DeltaChatCorePlugin plugin = new DeltaChatCorePlugin();
         plugin.onAttachedToEngine(registrar.context(), registrar.messenger());
         registrar.addViewDestroyListener(plugin);
@@ -134,7 +135,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
     // Flutter plugin v2 embedding
     @Override
     public void onAttachedToEngine(FlutterPluginBinding binding) {
-        Log.d(TAG, "Attaching plugin via v2 embedding");
+        logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Attaching plugin via v2 embedding");
         onAttachedToEngine(binding.getApplicationContext(), binding.getBinaryMessenger());
     }
 
@@ -147,7 +148,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
 
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-        Log.d(TAG, "Detaching plugin via v2 embedding");
+        logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Detaching plugin via v2 embedding");
         channel.setMethodCallHandler(null);
         channel = null;
         eventChannelHandler.close();
@@ -170,7 +171,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
 
     @Override
     public void onDetachedFromActivity() {
-        Log.d(TAG, "Stopping threads via v2 embedding");
+        logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Stopping threads via v2 embedding");
         stopNativeInteractionManager();
     }
 
@@ -264,7 +265,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
         messageCallHandler = new MessageCallHandler(nativeInteractionManager, contextCallHandler);
         contactCallHandler = new ContactCallHandler(nativeInteractionManager, contextCallHandler);
         chatCallHandler = new ChatCallHandler(nativeInteractionManager, contextCallHandler);
-        Log.d(TAG, nativeInteractionManager.getInfo());
+        logEventAndDelegate(eventChannelHandler, DEBUG, TAG, nativeInteractionManager.getInfo());
         result.success(nativeInteractionManager.getDbPath());
     }
 

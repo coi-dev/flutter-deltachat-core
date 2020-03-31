@@ -41,6 +41,7 @@
  */
 
 import UIKit
+import SwiftyBeaver
 
 struct Utils {
 
@@ -54,6 +55,32 @@ struct Utils {
         dc_array_unref(inputArray)
 
         return acc
+    }
+    
+    static func logEventAndDelegate(logLevel: SwiftyBeaver.Level, message: String) {
+        switch logLevel {
+        case .debug:
+            EventChannelHandler.sharedInstance.handle(DC_EVENT_INFO, data1: message, data2: logLevel.rawValue)
+            log.debug(message)
+            break
+        case .info:
+            EventChannelHandler.sharedInstance.handle(DC_EVENT_INFO, data1: message, data2: logLevel.rawValue)
+            log.info(message)
+            break
+        case .warning:
+            EventChannelHandler.sharedInstance.handle(DC_EVENT_WARNING, data1: message, data2: logLevel.rawValue)
+            log.warning(message)
+            break
+        case .error:
+            EventChannelHandler.sharedInstance.handle(DC_EVENT_ERROR, data1: message, data2: logLevel.rawValue)
+            log.error(message)
+            break
+        case .verbose:
+            EventChannelHandler.sharedInstance.handle(DC_EVENT_INFO, data1: message, data2: logLevel.rawValue)
+            log.verbose(message)
+            break
+        }
+        
     }
 
 }
