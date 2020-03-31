@@ -264,6 +264,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
         messageCallHandler = new MessageCallHandler(nativeInteractionManager, contextCallHandler);
         contactCallHandler = new ContactCallHandler(nativeInteractionManager, contextCallHandler);
         chatCallHandler = new ChatCallHandler(nativeInteractionManager, contextCallHandler);
+        Log.d(TAG, nativeInteractionManager.getInfo());
         result.success(nativeInteractionManager.getDbPath());
     }
 
