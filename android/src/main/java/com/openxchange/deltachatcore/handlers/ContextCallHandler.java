@@ -42,7 +42,10 @@
 
 package com.openxchange.deltachatcore.handlers;
 
+import android.util.Log;
+
 import com.b44t.messenger.DcChat;
+import com.b44t.messenger.DcChatlist;
 import com.b44t.messenger.DcContact;
 import com.b44t.messenger.DcContext;
 import com.b44t.messenger.DcLot;
@@ -407,11 +410,27 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
             resultErrorArgumentMissingValue(result);
             return;
         }
-        boolean deleted = dcContext.deleteContact(contactId);
-        if (deleted) {
+        boolean isDeletable;
+
+        DcChatlist chats = dcContext.getChatlist(dcContext.DC_GCL_NO_SPECIALS, null, contactId);
+        int chatCnt = chats.getCnt();
+
+        if(chatCnt > 0){
+            for (int i = 0; i < chatCnt; i++) {
+                isDeletable = !dcContext.isContactInChat(chats.getChatId(i), contactId);
+                if(!isDeletable){
+                    result.success(false);
+                    return;
+                }
+            }
+        }
+
+        isDeletable = dcContext.deleteContact(contactId);
+
+        if (isDeletable) {
             contactCache.delete(contactId);
         }
-        result.success(deleted);
+        result.success(isDeletable);
     }
 
     private void blockContact(MethodCall methodCall, MethodChannel.Result result) {
