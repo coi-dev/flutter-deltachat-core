@@ -41,6 +41,7 @@
  */
 
 import Foundation
+import SwiftyBeaver
 
 class ChatListCallHandler: MethodCallHandling {
 
