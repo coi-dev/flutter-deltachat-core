@@ -69,6 +69,23 @@ class DcContext {
         return Bool(truncating: result)
     }
     
+    // MARK: - Core Info
+    
+    func getCoreInfo() -> [[String]] {
+        if let cString = dc_get_info(DcContext.contextPointer) {
+            let info = String(cString: cString)
+            dc_str_unref(cString)
+            log.debug("*************** BEGIN: DCC Info ***************")
+            log.debug(info)
+            log.debug("**************** END: DCC Info ****************")
+            return info.components(separatedBy: "\n").map { val in
+                val.components(separatedBy: "=")
+            }
+        }
+
+        return []
+    }
+
     // MARK: - Chats
 
     func getChatlist(flags: Int32, queryString: String?, queryId: Int) -> DcChatlist {

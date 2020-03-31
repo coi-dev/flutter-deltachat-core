@@ -163,6 +163,7 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
     fileprivate func baseInit(result: FlutterResult) {
         if dcContext.openUserDataBase() {
             dcEventHandler.start()
+            _ = dcContext.getCoreInfo()
             result(dcContext.userDatabasePath)
             return
         }
