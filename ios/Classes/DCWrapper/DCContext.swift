@@ -407,6 +407,10 @@ class DcContext {
     func setCoiMessageFilter(mode: Int32, id: Int32) {
         dc_set_coi_message_filter(DcContext.contextPointer, mode, id)
     }
+    
+    func isCoiMessageFilterEnabled() -> Int32 {
+        return dc_get_coi_message_filter(DcContext.contextPointer)
+    }
 
     func validateWebPush(uid: String, message: String, id: Int32) {
         dc_validate_webpush(DcContext.contextPointer, uid, message, id)
