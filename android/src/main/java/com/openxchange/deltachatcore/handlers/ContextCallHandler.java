@@ -112,6 +112,7 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
     private static final String METHOD_GET_WEB_PUSH_SUBSCRIPTION = "context_getWebPushSubscription";
     private static final String METHOD_SET_COI_ENABLED = "context_setCoiEnabled";
     private static final String METHOD_SET_COI_MESSAGE_FILTER = "context_setCoiMessageFilter";
+    private static final String METHOD_IS_COI_MESSAGE_FILTER_ENABLED = "context_isCoiMessageFilterEnabled";
     private static final String METHOD_GET_MESSAGE_INFO = "context_getMessageInfo";
     private static final String METHOD_RETRY_SENDING_PENDING_MESSAGES = "context_retrySendingPendingMessages";
     private static final String METHOD_GET_CONTACT_ID_BY_ADDRESS = "context_getContactIdByAddress";
@@ -288,6 +289,9 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
                 break;
             case METHOD_SET_COI_MESSAGE_FILTER:
                 setCoiMessageFilter(methodCall, result);
+                break;
+            case METHOD_IS_COI_MESSAGE_FILTER_ENABLED:
+                isCoiMessageFilterEnabled(result);
                 break;
             case METHOD_VALIDATE_WEB_PUSH:
                 validateWebPush(methodCall, result);
@@ -1050,6 +1054,11 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
         }
         dcContext.setCoiMessageFilter(mode, id);
         result.success(null);
+    }
+
+    private void isCoiMessageFilterEnabled(MethodChannel.Result result) {
+        int coiMessageFilterEnabled = dcContext.isCoiMessageFilterEnabled();
+        result.success(coiMessageFilterEnabled);
     }
 
     private void subscribeWebPush(MethodCall methodCall, MethodChannel.Result result) {

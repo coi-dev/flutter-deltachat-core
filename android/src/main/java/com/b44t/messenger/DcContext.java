@@ -179,6 +179,7 @@ public class DcContext {
     public native void         getWebPushSubscription (String uid, int id);
     public native void         setCoiEnabled        (int enable, int id);
     public native void         setCoiMessageFilter  (int mode, int id);
+    public native int          isCoiMessageFilterEnabled();
     public native void         validateWebPush      (String uid, String msg, int id);
 
     /**

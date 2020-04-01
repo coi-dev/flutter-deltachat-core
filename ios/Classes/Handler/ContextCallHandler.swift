@@ -163,6 +163,8 @@ class ContextCallHandler: MethodCallHandling {
             setCoiEnabled(methodCall: call, result: result)
         case Method.Context.SET_COI_MESSAGE_FILTER:
             setCoiMessageFilter(methodCall: call, result: result)
+        case Method.Context.IS_COI_MESSAGE_FILTER_ENABLED:
+            isCoiMessageFilterEnabled(result: result)
         case Method.Context.VALIDATE_WEB_PUSH:
             validateWebPush(methodCall: call, result: result)
         case Method.Context.GET_MESSAGE_INFO:
@@ -675,6 +677,10 @@ class ContextCallHandler: MethodCallHandling {
 
         context.setCoiMessageFilter(mode: mode, id: id)
         result(nil)
+    }
+    
+    fileprivate func isCoiMessageFilterEnabled(result: FlutterResult) {
+        result(NSNumber(value: context.isCoiMessageFilterEnabled()))
     }
 
     // MARK: - Webpush Related

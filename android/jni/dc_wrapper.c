@@ -859,6 +859,11 @@ JNIEXPORT void Java_com_b44t_messenger_DcContext_setCoiMessageFilter(JNIEnv *env
 	    dc_set_coi_message_filter(get_dc_context(env, obj), mode, id);
 }
 
+JNIEXPORT jint Java_com_b44t_messenger_DcContext_isCoiMessageFilterEnabled(JNIEnv *env, jobject obj)
+{
+	return (jint)dc_get_coi_message_filter(get_dc_context(env, obj));
+}
+
 /*******************************************************************************
  * DcArray
  ******************************************************************************/

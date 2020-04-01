@@ -100,6 +100,7 @@ class Context {
   static const String methodGetWebPushSubscription = "context_getWebPushSubscription";
   static const String methodSetCoiEnabled = "context_setCoiEnabled";
   static const String methodSetCoiMessageFilter = "context_setCoiMessageFilter";
+  static const String methodIsCoiMessageFilterEnabled = "context_isCoiMessageFilterEnabled";
   static const String methodGetMessageInfo = "context_getMessageInfo";
   static const String methodRetrySendingPendingMessages = "context_retrySendingPendingMessages";
   static const String methodGetContactIdByAddress = "context_getContactIdByAddress";
@@ -376,6 +377,10 @@ class Context {
 
   Future<void> setCoiMessageFilter(int mode, int id) async {
     return await core.invokeMethod(methodSetCoiMessageFilter, getSetCoiMessageFilter(mode, id));
+  }
+
+  Future<int> isCoiMessageFilterEnabled() async {
+    return await core.invokeMethod(methodIsCoiMessageFilterEnabled);
   }
 
   Future<String> getMessageInfo(int msgId) async {
