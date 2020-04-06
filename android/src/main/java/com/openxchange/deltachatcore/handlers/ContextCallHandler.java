@@ -116,6 +116,7 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
     private static final String METHOD_GET_MESSAGE_INFO = "context_getMessageInfo";
     private static final String METHOD_RETRY_SENDING_PENDING_MESSAGES = "context_retrySendingPendingMessages";
     private static final String METHOD_GET_CONTACT_ID_BY_ADDRESS = "context_getContactIdByAddress";
+    private static final String METHOD_GET_NEXT_MEDIA = "context_getNextMedia";
 
     private static final String TYPE_INT = "int";
     private static final String TYPE_STRING = "String";
@@ -304,6 +305,9 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
                 break;
             case METHOD_GET_CONTACT_ID_BY_ADDRESS:
                 getContactIdByAddress(methodCall, result);
+                break;
+            case METHOD_GET_NEXT_MEDIA:
+                getNextMedia(methodCall, result);
                 break;
             default:
                 result.notImplemented();
@@ -1152,6 +1156,38 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
 
         int contactId = dcContext.lookupContactIdByAddr(address);
         result.success(contactId);
+    }
+
+    private void getNextMedia(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_MESSAGE_ID, ARGUMENT_DIR)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+
+        Integer messageId = methodCall.argument(ARGUMENT_MESSAGE_ID);
+        Integer dir = methodCall.argument(ARGUMENT_DIR);
+
+        if (messageId == null || dir == null) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+
+        Integer messageTypeOne = methodCall.argument(ARGUMENT_MESSAGE_TYPE_ONE);
+        Integer messageTypeTwo = methodCall.argument(ARGUMENT_MESSAGE_TYPE_TWO);
+        Integer messageTypeThree = methodCall.argument(ARGUMENT_MESSAGE_TYPE_THREE);
+
+        if(messageTypeOne == null){
+            messageTypeOne = 0;
+        }
+        if(messageTypeTwo == null){
+            messageTypeTwo = 0;
+        }
+        if(messageTypeThree == null){
+            messageTypeThree = 0;
+        }
+
+        Integer nextMessageId = dcContext.getNextMedia(messageId, dir, messageTypeOne, messageTypeTwo, messageTypeThree);
+        result.success(nextMessageId);
     }
 
     private void retrySendingPendingMessages(MethodChannel.Result result) {
