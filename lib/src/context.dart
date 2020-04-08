@@ -124,6 +124,7 @@ class Context {
   static const String configShowEmails = "show_emails";
   static const String configMdnsEnabled = "mdns_enabled";
   static const String configRfc724MsgIdPrefix = "rfc724_msg_id_prefix";
+  static const String configMaxAttachSize = "max_attach_size";
 
   static const int contactListFlagVerifiedOnly = 1;
   static const int contactListFlagAddSelf = 2;
