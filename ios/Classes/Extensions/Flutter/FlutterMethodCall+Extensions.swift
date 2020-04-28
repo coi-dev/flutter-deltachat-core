@@ -82,13 +82,13 @@ extension FlutterMethodCall {
     }
 
     // MARK: - Parameter Values
-
+    
     func intValue(for key: String, defaultValue: Int32 = 0, result: FlutterResult) -> Int32 {
         guard let parameters = parameters else {
             return defaultValue
         }
 
-        if !contains(keys: [key]) {
+        if !contains(key: key) {
             Method.Error.missingArgument(result: result)
             return defaultValue
         }

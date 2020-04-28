@@ -173,6 +173,8 @@ class ContextCallHandler: MethodCallHandling {
             retrySendingPendingMessages(result: result)
         case Method.Context.GET_CONTACT_ID_BY_ADDRESS:
             getContactIdByAddress(methodCall: call, result: result)
+        case Method.Context.GET_NEXT_MEDIA:
+            getNextMedia(methodCall: call, result: result)
         default:
             Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.error, message: "Context: Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
@@ -323,6 +325,40 @@ class ContextCallHandler: MethodCallHandling {
         let contactID = context.lookupContactIdByAddr(addr: address)
         
         result(contactID)
+    }
+
+    fileprivate func getNextMedia(methodCall: FlutterMethodCall, result: FlutterResult) {
+        let NA = Int32(-99999)
+
+        if !methodCall.contains(key: Argument.MESSAGE_ID) {
+            Method.Error.missingArgument(Argument.MESSAGE_ID, result: result)
+            return
+        }
+        
+        if !methodCall.contains(key: Argument.DIR) {
+            Method.Error.missingArgument(Argument.DIR, result: result)
+            return
+        }
+        
+        let messageId = methodCall.intValue(for: Argument.MESSAGE_ID, defaultValue: NA, result: result)
+        if messageId == NA {
+            Method.Error.missingArgumentValue(for: Argument.MESSAGE_ID, result: result)
+            return
+        }
+
+        let dir = methodCall.intValue(for: Argument.DIR, defaultValue: NA, result: result)
+        if dir == NA {
+            Method.Error.missingArgumentValue(for: Argument.DIR, result: result)
+            return
+        }
+        
+        let messageTypeOne = methodCall.intValue(for: Argument.ARGUMENT_MESSAGE_TYPE_ONE, result: result)
+        let messageTypeTwo = methodCall.intValue(for: Argument.ARGUMENT_MESSAGE_TYPE_TWO, result: result)
+        let messageTypeThree = methodCall.intValue(for: Argument.ARGUMENT_MESSAGE_TYPE_THREE, result: result)
+
+        let nextMessageId = context.getNextMedia(messageId: UInt32(messageId), dir: dir, msgTypeOne: messageTypeOne, msgTypeTwo: messageTypeTwo, msgTypeThree: messageTypeThree)
+
+        result(nextMessageId)
     }
 
     // MARK: - Chat Related

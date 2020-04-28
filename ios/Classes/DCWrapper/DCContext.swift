@@ -353,6 +353,10 @@ class DcContext {
     func forwardMessages(messageIds: [UInt32], chatId: UInt32) {
         dc_forward_msgs(DcContext.contextPointer, UnsafePointer(messageIds), Int32(messageIds.count), chatId)
     }
+    
+    func getNextMedia(messageId: UInt32, dir: Int32, msgTypeOne: Int32, msgTypeTwo: Int32, msgTypeThree: Int32) -> UInt32 {
+        return dc_get_next_media(DcContext.contextPointer, messageId, dir, msgTypeOne, msgTypeTwo, msgTypeThree)
+    }
 
     // MARK: - General
 
