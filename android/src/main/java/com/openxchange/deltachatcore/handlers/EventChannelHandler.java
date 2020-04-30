@@ -122,13 +122,15 @@ public class EventChannelHandler implements EventChannel.StreamHandler {
         if (eventSink == null) {
             return;
         }
-        eventSink.endOfStream();
         eventSink = null;
     }
 
     public void close() {
-        eventChannel.setStreamHandler(null);
-        eventChannel = null;
+        eventSink = null;
+        if (eventChannel != null) {
+            eventChannel.setStreamHandler(null);
+            eventChannel = null;
+        }
     }
 
     private boolean isDelegateEvent(int eventId) {
