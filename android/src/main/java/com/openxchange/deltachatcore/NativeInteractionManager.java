@@ -122,7 +122,7 @@ public class NativeInteractionManager extends DcContext {
         }
     }
 
-    void start() {
+    private void start() {
         logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Starting threads");
         startThreads(INTERRUPT_IDLE);
         waitForThreadsRunning();

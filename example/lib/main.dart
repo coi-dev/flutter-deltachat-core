@@ -67,7 +67,7 @@ class _MyAppState extends State<MyApp> {
     _addListItem(information: true, text: "Information\n[Test succeeded] Informational text [assertion == result]");
     try {
       DeltaChatCore core = DeltaChatCore();
-      bool init = await core.init("messenger.db");
+      bool init = await core.setupAsync("messenger.db");
       if (init) {
         _addListItem(text: "Init done");
         Context context = Context();
@@ -156,7 +156,7 @@ class _MyAppState extends State<MyApp> {
         var chatCntAfterDeletingChat = await chatList.getChatCnt();
         await chatList.tearDown();
         _addListItem(text: "deleteChat", assertion: 0, result: chatCntAfterDeletingChat);
-        core.stop();
+        core.tearDownAsync();
         var dbFile = File(core.dbPath);
         dbFile.deleteSync();
       }

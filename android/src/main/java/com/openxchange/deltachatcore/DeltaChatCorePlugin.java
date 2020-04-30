@@ -90,8 +90,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
 
     private static final String METHOD_BASE_INIT = "base_init";
     private static final String METHOD_BASE_SYSTEM_INFO = "base_systemInfo";
-    private static final String METHOD_BASE_START = "base_start";
-    private static final String METHOD_BASE_STOP = "base_stop";
+    private static final String METHOD_BASE_TEAR_DOWN = "base_tearDown";
     private static final String METHOD_BASE_LOGOUT = "base_logout";
 
     private static final String ARGUMENT_REMOVE_CACHE_IDENTIFIER = "removeCacheIdentifier";
@@ -104,7 +103,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
 
     private Context context;
     private BinaryMessenger messenger;
-    private MethodChannel channel;
+    private MethodChannel methodChannel;
 
     private final IdCache<DcChat> chatCache = new IdCache<>();
     private final IdCache<DcContact> contactCache = new IdCache<>();
@@ -142,16 +141,14 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
     private void onAttachedToEngine(Context context, BinaryMessenger messenger) {
         this.context = context;
         this.messenger = messenger;
-        channel = new MethodChannel(messenger, CHANNEL_DELTA_CHAT_CORE);
-        channel.setMethodCallHandler(this);
+        methodChannel = new MethodChannel(messenger, CHANNEL_DELTA_CHAT_CORE);
+        methodChannel.setMethodCallHandler(this);
     }
 
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
         logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Detaching plugin via v2 embedding");
-        channel.setMethodCallHandler(null);
-        channel = null;
-        eventChannelHandler.close();
+        tearDownJavaInstance();
     }
 
     @Override
@@ -240,12 +237,9 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
             case METHOD_BASE_SYSTEM_INFO:
                 systemInfo(result);
                 break;
-            case METHOD_BASE_START:
-                start(result);
-                break;
-            case METHOD_BASE_STOP:
+            case METHOD_BASE_TEAR_DOWN:
             case METHOD_BASE_LOGOUT:
-                stop(result);
+                tearDown(result);
                 break;
             default:
                 result.notImplemented();
@@ -273,20 +267,22 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
         result.success(android.os.Build.VERSION.RELEASE);
     }
 
-    private void start(Result result) {
-        nativeInteractionManager.start();
+    private void tearDown(Result result) {
+        stopNativeInteractionManager();
         result.success(null);
     }
 
-    private void stop(Result result) {
-        stopNativeInteractionManager();
-        result.success(null);
+    private void tearDownJavaInstance() {
+        if (methodChannel != null) {
+            methodChannel.setMethodCallHandler(null);
+            methodChannel = null;
+        }
+        eventChannelHandler.close();
     }
 
     private void stopNativeInteractionManager() {
         nativeInteractionManager.stop();
     }
-
 
     private void handleContextCalls(MethodCall methodCall, Result result) {
         contextCallHandler.handleCall(methodCall, result);

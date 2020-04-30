@@ -61,22 +61,22 @@ export 'src/context.dart';
 
 class DeltaChatCore {
   static const String _channelDeltaChatCore = 'deltaChatCore';
+
   static const String _channelDeltaChatCoreEvents = 'deltaChatCoreEvents';
-
   static const String methodBaseInit = 'base_init';
-  static const String methodBaseStart = "base_start";
-  static const String methodBaseStop = "base_stop";
-  static const String methodBaseLogout = "base_logout";
 
+  static const String methodBaseTearDown = "base_tearDown";
+  static const String methodBaseLogout = "base_logout";
   static const String argumentDBName = "dbName";
 
   static DeltaChatCore _instance;
 
-  final _logger = Logger("delta_chat_core");
   final MethodChannel _methodChannel;
+
   final _eventChannel = EventChannel(_channelDeltaChatCoreEvents);
   final _eventChannelSubscribers = Map<int, Map<int, StreamController>>();
 
+  Logger _logger = Logger("delta_chat_core");
   String _dbPath;
   String get dbPath => _dbPath;
 
@@ -86,13 +86,15 @@ class DeltaChatCore {
   factory DeltaChatCore() {
     if (_instance == null) {
       final methodChannel = MethodChannel(_channelDeltaChatCore);
-      _instance = new DeltaChatCore._createInstance(methodChannel);
+      _instance = new DeltaChatCore._internal(methodChannel);
       setupLogger();
     }
     return _instance;
   }
 
-  DeltaChatCore._createInstance(this._methodChannel);
+  DeltaChatCore._internal(this._methodChannel) {
+    _logger.info("Creating new Dart core instance");
+  }
 
   Future<dynamic> invokeMethod(String method, [dynamic arguments]) async {
     if (!_init) {
@@ -101,8 +103,9 @@ class DeltaChatCore {
     return _methodChannel.invokeMethod(method, arguments);
   }
 
-  Future<bool> init(String dbName) async {
+  Future<bool> setupAsync(String dbName) async {
     if (!_init) {
+      _logger.info("Setting up new core");
       _dbPath = await _methodChannel.invokeMethod(methodBaseInit, <String, dynamic>{argumentDBName: dbName});
       _init = true;
       _setupEventChannelListener();
@@ -110,16 +113,29 @@ class DeltaChatCore {
     return _init;
   }
 
-  Future<void> start() async {
-    await _methodChannel.invokeMethod(methodBaseStart);
+  Future<void> tearDownAsync() async {
+    _logger.info("Tearing down core");
+    _unregisterListeners();
+    await _methodChannel.invokeMethod(methodBaseTearDown);
+    _tearDownDartInstance();
   }
 
-  Future<void> stop() async {
-    await _methodChannel.invokeMethod(methodBaseStop);
+  void _unregisterListeners() {
+    _eventChannelSubscription.cancel();
+    _eventChannelSubscribers.clear();
+    _methodChannel.setMethodCallHandler(null);
+  }
+
+  void _tearDownDartInstance() {
+    _instance = null;
+    _init = false;
   }
 
   Future<void> logout() async {
+    _logger.info("Logout started");
+    _unregisterListeners();
     await _methodChannel.invokeMethod(methodBaseLogout);
+    _tearDownDartInstance();
   }
 
   _setupEventChannelListener() {
@@ -135,10 +151,6 @@ class DeltaChatCore {
     _eventChannelSubscribers[event.eventId]?.forEach((_, streamController) {
       streamController.add(event);
     });
-  }
-
-  tearDown() {
-    _eventChannelSubscription.cancel();
   }
 
   void addListener({int eventId, List<int> eventIdList, @required StreamController streamController}) {
