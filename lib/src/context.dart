@@ -115,7 +115,9 @@ class Context {
   static const String configSendUser = "send_user";
   static const String configSendPassword = "send_pw";
   static const String configSendPort = "send_port";
-  static const String configServerFlags = "server_flags";
+  static const String configAuthScheme = "auth_scheme";
+  static const String configImapSecurity = "imap_security";
+  static const String configSmtpSecurity = "smtp_security";
   static const String configDisplayName = "displayname";
   static const String configSelfStatus = "selfstatus";
   static const String configSelfAvatar = "selfavatar";
