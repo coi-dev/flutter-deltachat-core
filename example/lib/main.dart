@@ -67,7 +67,7 @@ class _MyAppState extends State<MyApp> {
     _addListItem(information: true, text: "Information\n[Test succeeded] Informational text [assertion == result]");
     try {
       DeltaChatCore core = DeltaChatCore();
-      bool init = await core.setupAsync("messenger.db");
+      bool init = await core.setupAsync(dbName: "messenger.db", minimalSetup: false);
       if (init) {
         _addListItem(text: "Init done");
         Context context = Context();
