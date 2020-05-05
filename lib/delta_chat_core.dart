@@ -61,24 +61,29 @@ export 'src/context.dart';
 
 class DeltaChatCore {
   static const String _channelDeltaChatCore = 'deltaChatCore';
-
   static const String _channelDeltaChatCoreEvents = 'deltaChatCoreEvents';
-  static const String methodBaseInit = 'base_init';
 
+  static const String methodBaseInit = 'base_init';
   static const String methodBaseTearDown = "base_tearDown";
   static const String methodBaseLogout = "base_logout";
-  static const String argumentDBName = "dbName";
+
+  static const String argumentDatabaseName = "dbName";
+  static const String argumentMinimalSetup = "minimalSetup";
 
   static DeltaChatCore _instance;
 
-  final MethodChannel _methodChannel;
-
   final _eventChannel = EventChannel(_channelDeltaChatCoreEvents);
   final _eventChannelSubscribers = Map<int, Map<int, StreamController>>();
+  final _logger = Logger("delta_chat_core");
 
-  Logger _logger = Logger("delta_chat_core");
+  final MethodChannel _methodChannel;
+
+  bool _minimalSetup;
   String _dbPath;
+
   String get dbPath => _dbPath;
+
+  bool get minimalSetup => _minimalSetup;
 
   StreamSubscription _eventChannelSubscription;
   bool _init = false;
@@ -86,7 +91,7 @@ class DeltaChatCore {
   factory DeltaChatCore() {
     if (_instance == null) {
       final methodChannel = MethodChannel(_channelDeltaChatCore);
-      _instance = new DeltaChatCore._internal(methodChannel);
+      _instance = DeltaChatCore._internal(methodChannel);
       setupLogger();
     }
     return _instance;
@@ -103,10 +108,14 @@ class DeltaChatCore {
     return _methodChannel.invokeMethod(method, arguments);
   }
 
-  Future<bool> setupAsync(String dbName) async {
+  Future<bool> setupAsync({@required String dbName, @required bool minimalSetup}) async {
     if (!_init) {
+      _minimalSetup = minimalSetup;
       _logger.info("Setting up new core");
-      _dbPath = await _methodChannel.invokeMethod(methodBaseInit, <String, dynamic>{argumentDBName: dbName});
+      _dbPath = await _methodChannel.invokeMethod(methodBaseInit, <String, dynamic>{
+        argumentDatabaseName: dbName,
+        argumentMinimalSetup: minimalSetup,
+      });
       _init = true;
       _setupEventChannelListener();
     }

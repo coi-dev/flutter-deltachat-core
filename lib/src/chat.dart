@@ -115,6 +115,6 @@ class Chat extends Base {
   Map<String, dynamic> getDefaultArguments() => <String, dynamic>{Base.argumentId: _id};
 
   static Function getCreator() {
-    return (id) => new Chat._internal(id);
+    return (id) => Chat._internal(id);
   }
 }

@@ -111,6 +111,6 @@ class Contact extends Base {
   Map<String, dynamic> getDefaultArguments() => <String, dynamic>{Base.argumentId: _id};
 
   static Function getCreator() {
-    return (id) => new Contact._internal(id);
+    return (id) => Contact._internal(id);
   }
 }
