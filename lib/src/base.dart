@@ -74,6 +74,10 @@ abstract class Base {
   static const String argumentEnable = "enable";
   static const String argumentMimeType = "mimeType";
   static const String argumentDuration = "duration";
+  static const String argumentDir = "dir";
+  static const String argumentMessageTypeOne = "messageTypeOne";
+  static const String argumentMessageTypeTwo = "messageTypeTwo";
+  static const String argumentMessageTypeThree = "messageTypeThree";
 
   final DeltaChatCore core = DeltaChatCore();
 

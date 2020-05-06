@@ -76,6 +76,10 @@ struct Argument {
     static let MIME_TYPE               = "mimeType"
     static let REMOVE_CACHE_IDENTIFIER = "removeCacheIdentifier"
     static let DURATION                = "duration"
+    static let DIR                     = "dir"
+    static let MESSAGE_TYPE_ONE        = "messageTypeOne"
+    static let MESSAGE_TYPE_TWO        = "messageTypeTwo"
+    static let MESSAGE_TYPE_THREE      = "messageTypeThree"
 
     struct Error {
         static let MISSING       = "1"

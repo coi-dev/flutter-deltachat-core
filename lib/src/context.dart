@@ -104,7 +104,7 @@ class Context {
   static const String methodGetMessageInfo = "context_getMessageInfo";
   static const String methodRetrySendingPendingMessages = "context_retrySendingPendingMessages";
   static const String methodGetContactIdByAddress = "context_getContactIdByAddress";
-
+  static const String methodGetNextMedia = "context_getNextMedia";
 
   static const String configAddress = "addr";
   static const String configMailServer = "mail_server";
@@ -243,7 +243,8 @@ class Context {
   }
 
   Future<int> createChatAttachmentMessage(int chatId, String path, int msgType, String mimeType, int duration, [String text]) async {
-    return await core.invokeMethod(methodCreateChatAttachmentMessage, getCreateAttachmentMessageArguments(chatId, path, msgType, mimeType, duration, text));
+    return await core.invokeMethod(
+        methodCreateChatAttachmentMessage, getCreateAttachmentMessageArguments(chatId, path, msgType, mimeType, duration, text));
   }
 
   Future<int> addContactToChat(int chatId, int contactId) async {
@@ -398,15 +399,18 @@ class Context {
     return await core.invokeMethod(methodGetContactIdByAddress, getContactIdByAddressArguments(address));
   }
 
+  Future<int> getNextMedia(int messageId, int dir, {int messageTypeOne = 0, int messageTypeTwo = 0, int messageTypeThree = 0}) async {
+    return await core.invokeMethod(methodGetNextMedia, getNextMediaArguments(messageId, dir, messageTypeOne, messageTypeTwo, messageTypeThree));
+  }
+
   Map<String, dynamic> getKeyArguments(String key) => <String, dynamic>{Base.argumentKey: key};
 
   Map<String, dynamic> getConfigArguments(String type, String key, value) =>
-    <String, dynamic>{Base.argumentType: type, Base.argumentKey: key, Base.argumentValue: value};
+      <String, dynamic>{Base.argumentType: type, Base.argumentKey: key, Base.argumentValue: value};
 
   Map<String, dynamic> getAddressBookArguments(String addressBook) => <String, dynamic>{Base.argumentAddressBook: addressBook};
 
-  Map<String, dynamic> getContactArguments(String name, String address) =>
-    <String, dynamic>{Base.argumentName: name, Base.argumentAddress: address};
+  Map<String, dynamic> getContactArguments(String name, String address) => <String, dynamic>{Base.argumentName: name, Base.argumentAddress: address};
 
   Map<String, dynamic> getIdArguments(int id) => <String, dynamic>{Base.argumentId: id};
 
@@ -415,46 +419,54 @@ class Context {
   Map<String, dynamic> getMessageIdsArguments(List<int> msgIds) => <String, dynamic>{Base.argumentMessageIds: msgIds};
 
   Map<String, dynamic> getCreateGroupArguments(bool verified, String name) =>
-    <String, dynamic>{Base.argumentVerified: verified, Base.argumentName: name};
+      <String, dynamic>{Base.argumentVerified: verified, Base.argumentName: name};
 
-  Map<String, dynamic> getContactsArguments(int flags, String query) =>
-    <String, dynamic>{Base.argumentFlags: flags, Base.argumentQuery: query};
+  Map<String, dynamic> getContactsArguments(int flags, String query) => <String, dynamic>{Base.argumentFlags: flags, Base.argumentQuery: query};
 
   Map<String, dynamic> getChatIdArguments(int chatId) => <String, dynamic>{Base.argumentChatId: chatId};
 
-  Map<String, dynamic> getChatMessageArguments(int chatId, int flags) =>
-    <String, dynamic>{Base.argumentChatId: chatId, Base.argumentFlags: flags};
+  Map<String, dynamic> getChatMessageArguments(int chatId, int flags) => <String, dynamic>{Base.argumentChatId: chatId, Base.argumentFlags: flags};
 
-  Map<String, dynamic> createChatMessageArguments(int chatId, String text) =>
-    <String, dynamic>{Base.argumentChatId: chatId, Base.argumentText: text};
+  Map<String, dynamic> createChatMessageArguments(int chatId, String text) => <String, dynamic>{Base.argumentChatId: chatId, Base.argumentText: text};
 
   Map<String, dynamic> getCreateAttachmentMessageArguments(int chatId, String path, int msgType, String mimeType, int duration, String text) =>
-    <String, dynamic>{Base.argumentChatId: chatId, Base.argumentPath: path, Base.argumentType: msgType, Base.argumentMimeType: mimeType, Base.argumentDuration: duration, Base.argumentText: text};
+      <String, dynamic>{
+        Base.argumentChatId: chatId,
+        Base.argumentPath: path,
+        Base.argumentType: msgType,
+        Base.argumentMimeType: mimeType,
+        Base.argumentDuration: duration,
+        Base.argumentText: text
+      };
 
   Map<String, dynamic> getChatAndContactIdArguments(int chatId, int contactId) =>
-    <String, dynamic>{Base.argumentChatId: chatId, Base.argumentContactId: contactId};
+      <String, dynamic>{Base.argumentChatId: chatId, Base.argumentContactId: contactId};
 
   Map<String, dynamic> getContactIdArguments(int contactId) => <String, dynamic>{Base.argumentContactId: contactId};
 
   Map<String, dynamic> getExportImportArguments(String path) => <String, dynamic>{Base.argumentPath: path};
 
   Map<String, dynamic> getContinueKeyTransferArguments(int messageId, String setupCode) =>
-    <String, dynamic>{Base.argumentId: messageId, Base.argumentSetupCode: setupCode};
+      <String, dynamic>{Base.argumentId: messageId, Base.argumentSetupCode: setupCode};
 
   Map<String, dynamic> getForwardMessageArguments(int chatId, List<int> msgIds) =>
-    <String, dynamic>{Base.argumentChatId: chatId, Base.argumentMessageIds: msgIds};
+      <String, dynamic>{Base.argumentChatId: chatId, Base.argumentMessageIds: msgIds};
 
   Map<String, dynamic> getSecureJoinQrArguments(int chatId) => <String, dynamic>{Base.argumentChatId: chatId};
 
   Map<String, dynamic> getQrTextArguments(String qrText) => <String, dynamic>{Base.argumentQrText: qrText};
 
-  Map<String, dynamic> getStarMessagesArguments(List<int> msgIds, int star) => <String, dynamic>{Base.argumentMessageIds: msgIds, Base.argumentValue: star};
+  Map<String, dynamic> getStarMessagesArguments(List<int> msgIds, int star) =>
+      <String, dynamic>{Base.argumentMessageIds: msgIds, Base.argumentValue: star};
 
-  Map<String, dynamic> getSetNameOrImageArguments(int chatId, String newValue) => <String, dynamic>{Base.argumentChatId: chatId, Base.argumentValue: newValue};
+  Map<String, dynamic> getSetNameOrImageArguments(int chatId, String newValue) =>
+      <String, dynamic>{Base.argumentChatId: chatId, Base.argumentValue: newValue};
 
-  Map<String, dynamic> getWebPushSubscribeArguments(String uid, String json, int id) => <String, dynamic>{Base.argumentUid: uid, Base.argumentJson: json, Base.argumentId: id};
+  Map<String, dynamic> getWebPushSubscribeArguments(String uid, String json, int id) =>
+      <String, dynamic>{Base.argumentUid: uid, Base.argumentJson: json, Base.argumentId: id};
 
-  Map<String, dynamic> getWebPushValidateArguments(String uid, String message, int id) => <String, dynamic>{Base.argumentUid: uid, Base.argumentMessage: message, Base.argumentId: id};
+  Map<String, dynamic> getWebPushValidateArguments(String uid, String message, int id) =>
+      <String, dynamic>{Base.argumentUid: uid, Base.argumentMessage: message, Base.argumentId: id};
 
   Map<String, dynamic> getWebPushGetSubscriptionArguments(String uid, int id) => <String, dynamic>{Base.argumentUid: uid, Base.argumentId: id};
 
@@ -463,4 +475,13 @@ class Context {
   Map<String, dynamic> getSetCoiMessageFilter(int mode, int id) => <String, dynamic>{Base.argumentMode: mode, Base.argumentId: id};
 
   Map<String, dynamic> getContactIdByAddressArguments(String address) => <String, dynamic>{Base.argumentAddress: address};
+
+  Map<String, dynamic> getNextMediaArguments(int messageId, int dir, int messageTypeOne, int messageTypeTwo, int messageTypeThree) =>
+      <String, dynamic>{
+        Base.argumentMessageId: messageId,
+        Base.argumentDir: dir,
+        Base.argumentMessageTypeOne: messageTypeOne,
+        Base.argumentMessageTypeTwo: messageTypeTwo,
+        Base.argumentMessageTypeThree: messageTypeThree
+      };
 }

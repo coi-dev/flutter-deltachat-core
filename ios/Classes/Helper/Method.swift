@@ -216,6 +216,7 @@ extension Method {
         static let GET_MESSAGE_INFO                     = "context_getMessageInfo"
         static let RETRY_SENDING_PENDING_MESSAGES       = "context_retrySendingPendingMessages"
         static let GET_CONTACT_ID_BY_ADDRESS            = "context_getContactIdByAddress"
+        static let GET_NEXT_MEDIA                       = "context_getNextMedia"
         static let CLOSE                                = "context_close"
     }
 
@@ -227,9 +228,17 @@ extension Method {
         static func missingArgument(result: FlutterResult) {
             result(FlutterError(code: Argument.Error.MISSING, message: "Argument is missing", details: nil))
         }
-
+        
+        static func missingArgument(_ argument: String, result: FlutterResult) {
+            result(FlutterError(code: Argument.Error.MISSING, message: "Argument is missing: '\(argument)'", details: nil))
+        }
+        
         static func missingArgumentValue(for argument: String, result: FlutterResult) {
             result(FlutterError(code: Argument.Error.MISSING_VALUE, message: "Argument value for key: '\(argument)' is missing or null", details: nil))
+        }
+        
+        static func missingArgumentValues(for arguments: [String], result: FlutterResult) {
+            result(FlutterError(code: Argument.Error.MISSING_VALUE, message: "Argument values for keys: '\(arguments)' are missing or null", details: nil))
         }
 
         static func typeMismatch(for argument: String, result: FlutterResult) {
