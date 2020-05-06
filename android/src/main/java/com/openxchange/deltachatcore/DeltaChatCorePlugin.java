@@ -44,6 +44,7 @@ package com.openxchange.deltachatcore;
 
 
 import android.content.Context;
+import android.util.Log;
 
 import com.b44t.messenger.DcChat;
 import com.b44t.messenger.DcContact;
@@ -120,11 +121,13 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
 
     @SuppressWarnings("WeakerAccess")
     public DeltaChatCorePlugin() {
+        Log.d("dboehrs", "DeltaChatCorePlugin: constructor");
         // Required for Flutter plugin embedding v2
     }
 
     // Flutter plugin v1 embedding
     public static void registerWith(Registrar registrar) {
+        Log.d("dboehrs", "registerWith: ");
         logEventAndDelegate(null, DEBUG, TAG, "Attaching plugin via v1 embedding");
         DeltaChatCorePlugin plugin = new DeltaChatCorePlugin();
         plugin.onAttachedToEngine(registrar.context(), registrar.messenger());
@@ -134,11 +137,13 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
     // Flutter plugin v2 embedding
     @Override
     public void onAttachedToEngine(FlutterPluginBinding binding) {
+        Log.d("dboehrs", "onAttachedToEngine: Override");
         logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Attaching plugin via v2 embedding");
         onAttachedToEngine(binding.getApplicationContext(), binding.getBinaryMessenger());
     }
 
     private void onAttachedToEngine(Context context, BinaryMessenger messenger) {
+        Log.d("dboehrs", "onAttachedToEngine: ");
         this.context = context;
         this.messenger = messenger;
         methodChannel = new MethodChannel(messenger, CHANNEL_DELTA_CHAT_CORE);
@@ -147,27 +152,32 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
 
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+        Log.d("dboehrs", "onDetachedFromEngine: ");
         logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Detaching plugin via v2 embedding");
         tearDownJavaInstance();
     }
 
     @Override
     public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
+        Log.d("dboehrs", "onAttachedToActivity: ");
         // No implementation required, as no activity context is used by the plugin
     }
 
     @Override
     public void onDetachedFromActivityForConfigChanges() {
+        Log.d("dboehrs", "onDetachedFromActivityForConfigChanges: ");
         // No implementation required, as no activity context is used by the plugin
     }
 
     @Override
     public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
+        Log.d("dboehrs", "onReattachedToActivityForConfigChanges: ");
         // No implementation required, as no activity context is used by the plugin
     }
 
     @Override
     public void onDetachedFromActivity() {
+        Log.d("dboehrs", "onDetachedFromActivity: ");
         logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Stopping threads via v2 embedding");
         stopNativeInteractionManager();
     }
@@ -268,11 +278,13 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
     }
 
     private void tearDown(Result result) {
+        Log.d("dboehrs", "tearDown: ");
         stopNativeInteractionManager();
         result.success(null);
     }
 
     private void tearDownJavaInstance() {
+        Log.d("dboehrs", "tearDownJavaInstance: ");
         if (methodChannel != null) {
             methodChannel.setMethodCallHandler(null);
             methodChannel = null;
@@ -281,6 +293,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
     }
 
     private void stopNativeInteractionManager() {
+        Log.d("dboehrs", "stopNativeInteractionManager: ");
         nativeInteractionManager.stop();
     }
 
@@ -306,6 +319,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
 
     @Override
     public boolean onViewDestroy(FlutterNativeView flutterNativeView) {
+        Log.d("dboehrs", "onViewDestroy: ");
         stopNativeInteractionManager();
         return false;
     }
