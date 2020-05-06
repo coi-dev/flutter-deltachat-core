@@ -352,9 +352,9 @@ class ContextCallHandler: MethodCallHandling {
             return
         }
         
-        let messageTypeOne = methodCall.intValue(for: Argument.ARGUMENT_MESSAGE_TYPE_ONE, result: result)
-        let messageTypeTwo = methodCall.intValue(for: Argument.ARGUMENT_MESSAGE_TYPE_TWO, result: result)
-        let messageTypeThree = methodCall.intValue(for: Argument.ARGUMENT_MESSAGE_TYPE_THREE, result: result)
+        let messageTypeOne = methodCall.intValue(for: Argument.MESSAGE_TYPE_ONE, result: result)
+        let messageTypeTwo = methodCall.intValue(for: Argument.MESSAGE_TYPE_TWO, result: result)
+        let messageTypeThree = methodCall.intValue(for: Argument.MESSAGE_TYPE_THREE, result: result)
 
         let nextMessageId = context.getNextMedia(messageId: UInt32(messageId), dir: dir, msgTypeOne: messageTypeOne, msgTypeTwo: messageTypeTwo, msgTypeThree: messageTypeThree)
 
