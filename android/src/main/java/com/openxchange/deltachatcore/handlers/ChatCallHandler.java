@@ -52,7 +52,7 @@ import io.flutter.plugin.common.MethodChannel;
 public class ChatCallHandler extends AbstractCallHandler {
     private static final String METHOD_CHAT_GET_ID = "chat_getId";
     private static final String METHOD_CHAT_IS_GROUP = "chat_isGroup";
-    private static final String METHOD_CHAT_GET_ARCHIVED = "chat_getArchived";
+    private static final String METHOD_CHAT_GET_VISIBILITY = "chat_getVisibility";
     private static final String METHOD_CHAT_GET_COLOR = "chat_getColor";
     private static final String METHOD_CHAT_GET_NAME = "chat_getName";
     private static final String METHOD_CHAT_GET_PROFILE_IMAGE = "chat_getProfileImage";
@@ -76,8 +76,8 @@ public class ChatCallHandler extends AbstractCallHandler {
             case METHOD_CHAT_IS_GROUP:
                 isGroup(methodCall, result);
                 break;
-            case METHOD_CHAT_GET_ARCHIVED:
-                getArchived(methodCall, result);
+            case METHOD_CHAT_GET_VISIBILITY:
+                getVisibility(methodCall, result);
                 break;
             case METHOD_CHAT_GET_COLOR:
                 getColor(methodCall, result);
@@ -138,13 +138,13 @@ public class ChatCallHandler extends AbstractCallHandler {
         result.success(chat.getName());
     }
 
-    private void getArchived(MethodCall methodCall, MethodChannel.Result result) {
+    private void getVisibility(MethodCall methodCall, MethodChannel.Result result) {
         DcChat chat = getChat(methodCall, result);
         if (chat == null) {
             resultErrorGeneric(methodCall, result);
             return;
         }
-        result.success(chat.getArchived());
+        result.success(chat.getVisibility());
     }
 
     private void getColor(MethodCall methodCall, MethodChannel.Result result) {

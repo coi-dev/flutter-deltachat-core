@@ -50,7 +50,7 @@ class Chat extends Base {
 
   static const String methodChatGetId = "chat_getId";
   static const String methodChatIsGroup = "chat_isGroup";
-  static const String methodChatGetArchived = "chat_getArchived";
+  static const String methodChatGetVisibility = "chat_getVisibility";
   static const String methodChatGetColor = "chat_getColor";
   static const String methodChatGetName = "chat_getName";
   static const String methodChatGetProfileImage = "chat_getProfileImage";
@@ -83,8 +83,8 @@ class Chat extends Base {
     return await loadAndGetValue(methodChatIsGroup);
   }
 
-  Future<int> getArchived() async {
-    return await loadAndGetValue(methodChatGetArchived);
+  Future<int> getVisibility() async {
+    return await loadAndGetValue(methodChatGetVisibility);
   }
 
   Future<int> getColor() async {
