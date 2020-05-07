@@ -9,6 +9,10 @@ public class DcChat {
     public final static int DC_CHAT_ID_ALLDONE_HINT  = 7;
     public final static int DC_CHAT_ID_LAST_SPECIAL  = 9;
 
+    public final static int DC_CHAT_VISIBILITY_NORMAL   = 0;
+    public final static int DC_CHAT_VISIBILITY_ARCHIVED = 1;
+    public final static int DC_CHAT_VISIBILITY_PINNED   = 2;
+
     public DcChat(long chatCPtr) {
         this.chatCPtr = chatCPtr;
     }
@@ -21,12 +25,14 @@ public class DcChat {
 
     public native int     getId             ();
     public native boolean isGroup           ();
-    public native int     getArchived       ();
+    public native int     getVisibility     ();
     public native String  getName           ();
     public native String  getProfileImage   ();
     public native int     getColor          ();
     public native boolean isUnpromoted      ();
     public native boolean isSelfTalk        ();
+    public native boolean isDeviceTalk      ();
+    public native boolean canSend           ();
     public native boolean isVerified        ();
     public native boolean isSendingLocations();
 
