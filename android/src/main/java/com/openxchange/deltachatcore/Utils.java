@@ -71,6 +71,14 @@ public class Utils {
         AsyncTask.THREAD_POOL_EXECUTOR.execute(runnable);
     }
 
+    public static void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            throw new AssertionError(e);
+        }
+    }
+
     public static void logEventAndDelegate(@Nullable EventChannelHandler eventChannelHandler, int logLevel, String tag, String message) {
         boolean shouldDelegate = eventChannelHandler != null;
 

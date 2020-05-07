@@ -67,11 +67,11 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 
-import static android.util.Log.DEBUG;
+import static android.util.Log.INFO;
 import static com.openxchange.deltachatcore.Utils.logEventAndDelegate;
 
 public class DeltaChatCorePlugin implements MethodCallHandler, FlutterPlugin {
-    static final String TAG = "coi";
+    static final String TAG = "coi-plugin";
 
     private static final String LIBRARY_NAME = "native-utils";
     private static final String CHANNEL_DELTA_CHAT_CORE = "deltaChatCore";
@@ -90,6 +90,8 @@ public class DeltaChatCorePlugin implements MethodCallHandler, FlutterPlugin {
 
     private static final String ARGUMENT_REMOVE_CACHE_IDENTIFIER = "removeCacheIdentifier";
     private static final String ARGUMENT_DB_NAME = "dbName";
+    private static final String ARGUMENT_MINIMAL_SETUP = "minimalSetup";
+
 
     private static final String CACHE_IDENTIFIER_CHAT = "chat";
     private static final String CACHE_IDENTIFIER_CHAT_LIST = "chatList";
@@ -122,7 +124,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler, FlutterPlugin {
     @Override
     public void onAttachedToEngine(FlutterPluginBinding binding) {
         Log.d("dboehrs" + this.hashCode(), "onAttachedToEngine:");
-        logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Attaching plugin via v2 embedding");
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, "Attaching plugin via v2 embedding");
         context = binding.getApplicationContext();
         messenger = binding.getBinaryMessenger();
         methodChannel = new MethodChannel(messenger, CHANNEL_DELTA_CHAT_CORE);
@@ -132,7 +134,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler, FlutterPlugin {
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
         Log.d("dboehrs" + this.hashCode(), "onDetachedFromEngine: ");
-        logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Detaching plugin via v2 embedding");
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, "Detaching plugin via v2 embedding");
         context = null;
         messenger = null;
         if (methodChannel != null) {
@@ -214,25 +216,32 @@ public class DeltaChatCorePlugin implements MethodCallHandler, FlutterPlugin {
     }
 
     private void init(MethodCall methodCall, Result result) {
+        Boolean minimalSetup = methodCall.argument(ARGUMENT_MINIMAL_SETUP);
+        if (minimalSetup == null ) {
+            throw new IllegalArgumentException("No setup type defined (minimal vs. full setup, exiting.");
+        }
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, "Init started, with minimal setup = " + minimalSetup);
         String dbName = methodCall.argument(ARGUMENT_DB_NAME);
         if (dbName == null || dbName.isEmpty()) {
             throw new IllegalArgumentException("No database name given, exiting.");
         }
         System.loadLibrary(LIBRARY_NAME);
         eventChannelHandler = new EventChannelHandler(messenger);
-        nativeInteractionManager = new NativeInteractionManager(context, dbName, eventChannelHandler);
+        nativeInteractionManager = new NativeInteractionManager(context, dbName, minimalSetup, eventChannelHandler);
         contextCallHandler = new ContextCallHandler(nativeInteractionManager, contactCache, messageCache, chatCache);
         chatListCallHandler = new ChatListCallHandler(nativeInteractionManager, chatCache);
         messageCallHandler = new MessageCallHandler(nativeInteractionManager, contextCallHandler);
         contactCallHandler = new ContactCallHandler(nativeInteractionManager, contextCallHandler);
         chatCallHandler = new ChatCallHandler(nativeInteractionManager, contextCallHandler);
-        logEventAndDelegate(eventChannelHandler, DEBUG, TAG, nativeInteractionManager.getInfo());
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, nativeInteractionManager.getInfo());
         result.success(nativeInteractionManager.getDbPath());
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, "Init finished");
     }
 
     private void tearDown(Result result) {
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, "Teardown started");
         Log.d("dboehrs" + this.hashCode(), "tearDown: ");
-        nativeInteractionManager.stop();
+        nativeInteractionManager.tearDown();
         nativeInteractionManager = null;
         contextCallHandler = null;
         chatListCallHandler = null;
@@ -247,6 +256,7 @@ public class DeltaChatCorePlugin implements MethodCallHandler, FlutterPlugin {
         chatCache.clear();
         contactCache.clear();
         messageCache.clear();
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, "Teardown finished");
     }
 
     private void handleContextCalls(MethodCall methodCall, Result result) {

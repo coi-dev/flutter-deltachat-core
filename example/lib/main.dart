@@ -156,9 +156,11 @@ class _MyAppState extends State<MyApp> {
         var chatCntAfterDeletingChat = await chatList.getChatCnt();
         await chatList.tearDown();
         _addListItem(text: "deleteChat", assertion: 0, result: chatCntAfterDeletingChat);
+        await Future.delayed(const Duration(seconds: 1));
         core.tearDownAsync();
         var dbFile = File(core.dbPath);
         dbFile.deleteSync();
+        _addListItem(text: "Teardown and cleanup down");
       }
     } on PlatformException {
       throw StateError("Test suite failed, forbidden state entered");
