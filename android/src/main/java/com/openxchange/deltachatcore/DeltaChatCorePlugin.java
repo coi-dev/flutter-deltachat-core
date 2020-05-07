@@ -61,21 +61,16 @@ import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
-import io.flutter.embedding.engine.plugins.activity.ActivityAware;
-import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
-import io.flutter.view.FlutterNativeView;
 
 import static android.util.Log.DEBUG;
 import static com.openxchange.deltachatcore.Utils.logEventAndDelegate;
 
-public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.ViewDestroyListener, FlutterPlugin, ActivityAware {
+public class DeltaChatCorePlugin implements MethodCallHandler, FlutterPlugin {
     static final String TAG = "coi";
 
     private static final String LIBRARY_NAME = "native-utils";
@@ -90,7 +85,6 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
     private static final String METHOD_PREFIX_MSG = "msg";
 
     private static final String METHOD_BASE_INIT = "base_init";
-    private static final String METHOD_BASE_SYSTEM_INFO = "base_systemInfo";
     private static final String METHOD_BASE_TEAR_DOWN = "base_tearDown";
     private static final String METHOD_BASE_LOGOUT = "base_logout";
 
@@ -102,84 +96,50 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
     private static final String CACHE_IDENTIFIER_CHAT_MESSAGE = "chatMessage";
     private static final String CACHE_IDENTIFIER_CONTACT = "contact";
 
+    // Only change during onAttachedToEngine / onDetachedFromEngine
     private Context context;
     private BinaryMessenger messenger;
     private MethodChannel methodChannel;
 
+    // Clear on tearDown
     private final IdCache<DcChat> chatCache = new IdCache<>();
     private final IdCache<DcContact> contactCache = new IdCache<>();
     private final IdCache<DcMsg> messageCache = new IdCache<>();
 
+    // Null on tearDown
     private NativeInteractionManager nativeInteractionManager;
     private ChatCallHandler chatCallHandler;
     private ChatListCallHandler chatListCallHandler;
     private ContactCallHandler contactCallHandler;
     private ContextCallHandler contextCallHandler;
     private MessageCallHandler messageCallHandler;
-    @SuppressWarnings("FieldCanBeLocal")
     private EventChannelHandler eventChannelHandler;
 
-    @SuppressWarnings("WeakerAccess")
     public DeltaChatCorePlugin() {
-        Log.d("dboehrs", "DeltaChatCorePlugin: constructor");
         // Required for Flutter plugin embedding v2
     }
 
-    // Flutter plugin v1 embedding
-    public static void registerWith(Registrar registrar) {
-        Log.d("dboehrs", "registerWith: ");
-        logEventAndDelegate(null, DEBUG, TAG, "Attaching plugin via v1 embedding");
-        DeltaChatCorePlugin plugin = new DeltaChatCorePlugin();
-        plugin.onAttachedToEngine(registrar.context(), registrar.messenger());
-        registrar.addViewDestroyListener(plugin);
-    }
-
-    // Flutter plugin v2 embedding
     @Override
     public void onAttachedToEngine(FlutterPluginBinding binding) {
-        Log.d("dboehrs", "onAttachedToEngine: Override");
+        Log.d("dboehrs" + this.hashCode(), "onAttachedToEngine:");
         logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Attaching plugin via v2 embedding");
-        onAttachedToEngine(binding.getApplicationContext(), binding.getBinaryMessenger());
-    }
-
-    private void onAttachedToEngine(Context context, BinaryMessenger messenger) {
-        Log.d("dboehrs", "onAttachedToEngine: ");
-        this.context = context;
-        this.messenger = messenger;
+        context = binding.getApplicationContext();
+        messenger = binding.getBinaryMessenger();
         methodChannel = new MethodChannel(messenger, CHANNEL_DELTA_CHAT_CORE);
         methodChannel.setMethodCallHandler(this);
     }
 
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-        Log.d("dboehrs", "onDetachedFromEngine: ");
+        Log.d("dboehrs" + this.hashCode(), "onDetachedFromEngine: ");
         logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Detaching plugin via v2 embedding");
-        tearDownJavaInstance();
-    }
-
-    @Override
-    public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
-        Log.d("dboehrs", "onAttachedToActivity: ");
-        // No implementation required, as no activity context is used by the plugin
-    }
-
-    @Override
-    public void onDetachedFromActivityForConfigChanges() {
-        Log.d("dboehrs", "onDetachedFromActivityForConfigChanges: ");
-        // No implementation required, as no activity context is used by the plugin
-    }
-
-    @Override
-    public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
-        Log.d("dboehrs", "onReattachedToActivityForConfigChanges: ");
-        // No implementation required, as no activity context is used by the plugin
-    }
-
-    @Override
-    public void onDetachedFromActivity() {
-        Log.d("dboehrs", "onDetachedFromActivity: ");
-        logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Stopping threads via v2 embedding");
-        stopNativeInteractionManager();
+        context = null;
+        messenger = null;
+        if (methodChannel != null) {
+            methodChannel.setMethodCallHandler(null);
+            methodChannel = null;
+        }
+        tearDown(null);
     }
 
     @Override
@@ -244,9 +204,6 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
             case METHOD_BASE_INIT:
                 init(methodCall, result);
                 break;
-            case METHOD_BASE_SYSTEM_INFO:
-                systemInfo(result);
-                break;
             case METHOD_BASE_TEAR_DOWN:
             case METHOD_BASE_LOGOUT:
                 tearDown(result);
@@ -273,28 +230,23 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
         result.success(nativeInteractionManager.getDbPath());
     }
 
-    private void systemInfo(Result result) {
-        result.success(android.os.Build.VERSION.RELEASE);
-    }
-
     private void tearDown(Result result) {
-        Log.d("dboehrs", "tearDown: ");
-        stopNativeInteractionManager();
-        result.success(null);
-    }
-
-    private void tearDownJavaInstance() {
-        Log.d("dboehrs", "tearDownJavaInstance: ");
-        if (methodChannel != null) {
-            methodChannel.setMethodCallHandler(null);
-            methodChannel = null;
+        Log.d("dboehrs" + this.hashCode(), "tearDown: ");
+        nativeInteractionManager.stop();
+        nativeInteractionManager = null;
+        contextCallHandler = null;
+        chatListCallHandler = null;
+        messageCallHandler = null;
+        contactCallHandler = null;
+        chatCallHandler = null;
+        if (result != null) {
+            result.success(null);
         }
         eventChannelHandler.close();
-    }
-
-    private void stopNativeInteractionManager() {
-        Log.d("dboehrs", "stopNativeInteractionManager: ");
-        nativeInteractionManager.stop();
+        eventChannelHandler = null;
+        chatCache.clear();
+        contactCache.clear();
+        messageCache.clear();
     }
 
     private void handleContextCalls(MethodCall methodCall, Result result) {
@@ -315,12 +267,5 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
 
     private void handleMessageCalls(MethodCall methodCall, Result result) {
         messageCallHandler.handleCall(methodCall, result);
-    }
-
-    @Override
-    public boolean onViewDestroy(FlutterNativeView flutterNativeView) {
-        Log.d("dboehrs", "onViewDestroy: ");
-        stopNativeInteractionManager();
-        return false;
     }
 }

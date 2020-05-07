@@ -81,94 +81,59 @@ public class NativeInteractionManager extends DcContext {
             logEventAndDelegate(eventChannelHandler, ERROR, TAG, "Cannot create wakeLocks");
         }
         start();
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivityManager != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                registerConnectivityReceiverAndroidN(connectivityManager);
-            } else {
-                registerConnectivityReceiver(context, connectivityManager);
-            }
+        setupConnectivityObserver(context);
+    }
+
+    @Override
+    public long handleEvent(final int eventId, long data1, long data2) {
+        switch (eventId) {
+            case DC_EVENT_INFO:
+                logEventAndDelegate(eventChannelHandler, INFO, TAG, dataToString(data2));
+                break;
+
+            case DC_EVENT_WARNING:
+                logEventAndDelegate(eventChannelHandler, WARN, TAG, dataToString(data2));
+                break;
+
+            case DC_EVENT_ERROR:
+                // Intended fall through
+            case DC_EVENT_ERROR_NETWORK:
+                // Intended fall through
+            case DC_EVENT_ERROR_SELF_NOT_IN_GROUP:
+                delegateError(eventId, data1, dataToString(data2));
+                break;
+            default:
+                delegateEvent(eventId, data1, data2);
+                break;
+        }
+        return 0;
+    }
+
+    private void delegateEvent(int eventId, long data1, long data2) {
+        final Object data1Object = getData1Object(eventId, data1);
+        final Object data2Object = getData2Object(eventId, data2);
+        if (eventChannelHandler != null) {
+            eventChannelHandler.handleEvent(eventId, data1Object, data2Object);
         }
     }
 
-    @SuppressWarnings("deprecation")
-    private void registerConnectivityReceiver(Context context, ConnectivityManager connectivityManager) {
-        context.registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-                boolean isConnected = networkInfo != null && networkInfo.isConnected();
-                if (isConnected) {
-                    startOnNetworkAvailable();
-                }
-            }
-        }, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
+    private Object getData1Object(int eventId, long data1) {
+        return data1IsString(eventId) ? dataToString(data1) : data1;
     }
 
-    private void startOnNetworkAvailable() {
-        logEventAndDelegate(eventChannelHandler, INFO, TAG, "###################### Network is connected again. ######################");
-        start();
+    private Object getData2Object(int eventId, long data2) {
+        return data2IsString(eventId) ? dataToString(data2) : data2;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    private void registerConnectivityReceiverAndroidN(ConnectivityManager connectivityManager) {
-        if (connectivityManager != null) {
-            connectivityManager.registerDefaultNetworkCallback(new ConnectivityManager.NetworkCallback() {
-                @Override
-                public void onAvailable(Network network) {
-                    startOnNetworkAvailable();
-                }
-            });
-        }
+    private void delegateError(int eventId, long data1, String error) {
+        final Object data1Object = getData1Object(eventId, data1);
+        eventChannelHandler.handleEvent(eventId, data1Object, error);
     }
 
     private void start() {
         logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Starting threads");
         startThreads(INTERRUPT_IDLE);
         waitForThreadsRunning();
-    }
-
-    private void waitForThreadsRunning() {
-        try {
-            synchronized (imapThreadSynchronized) {
-                while (!imapThreadStarted) {
-                    imapThreadSynchronized.wait();
-                }
-            }
-
-            synchronized (mvboxThreadSynchronized) {
-                while (!mvboxThreadStarted) {
-                    mvboxThreadSynchronized.wait();
-                }
-            }
-
-            synchronized (sentBoxThreadSynchronized) {
-                while (!sentBoxThreadStarted) {
-                    sentBoxThreadSynchronized.wait();
-                }
-            }
-
-            synchronized (smtpThreadSynchronized) {
-                while (!smtpThreadStarted) {
-                    smtpThreadSynchronized.wait();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    void stop() {
-        logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Stopping threads");
-        stopThreads();
-        interruptImapIdle();
-        interruptMvboxIdle();
-        interruptSentboxIdle();
-        interruptSmtpIdle();
-        imapThread = null;
-        mvboxThread = null;
-        sentBoxThread = null;
-        smtpThread = null;
     }
 
     private void startThreads(@SuppressWarnings("SameParameterValue") int flags) {
@@ -337,6 +302,51 @@ public class NativeInteractionManager extends DcContext {
         }
     }
 
+    private void waitForThreadsRunning() {
+        try {
+            synchronized (imapThreadSynchronized) {
+                while (!imapThreadStarted) {
+                    imapThreadSynchronized.wait();
+                }
+            }
+
+            synchronized (mvboxThreadSynchronized) {
+                while (!mvboxThreadStarted) {
+                    mvboxThreadSynchronized.wait();
+                }
+            }
+
+            synchronized (sentBoxThreadSynchronized) {
+                while (!sentBoxThreadStarted) {
+                    sentBoxThreadSynchronized.wait();
+                }
+            }
+
+            synchronized (smtpThreadSynchronized) {
+                while (!smtpThreadStarted) {
+                    smtpThreadSynchronized.wait();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    void stop() {
+        logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Stopping threads");
+        stopThreads();
+        interruptImapIdle();
+        interruptMvboxIdle();
+        interruptSentboxIdle();
+        interruptSmtpIdle();
+        imapThread = null;
+        mvboxThread = null;
+        sentBoxThread = null;
+        smtpThread = null;
+        logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Closing database");
+        close();
+    }
+
     private void stopThreads() {
         if (imapThread != null) {
             imapThread.interrupt();
@@ -352,50 +362,45 @@ public class NativeInteractionManager extends DcContext {
         }
     }
 
-    @Override
-    public long handleEvent(final int eventId, long data1, long data2) {
-        switch (eventId) {
-            case DC_EVENT_INFO:
-                logEventAndDelegate(eventChannelHandler, INFO, TAG, dataToString(data2));
-                break;
-
-            case DC_EVENT_WARNING:
-                logEventAndDelegate(eventChannelHandler, WARN, TAG, dataToString(data2));
-                break;
-
-            case DC_EVENT_ERROR:
-                // Intended fall through
-            case DC_EVENT_ERROR_NETWORK:
-                // Intended fall through
-            case DC_EVENT_ERROR_SELF_NOT_IN_GROUP:
-                delegateError(eventId, data1, dataToString(data2));
-                break;
-            default:
-                delegateEvent(eventId, data1, data2);
-                break;
-        }
-        return 0;
-    }
-
-    private void delegateEvent(int eventId, long data1, long data2) {
-        final Object data1Object = getData1Object(eventId, data1);
-        final Object data2Object = getData2Object(eventId, data2);
-        if (eventChannelHandler != null) {
-            eventChannelHandler.handleEvent(eventId, data1Object, data2Object);
+    private void setupConnectivityObserver(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                registerConnectivityReceiverAndroidN(connectivityManager);
+            } else {
+                registerConnectivityReceiver(context, connectivityManager);
+            }
         }
     }
 
-    private Object getData1Object(int eventId, long data1) {
-        return data1IsString(eventId) ? dataToString(data1) : data1;
+    private void registerConnectivityReceiver(Context context, ConnectivityManager connectivityManager) {
+        context.registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+                boolean isConnected = networkInfo != null && networkInfo.isConnected();
+                if (isConnected) {
+                    startOnNetworkAvailable();
+                }
+            }
+        }, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
-    private Object getData2Object(int eventId, long data2) {
-        return data2IsString(eventId) ? dataToString(data2) : data2;
+    private void startOnNetworkAvailable() {
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, "###################### Network is connected again. ######################");
+        start();
     }
 
-    private void delegateError(int eventId, long data1, String error) {
-        final Object data1Object = getData1Object(eventId, data1);
-        eventChannelHandler.handleEvent(eventId, data1Object, error);
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void registerConnectivityReceiverAndroidN(ConnectivityManager connectivityManager) {
+        if (connectivityManager != null) {
+            connectivityManager.registerDefaultNetworkCallback(new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(Network network) {
+                    startOnNetworkAvailable();
+                }
+            });
+        }
     }
 
     String getDbPath() {
