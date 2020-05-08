@@ -42,8 +42,6 @@
 
 package com.openxchange.deltachatcore.handlers;
 
-import android.util.Log;
-
 import com.b44t.messenger.DcChat;
 import com.b44t.messenger.DcChatlist;
 import com.b44t.messenger.DcContact;
@@ -996,8 +994,10 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
     }
 
     private void interruptIdleForIncomingMessages(MethodChannel.Result result) {
-        dcContext.interruptImapIdle();
-        dcContext.interruptMvboxIdle();
+        dcContext.performImapJobs();
+        dcContext.performImapFetch();
+        dcContext.performMvboxJobs();
+        dcContext.performMvboxFetch();
         result.success(null);
     }
 
