@@ -965,7 +965,9 @@ JNIEXPORT jstring Java_com_b44t_messenger_DcContext_decryptMessageInMemory(JNIEn
 	char* temp = dc_decrypt_message_in_memory(get_dc_context(env, obj), contentTypePtr, contentPtr, senderAddrPtr, 0, &partCount, &chat_id);
 	jclass cls = (*env)->GetObjectClass(env, chatIdWrapper);
 	jfieldID fid = (*env)->GetFieldID(env,cls,"chatId","I");
-	(*env)->SetIntField(env, chatIdWrapper ,fid,chat_id);
+	(*env)->SetIntField(env,chatIdWrapper,fid,chat_id);
+
+
             jstring ret = JSTRING_NEW(temp);
         free(temp);
 	CHAR_UNREF(contentType);
