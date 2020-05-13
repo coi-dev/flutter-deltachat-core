@@ -961,13 +961,16 @@ JNIEXPORT jint Java_com_b44t_messenger_DcContext_isCoiMessageFilterEnabled(JNIEn
 	return (jint)dc_get_coi_message_filter(get_dc_context(env, obj));
 }
 
-JNIEXPORT jstring Java_com_b44t_messenger_DcContext_decryptMessageInMemory(JNIEnv *env, jobject obj, jstring contentType, jstring content, jstring senderAddr)
+JNIEXPORT jstring Java_com_b44t_messenger_DcContext_decryptMessageInMemory(JNIEnv *env, jobject obj, jstring contentType, jstring content, jstring senderAddr, jobject chatIdWrapper)
 {
 	CHAR_REF(contentType);
 	CHAR_REF(content);
 	CHAR_REF(senderAddr);
 	int partCount;
-		char* temp = dc_decrypt_message_in_memory(get_dc_context(env, obj), contentTypePtr, contentPtr, senderAddrPtr, 0, &partCount);
+	int chat_id;
+	char* temp = dc_decrypt_message_in_memory(get_dc_context(env, obj), contentTypePtr, contentPtr, senderAddrPtr, 0, &partCount, &chat_id);
+	jfieldID fid = (*env)->GetFieldID(env,myclass," chatId ","I");
+	(*env)->SetIntField(env, chatIdWrapper ,fid,chat_id);
             jstring ret = JSTRING_NEW(temp);
         free(temp);
 	CHAR_UNREF(contentType);
