@@ -1203,6 +1203,7 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
     }
 
     private void decryptMessageInMemory(MethodCall methodCall, MethodChannel.Result result) {
+        Log.d("dboehrs", "decryptMessageInMemory: started");
         if (!hasArgumentKeys(methodCall, ARGUMENT_CONTENT_TYPE, ARGUMENT_CONTENT, ARGUMENT_ADDRESS)) {
             resultErrorArgumentMissing(result);
             return;
@@ -1224,7 +1225,7 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
         }
         ChatIdWrapper chatIdWrapper = new ChatIdWrapper();
         String plainText = dcContext.decryptMessageInMemory(contentType, content, senderAddress, chatIdWrapper);
-        Log.d("dboehrs", "decryptMessageInMemory: " + chatIdWrapper.chatId);
+        Log.d("dboehrs", "decryptMessageInMemory: finished with" + chatIdWrapper.chatId);
         result.success(plainText);
     }
 }
