@@ -82,3 +82,4 @@ android/jni/x86
 android/jni/x86_64
 .cargo/
 libdeltachat.a
+/example/.flutter-plugins-dependencies
