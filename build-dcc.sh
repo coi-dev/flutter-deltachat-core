@@ -25,7 +25,7 @@ ANDROID_DCC_LIBRARY_SUB_FOLDERS=("arm64-v8a" "armeabi-v7a" "x86" "x86_64") # The
 
 # iOS
 IOS_DCC_LIBRARY_FOLDER="ios/Libraries"
-IOS_RUST_TARGETS=("aarch64-apple-ios" "armv7-apple-ios" "armv7s-apple-ios" "x86_64-apple-ios" "i386-apple-ios")
+IOS_RUST_TARGETS=("aarch64-apple-ios" "x86_64-apple-ios")
 
 # Functions
 function isAndroid {
