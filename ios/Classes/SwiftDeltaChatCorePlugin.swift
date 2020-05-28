@@ -85,7 +85,7 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
 
     // This is our entry point
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "deltaChatCore", binaryMessenger: registrar.messenger())
+        let channel = FlutterMethodChannel(name: MethodChannel.DeltaChat.Core, binaryMessenger: registrar.messenger())
         let delegate = SwiftDeltaChatCorePlugin(registrar: registrar)
         registrar.addMethodCallDelegate(delegate, channel: channel)
     }
