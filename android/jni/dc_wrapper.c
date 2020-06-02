@@ -1092,6 +1092,12 @@ JNIEXPORT jboolean Java_com_b44t_messenger_DcChat_isSelfTalk(JNIEnv *env, jobjec
 }
 
 
+JNIEXPORT jboolean Java_com_b44t_messenger_DcChat_isDeviceTalk(JNIEnv *env, jobject obj)
+{
+	return dc_chat_is_device_talk(get_dc_chat(env, obj))!=0;
+}
+
+
 JNIEXPORT jboolean Java_com_b44t_messenger_DcChat_isVerified(JNIEnv *env, jobject obj)
 {
 	return dc_chat_is_verified(get_dc_chat(env, obj))!=0;

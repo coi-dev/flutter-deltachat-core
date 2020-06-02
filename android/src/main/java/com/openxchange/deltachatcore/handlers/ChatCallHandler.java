@@ -58,6 +58,7 @@ public class ChatCallHandler extends AbstractCallHandler {
     private static final String METHOD_CHAT_GET_PROFILE_IMAGE = "chat_getProfileImage";
     private static final String METHOD_CHAT_IS_UNPROMOTED = "chat_isUnpromoted";
     private static final String METHOD_CHAT_IS_SELF_TALK = "chat_isSelfTalk";
+    private static final String METHOD_CHAT_IS_DEVICE_TALK = "chat_isDeviceTalk";
     private static final String METHOD_CHAT_IS_VERIFIED = "chat_isVerified";
 
     private final ContextCallHandler contextCallHandler;
@@ -94,12 +95,24 @@ public class ChatCallHandler extends AbstractCallHandler {
             case METHOD_CHAT_IS_SELF_TALK:
                 isSelfTalk(methodCall, result);
                 break;
+            case METHOD_CHAT_IS_DEVICE_TALK:
+                isDeviceTalk(methodCall, result);
+                break;
             case METHOD_CHAT_IS_VERIFIED:
                 isVerified(methodCall, result);
                 break;
             default:
                 result.notImplemented();
         }
+    }
+
+    private void isDeviceTalk(MethodCall methodCall, MethodChannel.Result result) {
+        DcChat chat = getChat(methodCall, result);
+        if (chat == null) {
+            resultErrorGeneric(methodCall, result);
+            return;
+        }
+        result.success(chat.isDeviceTalk());
     }
 
     private void isSelfTalk(MethodCall methodCall, MethodChannel.Result result) {
