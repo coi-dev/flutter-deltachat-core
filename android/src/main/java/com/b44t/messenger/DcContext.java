@@ -194,7 +194,7 @@ public class DcContext {
     public native void         setCoiMessageFilter  (int mode, int id);
     public native int          isCoiMessageFilterEnabled();
     public native void         validateWebPush      (String uid, String msg, int id);
-    public native String       decryptMessageInMemory (String contentType, String content, String senderAddress);
+    public native String       decryptMessageInMemory (String contentType, String content, String senderAddress, ChatIdWrapper chatIdWrapper);
 
     /**
      * @return true if at least one chat has location streaming enabled
