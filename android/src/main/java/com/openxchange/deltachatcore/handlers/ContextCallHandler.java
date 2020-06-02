@@ -42,8 +42,6 @@
 
 package com.openxchange.deltachatcore.handlers;
 
-import android.util.Log;
-
 import com.b44t.messenger.ChatIdWrapper;
 import com.b44t.messenger.DcChat;
 import com.b44t.messenger.DcChatlist;
@@ -54,6 +52,8 @@ import com.b44t.messenger.DcMsg;
 import com.openxchange.deltachatcore.IdCache;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -1203,7 +1203,6 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
     }
 
     private void decryptMessageInMemory(MethodCall methodCall, MethodChannel.Result result) {
-        Log.d("dboehrs", "decryptMessageInMemory: started");
         if (!hasArgumentKeys(methodCall, ARGUMENT_CONTENT_TYPE, ARGUMENT_CONTENT, ARGUMENT_ADDRESS)) {
             resultErrorArgumentMissing(result);
             return;
@@ -1225,7 +1224,7 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
         }
         ChatIdWrapper chatIdWrapper = new ChatIdWrapper();
         String plainText = dcContext.decryptMessageInMemory(contentType, content, senderAddress, chatIdWrapper);
-        Log.d("dboehrs", "decryptMessageInMemory: finished with" + chatIdWrapper.chatId);
-        result.success(plainText);
+        List<Object> data = Arrays.asList(chatIdWrapper.chatId, plainText);
+        result.success(data);
     }
 }

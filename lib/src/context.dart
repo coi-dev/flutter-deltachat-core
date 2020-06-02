@@ -404,7 +404,7 @@ class Context {
     return await core.invokeMethod(methodGetNextMedia, getNextMediaArguments(messageId, dir, messageTypeOne, messageTypeTwo, messageTypeThree));
   }
 
-  Future<String> decryptInMemory(String contentType, String content, String senderAddress) async {
+  Future<List<dynamic>> decryptInMemory(String contentType, String content, String senderAddress) async {
     return await core.invokeMethod(methodDecryptInMemory, getDecryptInMemoryArguments(contentType, content, senderAddress));
   }
 

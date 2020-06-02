@@ -44,7 +44,6 @@ package com.openxchange.deltachatcore;
 
 
 import android.content.Context;
-import android.util.Log;
 
 import com.b44t.messenger.DcChat;
 import com.b44t.messenger.DcContact;
@@ -123,7 +122,6 @@ public class DeltaChatCorePlugin implements MethodCallHandler, FlutterPlugin {
 
     @Override
     public void onAttachedToEngine(FlutterPluginBinding binding) {
-        Log.d("dboehrs" + this.hashCode(), "onAttachedToEngine:");
         logEventAndDelegate(eventChannelHandler, INFO, TAG, "Attaching plugin via v2 embedding");
         context = binding.getApplicationContext();
         messenger = binding.getBinaryMessenger();
@@ -133,7 +131,6 @@ public class DeltaChatCorePlugin implements MethodCallHandler, FlutterPlugin {
 
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-        Log.d("dboehrs" + this.hashCode(), "onDetachedFromEngine: ");
         logEventAndDelegate(eventChannelHandler, INFO, TAG, "Detaching plugin via v2 embedding");
         context = null;
         messenger = null;
@@ -240,7 +237,6 @@ public class DeltaChatCorePlugin implements MethodCallHandler, FlutterPlugin {
 
     private void tearDown(Result result) {
         logEventAndDelegate(eventChannelHandler, INFO, TAG, "Teardown started");
-        Log.d("dboehrs" + this.hashCode(), "tearDown: ");
         nativeInteractionManager.tearDown();
         nativeInteractionManager = null;
         contextCallHandler = null;

@@ -51,6 +51,7 @@ import 'package:logging/logging.dart';
 export 'package:delta_chat_core/src/types/chat_summary.dart';
 export 'package:delta_chat_core/src/types/event.dart';
 export 'package:delta_chat_core/src/types/qrcode_result.dart';
+export 'package:delta_chat_core/src/types/decrypted_chat_message.dart';
 
 export 'src/base.dart';
 export 'src/chat.dart';
