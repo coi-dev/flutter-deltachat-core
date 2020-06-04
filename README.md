@@ -10,7 +10,7 @@ The Delta Chat core plugin provides a Flutter / Dart wrapper for the [Delta Chat
 
 ## Requirements
 - The latest Flutter stable version is used (if problems occur try the [Flutter Dev Channel](https://github.com/flutter/flutter/wiki/Flutter-build-release-channels))
-- The latest Delta Chat Core develop branch of this [repository](https://github.com/open-xchange/deltachat-core) is used
+- The latest Delta Chat Core develop branch of this [repository](https://github.com/open-xchange/deltachat-core-rust) is used
 - The used Delta Chat Core is currently only out of the box buildable using Linux (Debian / Ubuntu is recommended)
 - Setup the Rust toolchain
 - Download the [Android NDK](https://developer.android.com/ndk/downloads/) stable version (r20b)
