@@ -10,8 +10,9 @@ The Delta Chat core plugin provides a Flutter / Dart wrapper for the [Delta Chat
 
 ## Requirements
 - The latest Flutter stable version is used (if problems occur try the [Flutter Dev Channel](https://github.com/flutter/flutter/wiki/Flutter-build-release-channels))
-- The latest Delta Chat Core master branch of this [repository](https://github.com/open-xchange/deltachat-core) is used
+- The latest Delta Chat Core develop branch of this [repository](https://github.com/open-xchange/deltachat-core) is used
 - The used Delta Chat Core is currently only out of the box buildable using Linux (Debian / Ubuntu is recommended)
+- Setup the Rust toolchain
 - Download the [Android NDK](https://developer.android.com/ndk/downloads/) stable version (r20b)
 - The Android NDK must be on the PATH (*ndk-build* must be callable)
 
@@ -26,8 +27,8 @@ To be able to edit / extend this project the following steps are important:
 - Perform all actions mentioned under **Execution**
 - Within this repository only Flutter / Dart and Java files should get edited. C files shouldn't get changed as they are provided by sub repositories or other sources
 - Everything located in the [com.b44t.messenger](https://github.com/open-xchange/flutter-deltachat-core/tree/master/android/src/main/java/com/b44t/messenger) package is mainly provided by the Delta Chat core team. This code should not get altered.
-- Implement your changes (if the Java part is changed a rebuild of the Android project could be needed)
-- Add tests and code for the test suite
+- Implement your changes (if the platform part is changed a rebuild of this the Android / iOS project could be required)
+- Add tests
 - Create a pull request
 
 ### Flutter 
