@@ -57,6 +57,7 @@ class Chat extends Base {
   static const String methodChatIsUnpromoted = "chat_isUnpromoted";
   static const String methodChatIsVerified = "chat_isVerified";
   static const String methodChatIsSelfTalk = "chat_isSelfTalk";
+  static const String methodChatIsDeviceTalk = "chat_isDeviceTalk";
 
   static const int typeNoChat = 0;
   static const int typeInvite = 1;
@@ -109,6 +110,10 @@ class Chat extends Base {
 
   Future<bool> isSelfTalk() async {
     return await loadAndGetValue(methodChatIsSelfTalk);
+  }
+
+  Future<bool> isDeviceTalk() async {
+    return await loadAndGetValue(methodChatIsDeviceTalk);
   }
 
   @override
