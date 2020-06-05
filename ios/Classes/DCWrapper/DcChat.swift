@@ -71,6 +71,10 @@ class DcChat {
     var type: Int32 {
         return dc_chat_get_type(chatPointer)
     }
+    
+    var visibility: Int32 {
+        return dc_chat_get_visibility(chatPointer)
+    }
 
     var chatType: ChatType {
         return ChatType(rawValue: type) ?? .group // group as fallback - shouldn't get here
@@ -114,10 +118,6 @@ class DcChat {
 
         return nil
     }()
-
-//    var archived: Int32 {
-//        return dc_chat_get_archived(chatPointer)
-//    }
 
     var color: UInt32 {
         return dc_chat_get_color(chatPointer)

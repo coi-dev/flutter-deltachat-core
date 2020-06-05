@@ -76,7 +76,7 @@ extension Method {
     struct Chat {
         static let GET_ID                               = "chat_getId"
         static let IS_GROUP                             = "chat_isGroup"
-        static let GET_ARCHIVED                         = "chat_getArchived"
+        static let GET_VISIBILITY                       = "chat_getVisibility"
         static let GET_COLOR                            = "chat_getColor"
         static let GET_NAME                             = "chat_getName"
         static let GET_PROFILE_IMAGE                    = "chat_getProfileImage"

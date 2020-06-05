@@ -63,8 +63,8 @@ class ChatCallHandler: MethodCallHandling {
         case Method.Chat.IS_GROUP:
             isGroup(methodCall: call, result: result)
             break
-        case Method.Chat.GET_ARCHIVED:
-//            getArchived(methodCall: call, result: result)
+        case Method.Chat.GET_VISIBILITY:
+            getVisibility(methodCall: call, result: result)
             break
         case Method.Chat.GET_COLOR:
             getColor(methodCall: call, result: result)
@@ -113,10 +113,10 @@ class ChatCallHandler: MethodCallHandling {
         result(chat.name)
     }
 
-//    private func getArchived(methodCall: FlutterMethodCall, result: FlutterResult) {
-//        let chat = getChat(methodCall: methodCall, result: result)
-//        result(NSNumber(value: chat.archived))
-//    }
+    private func getVisibility(methodCall: FlutterMethodCall, result: FlutterResult) {
+        let chat = getChat(methodCall: methodCall, result: result)
+        result(NSNumber(value: chat.visibility))
+    }
 
     private func getColor(methodCall: FlutterMethodCall, result: FlutterResult) {
         let chat = getChat(methodCall: methodCall, result: result)
