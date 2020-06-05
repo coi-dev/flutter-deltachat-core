@@ -56,6 +56,12 @@ class ContextCallHandler: MethodCallHandling {
         self.messageCache = messageCache
         self.chatCache = chatCache
     }
+    
+    deinit {
+        contactCache.clear()
+        messageCache.clear()
+        chatCache.clear()
+    }
 
     // MARK: - Protocol MethodCallHandling
 
@@ -454,7 +460,7 @@ class ContextCallHandler: MethodCallHandling {
         let chatId = methodCall.intValue(for: Argument.CHAT_ID, result: result)
         let type = methodCall.intValue(for: Argument.TYPE, result: result)
         let text = methodCall.stringValue(for: Argument.TEXT, result: result)
-        var mimeType = methodCall.stringValue(for: Argument.MIME_TYPE, result: result)
+        let mimeType = methodCall.stringValue(for: Argument.MIME_TYPE, result: result)
         let duration = methodCall.intValue(for: Argument.DURATION, result: result)
         
         guard let path = methodCall.stringValue(for: Argument.PATH, result: result) else {
@@ -466,12 +472,12 @@ class ContextCallHandler: MethodCallHandling {
             let messageId = try context.sendAttachment(fromPath: path, withType: type, mimeType: mimeType, text: text, duration: duration, forChatId: UInt32(chatId))
             result(NSNumber(value: messageId))
 
-        } catch DcContextError.ErrorKind.missingImageAtPath(let path) {
-            Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.error, message: "Can't find image at given path: \(path)")
-        } catch DcContextError.ErrorKind.wrongAttachmentType(let type) {
-            Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.error, message: "Wrong attachment type given: \(type)!")
+        } catch DcContextError.missingImageAtPath(let path) {
+            Utils.logEventAndDelegate(logLevel: .error, message: "Can't find image at given path: \(path)")
+        } catch DcContextError.wrongAttachmentType(let type) {
+            Utils.logEventAndDelegate(logLevel: .error, message: "Wrong attachment type given: \(type)!")
         } catch {
-            Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.error, message: "Unhandled error: \(error)")
+            Utils.logEventAndDelegate(logLevel: .error, message: "Unhandled error: \(error)")
         }
     }
 
@@ -601,7 +607,6 @@ class ContextCallHandler: MethodCallHandling {
 
         let star = methodCall.intValue(for: Argument.VALUE, result: result)
         context.starMessages(messageIds: msgIds, star: star)
-//        _ = msgIds.map { loadAndCacheChatMessage(with: $0, update: true) }
 
         result(nil)
     }

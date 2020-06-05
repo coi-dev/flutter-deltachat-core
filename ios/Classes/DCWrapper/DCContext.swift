@@ -61,6 +61,10 @@ class DcContext {
     deinit {
         dc_context_unref(DcContext.contextPointer)
     }
+    
+    func teardown() {
+        dc_close(DcContext.contextPointer)
+    }
 
     // MARK: - User Database
 
@@ -130,10 +134,6 @@ class DcContext {
     func deleteChat(chatId: UInt32) {
         dc_delete_chat(DcContext.contextPointer, UInt32(chatId))
     }
-
-//    func archiveChat(chatId: UInt32, archive: Bool) {
-//        dc_archive_chat(DcContext.contextPointer, UInt32(chatId), Int32(archive ? 1 : 0))
-//    }
 
     func createChatByMessageId(messageId: UInt32) -> DcChat {
         let chatId = dc_create_chat_by_msg_id(DcContext.contextPointer, messageId)
@@ -281,7 +281,7 @@ class DcContext {
 
     func sendAttachment(fromPath path: String, withType type: Int32, mimeType: String?, text: String?, duration: Int32?, forChatId chatId: UInt32) throws -> UInt32 {
         guard Int(type).isValidAttachmentType else {
-            throw DcContextError(kind: .wrongAttachmentType(type))
+            throw DcContextError.wrongAttachmentType(type)
         }
         
         let msg = DcMsg(type: type)
@@ -297,7 +297,7 @@ class DcContext {
         switch type {
             case DC_MSG_IMAGE, DC_MSG_GIF:
                 guard let image = UIImage(contentsOfFile: path) else {
-                    throw DcContextError(kind: .missingImageAtPath(path))
+                    throw DcContextError.missingImageAtPath(path)
                 }
 
                 let pixelSize = image.sizeInPixel

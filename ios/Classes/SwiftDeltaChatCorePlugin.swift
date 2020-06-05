@@ -50,18 +50,19 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
 
     fileprivate let registrar: FlutterPluginRegistrar!
     
-    fileprivate let dcContext: DcContext!
-    fileprivate let dcEventHandler: DCEventHandler!
+    fileprivate var dcContext: DcContext!
+    fileprivate var dcEventHandler: DCEventHandler!
 
-    fileprivate let chatCache: IdCache<DcChat> = IdCache()
-    fileprivate let contactCache: IdCache<DcContact> = IdCache()
-    fileprivate let messageCache: IdCache<DcMsg> = IdCache()
+    fileprivate var chatCache: IdCache<DcChat> = IdCache()
+    fileprivate var contactCache: IdCache<DcContact> = IdCache()
+    fileprivate var messageCache: IdCache<DcMsg> = IdCache()
 
-    fileprivate let chatCallHandler: ChatCallHandler!
-    fileprivate let chatListCallHandler: ChatListCallHandler!
-    fileprivate let contactCallHandler: ContactCallHandler!
-    fileprivate let contextCallHandler: ContextCallHandler!
-    fileprivate let messageCallHandler: MessageCallHandler!
+    fileprivate var chatCallHandler: ChatCallHandler!
+    fileprivate var chatListCallHandler: ChatListCallHandler!
+    fileprivate var contactCallHandler: ContactCallHandler!
+    fileprivate var contextCallHandler: ContextCallHandler!
+    fileprivate var messageCallHandler: MessageCallHandler!
+    fileprivate var eventChannelHandler: EventChannelHandler!
 
     // MARK: - Initialization
 
@@ -77,23 +78,29 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         self.contactCallHandler  = ContactCallHandler(context: dcContext, contextCallHandler: contextCallHandler)
         self.messageCallHandler  = MessageCallHandler(context: dcContext, contextCallHandler: contextCallHandler)
         
-        let ech = EventChannelHandler.sharedInstance
-        ech.messenger = registrar.messenger()
+        self.eventChannelHandler = EventChannelHandler.sharedInstance
+        self.eventChannelHandler.messenger = registrar.messenger()
         
         super.init()
     }
+    
+    // MARK: - FlutterPlugin
 
     // This is our entry point
     public static func register(with registrar: FlutterPluginRegistrar) {
+        Utils.logEventAndDelegate(logLevel: .info, message: "Attaching plugin via v2 embedding")
         let channel = FlutterMethodChannel(name: MethodChannel.DeltaChat.Core, binaryMessenger: registrar.messenger())
         let delegate = SwiftDeltaChatCorePlugin(registrar: registrar)
         registrar.addMethodCallDelegate(delegate, channel: channel)
     }
-
-    // MARK: - FlutterPlugin
+    
+    public func detachFromEngine(for registrar: FlutterPluginRegistrar) {
+        Utils.logEventAndDelegate(logLevel: .info, message: "Detaching plugin via v2 embedding")
+        teardown()
+    }
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.debug, message: "Dart MethodCall: \(call.method)")
+        Utils.logEventAndDelegate(logLevel: .debug, message: "Dart MethodCall: \(call.method)")
         
         if call.contains(key: Argument.REMOVE_CACHE_IDENTIFIER) {
             removeFromCache(with: call, result: result)
@@ -113,7 +120,7 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         case Method.Prefix.MSG:
             messageCallHandler.handle(call, result: result)
         default:
-            Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.debug, message: "Failing for \(call.method)")
+            Utils.logEventAndDelegate(logLevel: .debug, message: "Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
         }
 
@@ -122,11 +129,16 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
     func handleBaseCalls(with call: FlutterMethodCall, result: FlutterResult) {
         switch (call.method) {
         case Method.Base.INIT:
-            baseInit(result: result)
+            baseInit(with: call, result: result)
         case Method.Base.LOGOUT:
+            teardown()
             logout(result: result)
+            result(nil)
+        case Method.Base.TEARDOWN:
+            teardown()
+            result(nil)
         default:
-            Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.error, message: "Failing for \(call.method)")
+            Utils.logEventAndDelegate(logLevel: .error, message: "Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
         }
     }
@@ -146,7 +158,7 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
                 _ = chatCache.removeValue(for: id)
             case .chatMessage:
                 if let msg = messageCache.removeValue(for: id) {
-                    Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.info, message: "removed message: \(msg.type)")
+                    Utils.logEventAndDelegate(logLevel: .info, message: "removed message: \(msg.type)")
                 }
             case .contact:
                 _ = contactCache.removeValue(for: id)
@@ -158,14 +170,21 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
     
     // MARK: - Handle Base Calls
 
-    fileprivate func baseInit(result: FlutterResult) {
+    fileprivate func baseInit(with call: FlutterMethodCall, result: FlutterResult) {
+        let minimalSetup = call.boolValue(for: Argument.MINIMAL_SETUP, result: result)
+        
+        Utils.logEventAndDelegate(logLevel: .info, message: "Init started, with minimal setup: \(minimalSetup ? "YES": "NO")")
+        
         if dcContext.openUserDataBase() {
-            dcEventHandler.start()
+            if !minimalSetup {
+                dcEventHandler.start()
+            }
             _ = dcContext.getCoreInfo()
             result(dcContext.userDatabasePath)
             return
         }
-        Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.error, message: "Couldn't open user database at path: \(dcContext.userDatabasePath)")
+
+        Utils.logEventAndDelegate(logLevel: .error, message: "Couldn't open user database at path: \(dcContext.userDatabasePath)")
         result(DCPluginError.couldNotOpenDataBase())
     }
     
@@ -178,6 +197,27 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
             application.perform(sel)
             result(nil)
         }
+    }
+    
+    func teardown() {
+        Utils.logEventAndDelegate(logLevel: .info, message: "Teardown started")
+
+        dcContext.teardown()
+        dcContext = nil
+        dcEventHandler.stop()
+        dcEventHandler = nil
+        contextCallHandler  = nil
+        chatCallHandler     = nil
+        chatListCallHandler = nil
+        contactCallHandler  = nil
+        messageCallHandler  = nil
+        eventChannelHandler = nil
+        
+        chatCache.clear()
+        contactCache.clear()
+        messageCache.clear()
+
+        Utils.logEventAndDelegate(logLevel: .info, message: "Teardown finished")
     }
 
 }

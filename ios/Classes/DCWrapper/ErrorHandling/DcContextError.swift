@@ -42,13 +42,7 @@
 
 import Foundation
 
-struct DcContextError: Error {
-
-    enum ErrorKind {
-        case missingImageAtPath(String)
-        case wrongAttachmentType(Int32)
-    }
-
-    let kind: ErrorKind
-
+enum DcContextError: Error {
+    case missingImageAtPath(String)
+    case wrongAttachmentType(Int32)
 }

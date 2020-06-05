@@ -80,6 +80,7 @@ struct Argument {
     static let MESSAGE_TYPE_ONE        = "messageTypeOne"
     static let MESSAGE_TYPE_TWO        = "messageTypeTwo"
     static let MESSAGE_TYPE_THREE      = "messageTypeThree"
+    static let MINIMAL_SETUP           = "minimalSetup"
 
     struct Error {
         static let MISSING       = "1"

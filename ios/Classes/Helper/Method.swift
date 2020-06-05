@@ -66,6 +66,7 @@ extension Method {
         static let INIT                                 = "base_init"
         static let CORE_LISTENER                        = "base_coreListener"
         static let LOGOUT                               = "base_logout"
+        static let TEARDOWN                             = "base_tearDown"
     }
 
 }

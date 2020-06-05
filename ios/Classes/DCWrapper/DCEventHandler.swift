@@ -59,7 +59,6 @@ class DCEventHandler {
 
     func start(_ completion: (() -> Void)? = nil) {
         if state == .running { return }
-
         state = .running
 
         DispatchQueue.global(qos: .background).async {
