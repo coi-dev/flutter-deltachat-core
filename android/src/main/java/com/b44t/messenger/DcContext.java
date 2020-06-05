@@ -28,11 +28,6 @@ public class DcContext {
     public final static int DC_EVENT_IMEX_FILE_WRITTEN           = 2052;
     public final static int DC_EVENT_SECUREJOIN_INVITER_PROGRESS = 2060;
     public final static int DC_EVENT_SECUREJOIN_JOINER_PROGRESS  = 2061;
-    public final static int DC_EVENT_IS_OFFLINE                  = 2081;
-    public final static int DC_EVENT_GET_STRING                  = 2091;
-    public final static int DC_EVENT_GET_QUANTITIY_STRING        = 2092;
-    public final static int DC_EVENT_HTTP_GET                    = 2100;
-    public final static int DC_EVENT_HTTP_POST                   = 2110;
 
     public final static int DC_IMEX_EXPORT_SELF_KEYS = 1;
     public final static int DC_IMEX_IMPORT_SELF_KEYS = 2;
@@ -44,6 +39,7 @@ public class DcContext {
     public final static int DC_GCL_ARCHIVED_ONLY    = 0x01;
     public final static int DC_GCL_NO_SPECIALS      = 0x02;
     public final static int DC_GCL_ADD_ALLDONE_HINT = 0x04;
+    public final static int DC_GCL_FOR_FORWARDING   = 0x08;
 
     public final static int DC_GCM_ADDDAYMARKER = 0x01;
 
@@ -52,6 +48,7 @@ public class DcContext {
     public final static int DC_QR_FPR_OK            = 210;
     public final static int DC_QR_FPR_MISMATCH      = 220;
     public final static int DC_QR_FPR_WITHOUT_ADDR  = 230;
+    public final static int DC_QR_ACCOUNT           = 250;
     public final static int DC_QR_ADDR              = 320;
     public final static int DC_QR_TEXT              = 330;
     public final static int DC_QR_URL               = 332;
@@ -70,6 +67,9 @@ public class DcContext {
     public final static int DC_SHOW_EMAILS_ACCEPTED_CONTACTS = 1;
     public final static int DC_SHOW_EMAILS_ALL               = 2;
 
+    public final static int DC_MEDIA_QUALITY_BALANCED = 0;
+    public final static int DC_MEDIA_QUALITY_WORSE    = 1;
+
     public final static int DC_EMPTY_MVBOX           = 0x01;
     public final static int DC_EMPTY_INBOX           = 0x02;
 
@@ -78,8 +78,16 @@ public class DcContext {
         contextCPtr = createContextCPtr(osName);
     }
 
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        unrefContextCPtr();
+        contextCPtr = 0;
+    }
+
     public native int          open                 (String dbfile);
     public native void         close                ();
+    public native void         setStockTranslation  (int stockId, String translation);
     public native String       getBlobdir           ();
     public native void         configure            ();
     public native void         stopOngoingProcess   ();
@@ -102,11 +110,12 @@ public class DcContext {
 
     public native void         performSmtpJobs      ();
     public native void         performSmtpIdle      ();
-    public native void         interruptSmtpIdle ();
+    public native void         interruptSmtpIdle    ();
 
     public native void         maybeNetwork         ();
     public native void         setConfig            (String key, String value);
     public void                setConfigInt         (String key, int value) { setConfig(key, Integer.toString(value)); }
+    public native boolean      setConfigFromQr      (String qr);
     public native String       getConfig            (String key);
     public int                 getConfigInt         (String key) { try{return Integer.parseInt(getConfig(key));} catch(Exception e) {} return 0; }
     @Deprecated public String  getConfig            (String key, String def) { return getConfig(key); }
@@ -135,7 +144,7 @@ public class DcContext {
     public native void         marknoticedChat      (int chat_id);
     public native void         marknoticedAllChats  ();
     public native void         marknoticedContact   (int contact_id);
-    public native void         archiveChat          (int chat_id, int archive);
+    public native void         setChatVisibility    (int chat_id, int visibility);
     public native int          getChatIdByContactId (int contact_id);
     public native int          createChatByContactId(int contact_id);
     public native int          createChatByMsgId    (int msg_id);
@@ -157,13 +166,16 @@ public class DcContext {
     public @NonNull DcMsg      getMsg               (int msg_id) { return new DcMsg(getMsgCPtr(msg_id)); }
     public native String       getMsgInfo           (int id);
     public native int          getFreshMsgCount     (int chat_id);
+    public native int          estimateDeletionCount(boolean from_server, long seconds);
     public native void         deleteMsgs           (int msg_ids[]);
     public native void         forwardMsgs          (int msg_ids[], int chat_id);
     public native int          prepareMsg           (int chat_id, DcMsg msg);
     public native int          sendMsg              (int chat_id, DcMsg msg);
     public native int          sendTextMsg          (int chat_id, String text);
     public native void         starMsgs             (int msg_ids[], int star);
-    public native long         checkQrCPtr          (String qr);
+    public native int          addDeviceMsg         (String label, DcMsg msg);
+    public native boolean      wasDeviceMsgEverAdded(String label);
+    public native void         updateDeviceChats    ();
     public @NonNull DcLot      checkQr              (String qr) { return new DcLot(checkQrCPtr(qr)); }
     public native String       getSecurejoinQr      (int chat_id);
     public native int          joinSecurejoin       (String qr);
@@ -171,6 +183,7 @@ public class DcContext {
     public native boolean      isSendingLocationsToChat(int chat_id);
     public @NonNull DcArray    getLocations         (int chat_id, int contact_id, long timestamp_start, long timestamp_end) { return new DcArray(getLocationsCPtr(chat_id, contact_id, timestamp_start, timestamp_end)); }
     public native void         deleteAllLocations   ();
+    public @Nullable DcProvider getProviderFromEmail (String email) { long cptr = getProviderFromEmailCPtr(email); return cptr!=0 ? new DcProvider(cptr) : null; }
     public native int          isCoiSupported       ();
     public native int          isCoiEnabled         ();
     public native int          isWebPushSupported   ();
@@ -181,6 +194,7 @@ public class DcContext {
     public native void         setCoiMessageFilter  (int mode, int id);
     public native int          isCoiMessageFilterEnabled();
     public native void         validateWebPush      (String uid, String msg, int id);
+    public native String       decryptMessageInMemory (String contentType, String content, String senderAddress, ChatIdWrapper chatIdWrapper);
 
     /**
      * @return true if at least one chat has location streaming enabled
@@ -196,11 +210,11 @@ public class DcContext {
     public native static boolean data1IsString(int event);
     public native static boolean data2IsString(int event);
     public native static String  dataToString (long data);
-    public native static long    stringToData (String str);
 
     // working with raw c-data
     private long        contextCPtr;     // CAVE: the name is referenced in the JNI
     private native long createContextCPtr(String osName);
+    private native void unrefContextCPtr ();
     public  native long createMsgCPtr    (int viewtype);
     private native long getChatlistCPtr  (int listflags, String query, int queryId);
     private native long getChatCPtr      (int chat_id);
@@ -208,4 +222,6 @@ public class DcContext {
     private native long getDraftCPtr    (int id);
     private native long getContactCPtr   (int id);
     private native long getLocationsCPtr (int chat_id, int contact_id, long timestamp_start, long timestamp_end);
+    private native long checkQrCPtr      (String qr);
+    private native long getProviderFromEmailCPtr  (String addr);
 }

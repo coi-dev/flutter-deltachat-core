@@ -76,11 +76,6 @@ public class EventChannelHandler implements EventChannel.StreamHandler {
             DcContext.DC_EVENT_IMEX_FILE_WRITTEN,
             DcContext.DC_EVENT_SECUREJOIN_INVITER_PROGRESS,
             DcContext.DC_EVENT_SECUREJOIN_JOINER_PROGRESS,
-            DcContext.DC_EVENT_IS_OFFLINE,
-            DcContext.DC_EVENT_GET_STRING,
-            DcContext.DC_EVENT_GET_QUANTITIY_STRING,
-            DcContext.DC_EVENT_HTTP_GET,
-            DcContext.DC_EVENT_HTTP_POST,
             DcContext.DC_EVENT_MISSING_KEY,
             COI_EVENT_SET_METADATA_DONE,
             COI_EVENT_WEB_PUSH_SUBSCRIPTION);
@@ -122,13 +117,15 @@ public class EventChannelHandler implements EventChannel.StreamHandler {
         if (eventSink == null) {
             return;
         }
-        eventSink.endOfStream();
         eventSink = null;
     }
 
     public void close() {
-        eventChannel.setStreamHandler(null);
-        eventChannel = null;
+        eventSink = null;
+        if (eventChannel != null) {
+            eventChannel.setStreamHandler(null);
+            eventChannel = null;
+        }
     }
 
     private boolean isDelegateEvent(int eventId) {

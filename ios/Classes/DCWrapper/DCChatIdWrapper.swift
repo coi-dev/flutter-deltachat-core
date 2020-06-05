@@ -26,7 +26,7 @@
  * https://www.open-xchange.com/legal/. The contributing author shall be
  * given Attribution for the derivative code and a license granting use.
  *
- * Copyright (C) 2016-2019 OX Software GmbH
+ * Copyright (C) 2016-2020 OX Software GmbH
  * Mail: info@open-xchange.com
  *
  *
@@ -42,7 +42,7 @@
 
 import Foundation
 
-enum DcContextError: Error {
-    case missingImageAtPath(String)
-    case wrongAttachmentType(Int32)
+class DcChatIdWrapper {
+    var chatId: Int32 = 0
+    var totalNumberOfParts: Int32 = 0
 }

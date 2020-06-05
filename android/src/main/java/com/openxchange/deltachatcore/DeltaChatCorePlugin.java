@@ -60,22 +60,17 @@ import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
-import io.flutter.embedding.engine.plugins.activity.ActivityAware;
-import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
-import io.flutter.view.FlutterNativeView;
 
-import static android.util.Log.DEBUG;
+import static android.util.Log.INFO;
 import static com.openxchange.deltachatcore.Utils.logEventAndDelegate;
 
-public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.ViewDestroyListener, FlutterPlugin, ActivityAware {
-    static final String TAG = "coi";
+public class DeltaChatCorePlugin implements MethodCallHandler, FlutterPlugin {
+    static final String TAG = "coi-plugin";
 
     private static final String LIBRARY_NAME = "native-utils";
     private static final String CHANNEL_DELTA_CHAT_CORE = "deltaChatCore";
@@ -89,90 +84,61 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
     private static final String METHOD_PREFIX_MSG = "msg";
 
     private static final String METHOD_BASE_INIT = "base_init";
-    private static final String METHOD_BASE_SYSTEM_INFO = "base_systemInfo";
-    private static final String METHOD_BASE_START = "base_start";
-    private static final String METHOD_BASE_STOP = "base_stop";
+    private static final String METHOD_BASE_TEAR_DOWN = "base_tearDown";
     private static final String METHOD_BASE_LOGOUT = "base_logout";
 
     private static final String ARGUMENT_REMOVE_CACHE_IDENTIFIER = "removeCacheIdentifier";
     private static final String ARGUMENT_DB_NAME = "dbName";
+    private static final String ARGUMENT_MINIMAL_SETUP = "minimalSetup";
+
 
     private static final String CACHE_IDENTIFIER_CHAT = "chat";
     private static final String CACHE_IDENTIFIER_CHAT_LIST = "chatList";
     private static final String CACHE_IDENTIFIER_CHAT_MESSAGE = "chatMessage";
     private static final String CACHE_IDENTIFIER_CONTACT = "contact";
 
+    // Only change during onAttachedToEngine / onDetachedFromEngine
     private Context context;
     private BinaryMessenger messenger;
-    private MethodChannel channel;
+    private MethodChannel methodChannel;
 
+    // Clear on tearDown
     private final IdCache<DcChat> chatCache = new IdCache<>();
     private final IdCache<DcContact> contactCache = new IdCache<>();
     private final IdCache<DcMsg> messageCache = new IdCache<>();
 
+    // Null on tearDown
     private NativeInteractionManager nativeInteractionManager;
     private ChatCallHandler chatCallHandler;
     private ChatListCallHandler chatListCallHandler;
     private ContactCallHandler contactCallHandler;
     private ContextCallHandler contextCallHandler;
     private MessageCallHandler messageCallHandler;
-    @SuppressWarnings("FieldCanBeLocal")
     private EventChannelHandler eventChannelHandler;
 
-    @SuppressWarnings("WeakerAccess")
     public DeltaChatCorePlugin() {
         // Required for Flutter plugin embedding v2
     }
 
-    // Flutter plugin v1 embedding
-    public static void registerWith(Registrar registrar) {
-        logEventAndDelegate(null, DEBUG, TAG, "Attaching plugin via v1 embedding");
-        DeltaChatCorePlugin plugin = new DeltaChatCorePlugin();
-        plugin.onAttachedToEngine(registrar.context(), registrar.messenger());
-        registrar.addViewDestroyListener(plugin);
-    }
-
-    // Flutter plugin v2 embedding
     @Override
     public void onAttachedToEngine(FlutterPluginBinding binding) {
-        logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Attaching plugin via v2 embedding");
-        onAttachedToEngine(binding.getApplicationContext(), binding.getBinaryMessenger());
-    }
-
-    private void onAttachedToEngine(Context context, BinaryMessenger messenger) {
-        this.context = context;
-        this.messenger = messenger;
-        channel = new MethodChannel(messenger, CHANNEL_DELTA_CHAT_CORE);
-        channel.setMethodCallHandler(this);
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, "Attaching plugin via v2 embedding");
+        context = binding.getApplicationContext();
+        messenger = binding.getBinaryMessenger();
+        methodChannel = new MethodChannel(messenger, CHANNEL_DELTA_CHAT_CORE);
+        methodChannel.setMethodCallHandler(this);
     }
 
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-        logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Detaching plugin via v2 embedding");
-        channel.setMethodCallHandler(null);
-        channel = null;
-        eventChannelHandler.close();
-    }
-
-    @Override
-    public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
-        // No implementation required, as no activity context is used by the plugin
-    }
-
-    @Override
-    public void onDetachedFromActivityForConfigChanges() {
-        // No implementation required, as no activity context is used by the plugin
-    }
-
-    @Override
-    public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
-        // No implementation required, as no activity context is used by the plugin
-    }
-
-    @Override
-    public void onDetachedFromActivity() {
-        logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Stopping threads via v2 embedding");
-        stopNativeInteractionManager();
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, "Detaching plugin via v2 embedding");
+        context = null;
+        messenger = null;
+        if (methodChannel != null) {
+            methodChannel.setMethodCallHandler(null);
+            methodChannel = null;
+        }
+        tearDown(null);
     }
 
     @Override
@@ -237,15 +203,9 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
             case METHOD_BASE_INIT:
                 init(methodCall, result);
                 break;
-            case METHOD_BASE_SYSTEM_INFO:
-                systemInfo(result);
-                break;
-            case METHOD_BASE_START:
-                start(result);
-                break;
-            case METHOD_BASE_STOP:
+            case METHOD_BASE_TEAR_DOWN:
             case METHOD_BASE_LOGOUT:
-                stop(result);
+                tearDown(result);
                 break;
             default:
                 result.notImplemented();
@@ -253,40 +213,47 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
     }
 
     private void init(MethodCall methodCall, Result result) {
+        Boolean minimalSetup = methodCall.argument(ARGUMENT_MINIMAL_SETUP);
+        if (minimalSetup == null ) {
+            throw new IllegalArgumentException("No setup type defined (minimal vs. full setup, exiting.");
+        }
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, "Init started, with minimal setup = " + minimalSetup);
         String dbName = methodCall.argument(ARGUMENT_DB_NAME);
         if (dbName == null || dbName.isEmpty()) {
             throw new IllegalArgumentException("No database name given, exiting.");
         }
         System.loadLibrary(LIBRARY_NAME);
         eventChannelHandler = new EventChannelHandler(messenger);
-        nativeInteractionManager = new NativeInteractionManager(context, dbName, eventChannelHandler);
+        nativeInteractionManager = new NativeInteractionManager(context, dbName, minimalSetup, eventChannelHandler);
         contextCallHandler = new ContextCallHandler(nativeInteractionManager, contactCache, messageCache, chatCache);
         chatListCallHandler = new ChatListCallHandler(nativeInteractionManager, chatCache);
         messageCallHandler = new MessageCallHandler(nativeInteractionManager, contextCallHandler);
         contactCallHandler = new ContactCallHandler(nativeInteractionManager, contextCallHandler);
         chatCallHandler = new ChatCallHandler(nativeInteractionManager, contextCallHandler);
-        logEventAndDelegate(eventChannelHandler, DEBUG, TAG, nativeInteractionManager.getInfo());
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, nativeInteractionManager.getInfo());
         result.success(nativeInteractionManager.getDbPath());
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, "Init finished");
     }
 
-    private void systemInfo(Result result) {
-        result.success(android.os.Build.VERSION.RELEASE);
+    private void tearDown(Result result) {
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, "Teardown started");
+        nativeInteractionManager.tearDown();
+        nativeInteractionManager = null;
+        contextCallHandler = null;
+        chatListCallHandler = null;
+        messageCallHandler = null;
+        contactCallHandler = null;
+        chatCallHandler = null;
+        if (result != null) {
+            result.success(null);
+        }
+        eventChannelHandler.close();
+        eventChannelHandler = null;
+        chatCache.clear();
+        contactCache.clear();
+        messageCache.clear();
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, "Teardown finished");
     }
-
-    private void start(Result result) {
-        nativeInteractionManager.start();
-        result.success(null);
-    }
-
-    private void stop(Result result) {
-        stopNativeInteractionManager();
-        result.success(null);
-    }
-
-    private void stopNativeInteractionManager() {
-        nativeInteractionManager.stop();
-    }
-
 
     private void handleContextCalls(MethodCall methodCall, Result result) {
         contextCallHandler.handleCall(methodCall, result);
@@ -306,11 +273,5 @@ public class DeltaChatCorePlugin implements MethodCallHandler, PluginRegistry.Vi
 
     private void handleMessageCalls(MethodCall methodCall, Result result) {
         messageCallHandler.handleCall(methodCall, result);
-    }
-
-    @Override
-    public boolean onViewDestroy(FlutterNativeView flutterNativeView) {
-        stopNativeInteractionManager();
-        return false;
     }
 }

@@ -58,6 +58,11 @@ class ChatListCallHandler: MethodCallHandling {
         self.context = context
         self.chatCache = chatCache
     }
+    
+    deinit {
+        chatCache.clear()
+        chatListCache.clear()
+    }
 
     // MARK: - Protocol MethodCallHandling
 

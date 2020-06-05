@@ -67,7 +67,7 @@ class _MyAppState extends State<MyApp> {
     _addListItem(information: true, text: "Information\n[Test succeeded] Informational text [assertion == result]");
     try {
       DeltaChatCore core = DeltaChatCore();
-      bool init = await core.init("messenger.db");
+      bool init = await core.setupAsync(dbName: "messenger.db", minimalSetup: false);
       if (init) {
         _addListItem(text: "Init done");
         Context context = Context();
@@ -156,9 +156,11 @@ class _MyAppState extends State<MyApp> {
         var chatCntAfterDeletingChat = await chatList.getChatCnt();
         await chatList.tearDown();
         _addListItem(text: "deleteChat", assertion: 0, result: chatCntAfterDeletingChat);
-        core.stop();
+        await Future.delayed(const Duration(seconds: 1));
+        core.tearDownAsync();
         var dbFile = File(core.dbPath);
         dbFile.deleteSync();
+        _addListItem(text: "Teardown and cleanup down");
       }
     } on PlatformException {
       throw StateError("Test suite failed, forbidden state entered");

@@ -87,6 +87,11 @@ class EventChannelHandler: NSObject, FlutterStreamHandler {
     override init() {
         super.init()
     }
+    
+    deinit {
+        self.eventChannel.setStreamHandler(nil)
+        self.eventChannel = nil
+    }
 
     // MARK: - FlutterStreamHandler
 

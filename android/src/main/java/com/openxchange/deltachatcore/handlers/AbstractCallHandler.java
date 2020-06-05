@@ -82,6 +82,8 @@ abstract public class AbstractCallHandler {
     static final String ARGUMENT_UID = "uid";
     static final String ARGUMENT_MODE = "mode";
     static final String ARGUMENT_ENABLE = "enable";
+    static final String ARGUMENT_CONTENT = "content";
+    static final String ARGUMENT_CONTENT_TYPE = "contentType";
     static final String ARGUMENT_MIME_TYPE = "mimeType";
     static final String ARGUMENT_DURATION = "duration";
     static final String ARGUMENT_DIR = "dir";

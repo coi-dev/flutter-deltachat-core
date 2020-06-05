@@ -197,6 +197,6 @@ class ChatMsg extends Base {
   getSummaryArguments(int characterCount) => <String, dynamic>{Base.argumentId: _id, Base.argumentCount: characterCount};
 
   static Function getCreator() {
-    return (id) => new ChatMsg._internal(id);
+    return (id) => ChatMsg._internal(id);
   }
 }

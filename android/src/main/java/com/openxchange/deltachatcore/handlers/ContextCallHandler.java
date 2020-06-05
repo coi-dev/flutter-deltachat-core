@@ -42,8 +42,7 @@
 
 package com.openxchange.deltachatcore.handlers;
 
-import android.util.Log;
-
+import com.b44t.messenger.ChatIdWrapper;
 import com.b44t.messenger.DcChat;
 import com.b44t.messenger.DcChatlist;
 import com.b44t.messenger.DcContact;
@@ -53,6 +52,8 @@ import com.b44t.messenger.DcMsg;
 import com.openxchange.deltachatcore.IdCache;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -117,6 +118,7 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
     private static final String METHOD_RETRY_SENDING_PENDING_MESSAGES = "context_retrySendingPendingMessages";
     private static final String METHOD_GET_CONTACT_ID_BY_ADDRESS = "context_getContactIdByAddress";
     private static final String METHOD_GET_NEXT_MEDIA = "context_getNextMedia";
+    private static final String METHOD_DECRYPT_IN_MEMORY = "context_decryptInMemory";
 
     private static final String TYPE_INT = "int";
     private static final String TYPE_STRING = "String";
@@ -296,6 +298,9 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
                 break;
             case METHOD_VALIDATE_WEB_PUSH:
                 validateWebPush(methodCall, result);
+                break;
+            case METHOD_DECRYPT_IN_MEMORY:
+                decryptMessageInMemory(methodCall, result);
                 break;
             case METHOD_GET_MESSAGE_INFO:
                 getMessageInfo(methodCall, result);
@@ -992,8 +997,10 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
     }
 
     private void interruptIdleForIncomingMessages(MethodChannel.Result result) {
-        dcContext.interruptImapIdle();
-        dcContext.interruptMvboxIdle();
+        dcContext.performImapJobs();
+        dcContext.performImapFetch();
+        dcContext.performMvboxJobs();
+        dcContext.performMvboxFetch();
         result.success(null);
     }
 
@@ -1193,5 +1200,31 @@ public class ContextCallHandler extends com.openxchange.deltachatcore.handlers.A
     private void retrySendingPendingMessages(MethodChannel.Result result) {
         dcContext.maybeNetwork();
         result.success(null);
+    }
+
+    private void decryptMessageInMemory(MethodCall methodCall, MethodChannel.Result result) {
+        if (!hasArgumentKeys(methodCall, ARGUMENT_CONTENT_TYPE, ARGUMENT_CONTENT, ARGUMENT_ADDRESS)) {
+            resultErrorArgumentMissing(result);
+            return;
+        }
+        String contentType = methodCall.argument(ARGUMENT_CONTENT_TYPE);
+        if (contentType == null || contentType.isEmpty()) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        String content = methodCall.argument(ARGUMENT_CONTENT);
+        if (content == null || content.isEmpty()) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        String senderAddress = methodCall.argument(ARGUMENT_ADDRESS);
+        if (senderAddress == null || senderAddress.isEmpty()) {
+            resultErrorArgumentMissingValue(result);
+            return;
+        }
+        ChatIdWrapper chatIdWrapper = new ChatIdWrapper();
+        String plainText = dcContext.decryptMessageInMemory(contentType, content, senderAddress, chatIdWrapper);
+        List<Object> data = Arrays.asList(chatIdWrapper.chatId, plainText);
+        result.success(data);
     }
 }

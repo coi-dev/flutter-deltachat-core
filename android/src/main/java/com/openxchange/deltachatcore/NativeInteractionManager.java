@@ -18,7 +18,6 @@ import java.util.Objects;
 
 import androidx.annotation.RequiresApi;
 
-import static android.util.Log.DEBUG;
 import static android.util.Log.ERROR;
 import static android.util.Log.INFO;
 import static android.util.Log.WARN;
@@ -35,320 +34,70 @@ public class NativeInteractionManager extends DcContext {
 
     private final long wakeLockTimeout = 10 * 60 * 1000L; /*10 minutes*/
     private final String dbPath;
+    private final boolean minimalSetup;
     private final EventChannelHandler eventChannelHandler;
 
     private final Object threadsSynchronized = new Object();
-    private final Object imapThreadSynchronized = new Object();
-    private final Object mvboxThreadSynchronized = new Object();
-    private final Object sentBoxThreadSynchronized = new Object();
-    private final Object smtpThreadSynchronized = new Object();
-    private Thread imapThread = null;
+    private final Object loopsSynchronized = new Object();
+
+    // IMAP thread for the inbox folder
+    private Thread inboxThread = null;
     private PowerManager.WakeLock imapWakeLock = null;
+    private int inboxLoops = 0;
+
+    // IMAP thread for the move-to folder (Deltachat or coi/chats)
     private Thread mvboxThread = null;
     private PowerManager.WakeLock mvboxWakeLock = null;
+    private int mvboxLoops = 0;
+
+    // IMAP thread for the sent folder
     private Thread sentBoxThread = null;
     private PowerManager.WakeLock sentBoxWakeLock = null;
+    private int sentBoxLoops = 0;
+
+    // SMTP thread for sending messages
     private Thread smtpThread = null;
     private PowerManager.WakeLock smtpWakeLock = null;
-    private boolean imapThreadStarted;
-    private boolean mvboxThreadStarted;
-    private boolean sentBoxThreadStarted;
-    private boolean smtpThreadStarted;
+    private int smtpLoops = 0;
 
-    NativeInteractionManager(Context context, String dbName, EventChannelHandler eventChannelHandler) {
+    // Only relevant if minimalSetup = false, as if minimalSetup = true no threads are used at all
+    private boolean threadsRunning = true;
+
+    NativeInteractionManager(Context context, String dbName, boolean minimalSetup, EventChannelHandler eventChannelHandler) {
         super("Android " + BuildConfig.VERSION_NAME);
         this.eventChannelHandler = eventChannelHandler;
+        this.minimalSetup = minimalSetup;
 
         File databaseFile = new File(context.getFilesDir(), dbName);
         dbPath = databaseFile.getAbsolutePath();
+
+        init(context, databaseFile);
+    }
+
+    private void init(Context context, File databaseFile) {
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, "Opening database");
         open(databaseFile.getAbsolutePath());
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, "Database opened");
+        if (!minimalSetup) {
+            try {
+                PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
 
-        try {
-            PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+                imapWakeLock = Objects.requireNonNull(powerManager).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, COI_IMAP_WAKE_LOCK);
+                imapWakeLock.setReferenceCounted(false); // if the idle-thread is killed for any reasons, it is better not to rely on reference counting
 
-            imapWakeLock = Objects.requireNonNull(powerManager).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, COI_IMAP_WAKE_LOCK);
-            imapWakeLock.setReferenceCounted(false); // if the idle-thread is killed for any reasons, it is better not to rely on reference counting
+                mvboxWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, COI_MVBOX_WAKE_LOCK);
+                mvboxWakeLock.setReferenceCounted(false); // if the idle-thread is killed for any reasons, it is better not to rely on reference counting
 
-            mvboxWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, COI_MVBOX_WAKE_LOCK);
-            mvboxWakeLock.setReferenceCounted(false); // if the idle-thread is killed for any reasons, it is better not to rely on reference counting
+                sentBoxWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, COI_SENT_BOX_WAKE_LOCK);
+                sentBoxWakeLock.setReferenceCounted(false); // if the idle-thread is killed for any reasons, it is better not to rely on reference counting
 
-            sentBoxWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, COI_SENT_BOX_WAKE_LOCK);
-            sentBoxWakeLock.setReferenceCounted(false); // if the idle-thread is killed for any reasons, it is better not to rely on reference counting
-
-            smtpWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, COI_SMTP_WAKE_LOCK);
-            smtpWakeLock.setReferenceCounted(false); // if the idle-thread is killed for any reasons, it is better not to rely on reference counting
-        } catch (Exception e) {
-            logEventAndDelegate(eventChannelHandler, ERROR, TAG, "Cannot create wakeLocks");
-        }
-        start();
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivityManager != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                registerConnectivityReceiverAndroidN(connectivityManager);
-            } else {
-                registerConnectivityReceiver(context, connectivityManager);
+                smtpWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, COI_SMTP_WAKE_LOCK);
+                smtpWakeLock.setReferenceCounted(false); // if the idle-thread is killed for any reasons, it is better not to rely on reference counting
+            } catch (Exception e) {
+                logEventAndDelegate(eventChannelHandler, ERROR, TAG, "Cannot create wakeLocks");
             }
-        }
-    }
-
-    @SuppressWarnings("deprecation")
-    private void registerConnectivityReceiver(Context context, ConnectivityManager connectivityManager) {
-        context.registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-                boolean isConnected = networkInfo != null && networkInfo.isConnected();
-                if (isConnected) {
-                    startOnNetworkAvailable();
-                }
-            }
-        }, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
-    }
-
-    private void startOnNetworkAvailable() {
-        logEventAndDelegate(eventChannelHandler, INFO, TAG, "###################### Network is connected again. ######################");
-        start();
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    private void registerConnectivityReceiverAndroidN(ConnectivityManager connectivityManager) {
-        if (connectivityManager != null) {
-            connectivityManager.registerDefaultNetworkCallback(new ConnectivityManager.NetworkCallback() {
-                @Override
-                public void onAvailable(Network network) {
-                    startOnNetworkAvailable();
-                }
-            });
-        }
-    }
-
-    void start() {
-        logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Starting threads");
-        startThreads(INTERRUPT_IDLE);
-        waitForThreadsRunning();
-    }
-
-    private void waitForThreadsRunning() {
-        try {
-            synchronized (imapThreadSynchronized) {
-                while (!imapThreadStarted) {
-                    imapThreadSynchronized.wait();
-                }
-            }
-
-            synchronized (mvboxThreadSynchronized) {
-                while (!mvboxThreadStarted) {
-                    mvboxThreadSynchronized.wait();
-                }
-            }
-
-            synchronized (sentBoxThreadSynchronized) {
-                while (!sentBoxThreadStarted) {
-                    sentBoxThreadSynchronized.wait();
-                }
-            }
-
-            synchronized (smtpThreadSynchronized) {
-                while (!smtpThreadStarted) {
-                    smtpThreadSynchronized.wait();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    void stop() {
-        logEventAndDelegate(eventChannelHandler, DEBUG, TAG, "Stopping threads");
-        stopThreads();
-        interruptImapIdle();
-        interruptMvboxIdle();
-        interruptSentboxIdle();
-        interruptSmtpIdle();
-        imapThread = null;
-        mvboxThread = null;
-        sentBoxThread = null;
-        smtpThread = null;
-    }
-
-    private void startThreads(@SuppressWarnings("SameParameterValue") int flags) {
-        synchronized (threadsSynchronized) {
-
-            if (imapThread == null || !imapThread.isAlive()) {
-
-                synchronized (imapThreadSynchronized) {
-                    imapThreadStarted = false;
-                }
-
-                imapThread = new Thread(() -> {
-                    // raise the starting condition
-                    // after acquiring a wakelock so that the process is not terminated.
-                    // as imapWakeLock is not reference counted that would result in a wakelock-gap is not needed here.
-                    imapWakeLock.acquire(wakeLockTimeout);
-                    synchronized (imapThreadSynchronized) {
-                        imapThreadStarted = true;
-                        imapThreadSynchronized.notifyAll();
-                    }
-
-                    logEventAndDelegate(eventChannelHandler, INFO, TAG, "###################### IMAP-Thread " + Thread.currentThread().getId() + " started. ######################");
-
-
-                    while (true) {
-                        if (Thread.interrupted()) {
-                            synchronized (imapThreadSynchronized) {
-                                imapThreadStarted = false;
-                                imapThreadSynchronized.notifyAll();
-                            }
-                            logEventAndDelegate(eventChannelHandler, INFO, TAG, "###################### IMAP-Thread " + Thread.currentThread().getId() + " stopped. ######################");
-                            return;
-                        }
-                        imapWakeLock.acquire(wakeLockTimeout);
-                        performImapJobs();
-                        performImapFetch();
-                        imapWakeLock.release();
-                        performImapIdle();
-                    }
-                }, "imapThread");
-                imapThread.setPriority(Thread.NORM_PRIORITY);
-                imapThread.start();
-            } else {
-                if ((flags & INTERRUPT_IDLE) != 0) {
-                    interruptImapIdle();
-                }
-            }
-
-
-            if (mvboxThread == null || !mvboxThread.isAlive()) {
-
-                synchronized (mvboxThreadSynchronized) {
-                    mvboxThreadStarted = false;
-                }
-
-                mvboxThread = new Thread(() -> {
-                    mvboxWakeLock.acquire(wakeLockTimeout);
-                    synchronized (mvboxThreadSynchronized) {
-                        mvboxThreadStarted = true;
-                        mvboxThreadSynchronized.notifyAll();
-                    }
-
-                    logEventAndDelegate(eventChannelHandler, INFO, TAG, "###################### MVBOX-Thread " + Thread.currentThread().getId() + " started. ######################");
-
-
-                    while (true) {
-                        if (Thread.interrupted()) {
-                            synchronized (mvboxThreadSynchronized) {
-                                mvboxThreadStarted = false;
-                                mvboxThreadSynchronized.notifyAll();
-                            }
-                            logEventAndDelegate(eventChannelHandler, INFO, TAG, "###################### MVBOX-Thread " + Thread.currentThread().getId() + " stopped. ######################");
-                            return;
-                        }
-                        mvboxWakeLock.acquire(wakeLockTimeout);
-                        performMvboxJobs();
-                        performMvboxFetch();
-                        mvboxWakeLock.release();
-                        performMvboxIdle();
-                    }
-                }, "mvboxThread");
-                mvboxThread.setPriority(Thread.NORM_PRIORITY);
-                mvboxThread.start();
-            } else {
-                if ((flags & INTERRUPT_IDLE) != 0) {
-                    interruptMvboxIdle();
-                }
-            }
-
-
-            if (sentBoxThread == null || !sentBoxThread.isAlive()) {
-
-                synchronized (sentBoxThreadSynchronized) {
-                    sentBoxThreadStarted = false;
-                }
-
-                sentBoxThread = new Thread(() -> {
-                    sentBoxWakeLock.acquire(wakeLockTimeout);
-                    synchronized (sentBoxThreadSynchronized) {
-                        sentBoxThreadStarted = true;
-                        sentBoxThreadSynchronized.notifyAll();
-                    }
-
-                    logEventAndDelegate(eventChannelHandler, INFO, TAG, "###################### SENTBOX-Thread " + Thread.currentThread().getId() + " started. ######################");
-
-
-                    while (true) {
-                        if (Thread.interrupted()) {
-                            synchronized (sentBoxThreadSynchronized) {
-                                sentBoxThreadStarted = false;
-                                sentBoxThreadSynchronized.notifyAll();
-                            }
-                            logEventAndDelegate(eventChannelHandler, INFO, TAG, "###################### SENTBOX-Thread " + Thread.currentThread().getId() + " stopped. ######################");
-                            return;
-                        }
-                        sentBoxWakeLock.acquire(wakeLockTimeout);
-                        performSentboxJobs();
-                        performSentboxFetch();
-                        sentBoxWakeLock.release();
-                        performSentboxIdle();
-                    }
-                }, "sentBoxThread");
-                sentBoxThread.setPriority(Thread.NORM_PRIORITY - 1);
-                sentBoxThread.start();
-            } else {
-                if ((flags & INTERRUPT_IDLE) != 0) {
-                    interruptSentboxIdle();
-                }
-            }
-
-
-            if (smtpThread == null || !smtpThread.isAlive()) {
-
-                synchronized (smtpThreadSynchronized) {
-                    smtpThreadStarted = false;
-                }
-
-                smtpThread = new Thread(() -> {
-                    smtpWakeLock.acquire(wakeLockTimeout);
-                    synchronized (smtpThreadSynchronized) {
-                        smtpThreadStarted = true;
-                        smtpThreadSynchronized.notifyAll();
-                    }
-
-                    logEventAndDelegate(eventChannelHandler, INFO, TAG, "###################### SMTP-Thread " + Thread.currentThread().getId() + " started. ######################");
-
-
-                    while (true) {
-                        if (Thread.interrupted()) {
-                            synchronized (smtpThreadSynchronized) {
-                                smtpThreadStarted = false;
-                                smtpThreadSynchronized.notifyAll();
-                            }
-                            logEventAndDelegate(eventChannelHandler, INFO, TAG, "###################### SMTP-Thread " + Thread.currentThread().getId() + " stopped. ######################");
-                            return;
-                        }
-                        smtpWakeLock.acquire(wakeLockTimeout);
-                        performSmtpJobs();
-                        smtpWakeLock.release();
-                        performSmtpIdle();
-                    }
-                }, "smtpThread");
-                smtpThread.setPriority(Thread.MAX_PRIORITY);
-                smtpThread.start();
-            }
-        }
-    }
-
-    private void stopThreads() {
-        if (imapThread != null) {
-            imapThread.interrupt();
-        }
-        if (mvboxThread != null) {
-            mvboxThread.interrupt();
-        }
-        if (sentBoxThread != null) {
-            sentBoxThread.interrupt();
-        }
-        if (smtpThread != null) {
-            smtpThread.interrupt();
+            startThreads(INTERRUPT_IDLE);
+            setupConnectivityObserver(context);
         }
     }
 
@@ -396,6 +145,202 @@ public class NativeInteractionManager extends DcContext {
     private void delegateError(int eventId, long data1, String error) {
         final Object data1Object = getData1Object(eventId, data1);
         eventChannelHandler.handleEvent(eventId, data1Object, error);
+    }
+
+    private void startThreads(@SuppressWarnings("SameParameterValue") int flags) {
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, "Starting / reusing threads");
+        synchronized (threadsSynchronized) {
+            if (inboxThread == null || !inboxThread.isAlive()) {
+
+                inboxThread = new Thread(() -> {
+                    logEventAndDelegate(eventChannelHandler, INFO, TAG, "INBOX-Thread " + Thread.currentThread().getId() + " started.");
+                    while (threadsRunning) {
+                        imapWakeLock.acquire(wakeLockTimeout);
+                        performImapJobs();
+                        performImapFetch();
+                        imapWakeLock.release();
+                        synchronized (loopsSynchronized) {
+                            inboxLoops++;
+                        }
+                        performImapIdle();
+                    }
+                    logEventAndDelegate(eventChannelHandler, INFO, TAG, "INBOX-Thread " + Thread.currentThread().getId() + " stopped.");
+                }, "inboxThread");
+                inboxThread.setPriority(Thread.NORM_PRIORITY);
+                inboxThread.start();
+            } else {
+                if ((flags & INTERRUPT_IDLE) != 0) {
+                    interruptImapIdle();
+                }
+            }
+
+            if (mvboxThread == null || !mvboxThread.isAlive()) {
+
+                mvboxThread = new Thread(() -> {
+                    logEventAndDelegate(eventChannelHandler, INFO, TAG, "MVBOX-Thread " + Thread.currentThread().getId() + " started.");
+                    while (threadsRunning) {
+                        mvboxWakeLock.acquire(wakeLockTimeout);
+                        performMvboxJobs();
+                        performMvboxFetch();
+                        mvboxWakeLock.release();
+                        synchronized (loopsSynchronized) {
+                            mvboxLoops++;
+                        }
+                        performMvboxIdle();
+                    }
+                    logEventAndDelegate(eventChannelHandler, INFO, TAG, "MVBOX-Thread " + Thread.currentThread().getId() + " stopped.");
+                }, "mvboxThread");
+                mvboxThread.setPriority(Thread.NORM_PRIORITY);
+                mvboxThread.start();
+            } else {
+                if ((flags & INTERRUPT_IDLE) != 0) {
+                    interruptMvboxIdle();
+                }
+            }
+
+            if (sentBoxThread == null || !sentBoxThread.isAlive()) {
+
+                sentBoxThread = new Thread(() -> {
+                    logEventAndDelegate(eventChannelHandler, INFO, TAG, "SENTBOX-Thread " + Thread.currentThread().getId() + " started.");
+                    while (threadsRunning) {
+                        sentBoxWakeLock.acquire(wakeLockTimeout);
+                        performSentboxJobs();
+                        performSentboxFetch();
+                        sentBoxWakeLock.release();
+                        synchronized (loopsSynchronized) {
+                            sentBoxLoops++;
+                        }
+                        performSentboxIdle();
+                    }
+                    logEventAndDelegate(eventChannelHandler, INFO, TAG, "SENTBOX-Thread " + Thread.currentThread().getId() + " stopped.");
+                }, "sentBoxThread");
+                sentBoxThread.setPriority(Thread.NORM_PRIORITY - 1);
+                sentBoxThread.start();
+            } else {
+                if ((flags & INTERRUPT_IDLE) != 0) {
+                    interruptSentboxIdle();
+                }
+            }
+
+            if (smtpThread == null || !smtpThread.isAlive()) {
+                smtpThread = new Thread(() -> {
+                    logEventAndDelegate(eventChannelHandler, INFO, TAG, "SMTP-Thread " + Thread.currentThread().getId() + " started.");
+                    while (threadsRunning) {
+                        smtpWakeLock.acquire(wakeLockTimeout);
+                        performSmtpJobs();
+                        smtpWakeLock.release();
+                        synchronized (loopsSynchronized) {
+                            smtpLoops++;
+                        }
+                        performSmtpIdle();
+                    }
+                    logEventAndDelegate(eventChannelHandler, INFO, TAG, "SMTP-Thread " + Thread.currentThread().getId() + " stopped.");
+                }, "smtpThread");
+                smtpThread.setPriority(Thread.MAX_PRIORITY);
+                smtpThread.start();
+            }
+        }
+        waitForThreadsExecutedOnce();
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, "Threads started / reused");
+    }
+
+    private void waitForThreadsExecutedOnce() {
+        while (true) {
+            synchronized (loopsSynchronized) {
+                if (inboxLoops > 0 && mvboxLoops > 0 && sentBoxLoops > 0 && smtpLoops > 0) {
+                    break;
+                }
+            }
+            Utils.sleep(500);
+        }
+    }
+
+    void tearDown() {
+        if (!minimalSetup) {
+            logEventAndDelegate(eventChannelHandler, INFO, TAG, "Stopping threads");
+            stopThreads();
+            logEventAndDelegate(eventChannelHandler, INFO, TAG, "Threads stopped");
+        }
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, "Closing database");
+        close();
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, "Database closed");
+    }
+
+    private void stopThreads() {
+        threadsRunning = false;
+        synchronized (threadsSynchronized) {
+            do {
+                // in theory, interrupting once outside the loop should be sufficient,
+                // but there are some corner cases, see https://github.com/deltachat/deltachat-core-rust/issues/925
+                if (inboxThread != null && inboxThread.isAlive()) {
+                    interruptImapIdle();
+                }
+                if (mvboxThread != null && mvboxThread.isAlive()) {
+                    interruptMvboxIdle();
+                }
+                if (sentBoxThread != null && sentBoxThread.isAlive()) {
+                    interruptSentboxIdle();
+                }
+                if (smtpThread != null && smtpThread.isAlive()) {
+                    interruptSmtpIdle();
+                }
+
+                Utils.sleep(300);
+
+            } while ((inboxThread != null && inboxThread.isAlive())
+                    || (mvboxThread != null && mvboxThread.isAlive())
+                    || (sentBoxThread != null && sentBoxThread.isAlive())
+                    || (smtpThread != null && smtpThread.isAlive()));
+        }
+        inboxThread = null;
+        mvboxThread = null;
+        sentBoxThread = null;
+        smtpThread = null;
+        inboxLoops = 0;
+        mvboxLoops = 0;
+        sentBoxLoops = 0;
+        smtpLoops = 0;
+    }
+
+    private void setupConnectivityObserver(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                registerConnectivityReceiverAndroidN(connectivityManager);
+            } else {
+                registerConnectivityReceiver(context, connectivityManager);
+            }
+        }
+    }
+
+    private void registerConnectivityReceiver(Context context, ConnectivityManager connectivityManager) {
+        context.registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+                boolean isConnected = networkInfo != null && networkInfo.isConnected();
+                if (isConnected) {
+                    startOnNetworkAvailable();
+                }
+            }
+        }, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    private void startOnNetworkAvailable() {
+        logEventAndDelegate(eventChannelHandler, INFO, TAG, "Network is connected again.");
+        startThreads(INTERRUPT_IDLE);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void registerConnectivityReceiverAndroidN(ConnectivityManager connectivityManager) {
+        if (connectivityManager != null) {
+            connectivityManager.registerDefaultNetworkCallback(new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(Network network) {
+                    startOnNetworkAvailable();
+                }
+            });
+        }
     }
 
     String getDbPath() {

@@ -26,7 +26,7 @@
  * https://www.open-xchange.com/legal/. The contributing author shall be
  * given Attribution for the derivative code and a license granting use.
  *
- * Copyright (C) 2016-2019 OX Software GmbH
+ * Copyright (C) 2016-2020 OX Software GmbH
  * Mail: info@open-xchange.com
  *
  *
@@ -40,9 +40,18 @@
  * for more details.
  */
 
-import Foundation
+const indexChatId = 0;
+const indexContent = 1;
 
-enum DcContextError: Error {
-    case missingImageAtPath(String)
-    case wrongAttachmentType(Int32)
+class DecryptedChatMessage {
+  int chatId;
+  String content;
+
+  DecryptedChatMessage.fromMethodChannel(List<dynamic> data) {
+    if (data is! List) {
+      throw ArgumentError("Given data is no List, can't create DecryptedPushMessage object");
+    }
+    chatId = data[indexChatId];
+    content = data[indexContent];
+  }
 }
