@@ -83,6 +83,7 @@ extension Method {
         static let IS_UNPROMOTED                        = "chat_isUnpromoted"
         static let IS_SELF_TALK                         = "chat_isSelfTalk"
         static let IS_VERIFIED                          = "chat_isVerified"
+        static let IS_DEVICE_TALK                       = "chat_isDeviceTalk"
     }
 
 }
