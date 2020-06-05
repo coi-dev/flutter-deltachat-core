@@ -123,8 +123,6 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         switch (call.method) {
         case Method.Base.INIT:
             baseInit(result: result)
-        case Method.Base.SYSTEM_INFO:
-            systemInfo(result: result)
         case Method.Base.LOGOUT:
             logout(result: result)
         default:
@@ -169,10 +167,6 @@ public class SwiftDeltaChatCorePlugin: NSObject, FlutterPlugin {
         }
         Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.error, message: "Couldn't open user database at path: \(dcContext.userDatabasePath)")
         result(DCPluginError.couldNotOpenDataBase())
-    }
-
-    fileprivate func systemInfo(result: FlutterResult) {
-        result(UIApplication.version)
     }
     
     func logout(result: FlutterResult) {

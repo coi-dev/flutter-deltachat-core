@@ -64,7 +64,6 @@ extension Method {
 
     struct Base {
         static let INIT                                 = "base_init"
-        static let SYSTEM_INFO                          = "base_systemInfo"
         static let CORE_LISTENER                        = "base_coreListener"
         static let LOGOUT                               = "base_logout"
     }
