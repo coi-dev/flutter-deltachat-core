@@ -91,6 +91,10 @@ class DcChat {
     var isSelfTalk: Bool {
         return dc_chat_is_self_talk(chatPointer) > 0
     }
+    
+    var isDeviceTalk: Bool {
+        return dc_chat_is_device_talk(chatPointer) == 1
+    }
 
     var contactIds: [UInt32] {
         let chatContacts = dc_get_chat_contacts(DcContext.contextPointer, UInt32(id))

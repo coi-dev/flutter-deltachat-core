@@ -84,6 +84,9 @@ class ChatCallHandler: MethodCallHandling {
         case Method.Chat.IS_VERIFIED:
             isVerified(methodCall: call, result: result)
             break
+        case Method.Chat.IS_DEVICE_TALK:
+            isDeviceTalk(methodCall: call, result: result)
+            break
         default:
             Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.error, message: "Context: Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
@@ -129,10 +132,15 @@ class ChatCallHandler: MethodCallHandling {
         let chat = getChat(methodCall: methodCall, result: result)
         result(NSNumber(value: chat.id))
     }
-
+    
     private func isVerified(methodCall: FlutterMethodCall, result: FlutterResult) {
         let chat = getChat(methodCall: methodCall, result: result)
         result(NSNumber(value: chat.isVerified))
+    }
+    
+    private func isDeviceTalk(methodCall: FlutterMethodCall, result: FlutterResult) {
+        let chat = getChat(methodCall: methodCall, result: result)
+        result(NSNumber(value: chat.isDeviceTalk))
     }
 
     // MARK: - Helper
