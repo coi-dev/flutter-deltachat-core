@@ -219,6 +219,7 @@ extension Method {
         static let GET_CONTACT_ID_BY_ADDRESS            = "context_getContactIdByAddress"
         static let GET_NEXT_MEDIA                       = "context_getNextMedia"
         static let CLOSE                                = "context_close"
+        static let DECRYPT_IN_MEMORY                    = "context_decryptInMemory"
     }
 
 }

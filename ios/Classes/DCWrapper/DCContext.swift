@@ -357,6 +357,24 @@ class DcContext {
     func getNextMedia(messageId: UInt32, dir: Int32, msgTypeOne: Int32, msgTypeTwo: Int32, msgTypeThree: Int32) -> UInt32 {
         return dc_get_next_media(DcContext.contextPointer, messageId, dir, msgTypeOne, msgTypeTwo, msgTypeThree)
     }
+    
+    func decryptMessageInMemory(contentType: String, content: String, senderAddress: String, chatIdWrapper: DcChatIdWrapper) -> String? {
+//        var totalNumberOfParts: UnsafeMutablePointer<Int32>?
+//        var chatId: UnsafeMutablePointer<Int32>?
+//
+//        guard let cMessage = dc_decrypt_message_in_memory(
+//            DcContext.contextPointer,
+//            contentType,
+//            content,
+//            senderAddress,
+//            0,
+//            totalNumberOfParts,
+//            chatId) else {
+//                return nil
+//        }
+//        return String(cString: cMessage)
+        return nil
+    }
 
     // MARK: - General
 

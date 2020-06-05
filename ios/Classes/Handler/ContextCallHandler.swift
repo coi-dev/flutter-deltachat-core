@@ -181,6 +181,8 @@ class ContextCallHandler: MethodCallHandling {
             getContactIdByAddress(methodCall: call, result: result)
         case Method.Context.GET_NEXT_MEDIA:
             getNextMedia(methodCall: call, result: result)
+        case Method.Context.DECRYPT_IN_MEMORY:
+            decryptMessageInMemory(methodCall: call, result: result)
         default:
             Utils.logEventAndDelegate(logLevel: SwiftyBeaver.Level.error, message: "Context: Failing for \(call.method)")
             result(FlutterMethodNotImplemented)
@@ -365,6 +367,23 @@ class ContextCallHandler: MethodCallHandling {
         let nextMessageId = context.getNextMedia(messageId: UInt32(messageId), dir: dir, msgTypeOne: messageTypeOne, msgTypeTwo: messageTypeTwo, msgTypeThree: messageTypeThree)
 
         result(nextMessageId)
+    }
+    
+    fileprivate func decryptMessageInMemory(methodCall: FlutterMethodCall, result: FlutterResult) {
+//        if !methodCall.contains(keys: [Argument.CONTENT, Argument.CONTENT_TYPE, Argument.ADDRESS]) {
+//            Method.Error.missingArgument("'\(Argument.CONTENT)', '\(Argument.CONTENT_TYPE)' or '\(Argument.ADDRESS)'", result: result)
+//            return
+//        }
+//
+//        guard let content = methodCall.stringValue(for: Argument.CONTENT, result: result),
+//            let contentType = methodCall.stringValue(for: Argument.CONTENT_TYPE, result: result),
+//            let address = methodCall.stringValue(for: Argument.ADDRESS, result: result) else {
+//                Method.Error.missingArgumentValues(for: [Argument.CONTENT, Argument.CONTENT_TYPE, Argument.ADDRESS], result: result)
+//                return
+//        }
+        
+        //TODO: Finish Implementation!!!
+//        context.decryptMessageInMemory(contentType: contentType, content: content, senderAddress: address, chatIdWrapper: <#T##DcChatIdWrapper#>)
     }
 
     // MARK: - Chat Related
