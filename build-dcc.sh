@@ -22,6 +22,7 @@ DCC_IOS_ARCHITECTURES=("universal")
 # Android
 ANDROID_DCC_LIBRARY_FOLDER="android/jni"
 ANDROID_DCC_LIBRARY_SUB_FOLDERS=("arm64-v8a" "armeabi-v7a" "x86" "x86_64") # The order of DCC_ANDROID_TARGETS, DCC_ANDROID_BUILD_PARAMETERS and ANDROID_DCC_LIBRARY_SUB_FOLDERS must stay in sync
+# ANDROID_RUST_TARGETS is implicitly defined by DCC_ANDROID_ARCHITECTURES, please use DCC_ANDROID_ARCHITECTURES to refer to the Android Rust targets
 
 # iOS
 IOS_DCC_LIBRARY_FOLDER="ios/Libraries"
@@ -50,7 +51,13 @@ function checkTarget {
     isInstalled=$(rustup target list --installed | grep ${currentTarget} -c | cat)
     if [[ ${isInstalled} != 1 ]]; then
         echo "ERROR - $currentTarget is missing"
-        echo "Fix via (execute in $BASE_DCC): rustup target add $currentTarget"
+        if isAndroid; then
+            platformTargets=${DCC_ANDROID_ARCHITECTURES[@]}
+        fi
+        if isIos; then
+            platformTargets=${IOS_RUST_TARGETS[@]}
+        fi
+        echo "Fix via: cd $BASE_DCC && rustup target add $platformTargets && cd .."
         exit 5
     fi
 }
