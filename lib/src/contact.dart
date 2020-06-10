@@ -72,40 +72,40 @@ class Contact extends Base {
   @override
   String get identifier => _identifier;
 
-  Future<String> getName() async {
-    return await loadAndGetValue(methodContactGetName);
+  Future<String> getNameAsync() async {
+    return await loadAndGetValueAsync(methodContactGetName);
   }
 
-  Future<String> getDisplayName() async {
-    return await loadAndGetValue(methodContactGetDisplayName);
+  Future<String> getDisplayNameAsync() async {
+    return await loadAndGetValueAsync(methodContactGetDisplayName);
   }
 
-  Future<String> getFirstName() async {
-    return await loadAndGetValue(methodContactGetFirstName);
+  Future<String> getFirstNameAsync() async {
+    return await loadAndGetValueAsync(methodContactGetFirstName);
   }
 
-  Future<String> getAddress() async {
-    return await loadAndGetValue(methodContactGetAddress);
+  Future<String> getAddressAsync() async {
+    return await loadAndGetValueAsync(methodContactGetAddress);
   }
 
-  Future<String> getNameAndAddress() async {
-    return await loadAndGetValue(methodContactGetNameAndAddress);
+  Future<String> getNameAndAddressAsync() async {
+    return await loadAndGetValueAsync(methodContactGetNameAndAddress);
   }
 
-  Future<String> getProfileImage() async {
-    return await loadAndGetValue(methodContactGetProfileImage);
+  Future<String> getProfileImageAsync() async {
+    return await loadAndGetValueAsync(methodContactGetProfileImage);
   }
 
-  Future<int> getColor() async {
-    return await loadAndGetValue(methodContactGetColor);
+  Future<int> getColorAsync() async {
+    return await loadAndGetValueAsync(methodContactGetColor);
   }
 
-  Future<bool> isVerified() async {
-    return await loadAndGetValue(methodContactIsVerified);
+  Future<bool> isVerifiedAsync() async {
+    return await loadAndGetValueAsync(methodContactIsVerified);
   }
 
-  Future<bool> isBlocked() async {
-    return await loadAndGetValue(methodContactIsBlocked);
+  Future<bool> isBlockedAsync() async {
+    return await loadAndGetValueAsync(methodContactIsBlocked);
   }
 
   Map<String, dynamic> getDefaultArguments() => <String, dynamic>{Base.argumentId: _id};

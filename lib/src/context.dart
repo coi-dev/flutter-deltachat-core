@@ -163,168 +163,168 @@ class Context {
 
   final DeltaChatCore core = DeltaChatCore();
 
-  Future<dynamic> getConfigValue(String key, [ObjectType type]) async {
+  Future<dynamic> getConfigValueAsync(String key, [ObjectType type]) async {
     var method;
     if (type == null || type == ObjectType.String) {
       method = methodConfigGet;
     } else if (type == ObjectType.int) {
       method = methodConfigGetInt;
     }
-    return await core.invokeMethod(method, getKeyArguments(key));
+    return await core.invokeMethodAsync(method, getKeyArguments(key));
   }
 
-  Future<dynamic> setConfigValue(String key, value, ObjectType enforceType) async {
+  Future<dynamic> setConfigValueAsync(String key, value, ObjectType enforceType) async {
     String type;
     if (enforceType != null) {
       type = describeEnum(enforceType);
     } else {
       type = value != null ? value.runtimeType.toString() : null;
     }
-    await core.invokeMethod(methodConfigSet, getConfigArguments(type, key, value));
+    await core.invokeMethodAsync(methodConfigSet, getConfigArguments(type, key, value));
   }
 
-  Future<void> configure() async {
-    await core.invokeMethod(methodConfigure);
+  Future<void> configureAsync() async {
+    await core.invokeMethodAsync(methodConfigure);
   }
 
-  Future<bool> isConfigured() async {
-    return await core.invokeMethod(methodIsConfigured);
+  Future<bool> isConfiguredAsync() async {
+    return await core.invokeMethodAsync(methodIsConfigured);
   }
 
-  Future<int> addAddressBook(String addressBook) async {
-    return await core.invokeMethod(methodAddAddressBook, getAddressBookArguments(addressBook));
+  Future<int> addAddressBookAsync(String addressBook) async {
+    return await core.invokeMethodAsync(methodAddAddressBook, getAddressBookArguments(addressBook));
   }
 
-  Future<int> createContact(String name, String address) async {
-    return await core.invokeMethod(methodCreateContact, getContactArguments(name, address));
+  Future<int> createContactAsync(String name, String address) async {
+    return await core.invokeMethodAsync(methodCreateContact, getContactArguments(name, address));
   }
 
-  Future<bool> deleteContact(int id) async {
-    return await core.invokeMethod(methodDeleteContact, getIdArguments(id));
+  Future<bool> deleteContactAsync(int id) async {
+    return await core.invokeMethodAsync(methodDeleteContact, getIdArguments(id));
   }
 
-  Future<bool> blockContact(int id) async {
-    return await core.invokeMethod(methodBlockContact, getIdArguments(id));
+  Future<bool> blockContactAsync(int id) async {
+    return await core.invokeMethodAsync(methodBlockContact, getIdArguments(id));
   }
 
-  Future<bool> unblockContact(int id) async {
-    return await core.invokeMethod(methodUnblockContact, getIdArguments(id));
+  Future<bool> unblockContactAsync(int id) async {
+    return await core.invokeMethodAsync(methodUnblockContact, getIdArguments(id));
   }
 
-  Future<int> createChatByContactId(int id) async {
-    return await core.invokeMethod(methodCreateChatById, getIdArguments(id));
+  Future<int> createChatByContactIdAsync(int id) async {
+    return await core.invokeMethodAsync(methodCreateChatById, getIdArguments(id));
   }
 
-  Future<int> createChatByMessageId(int id) async {
-    return await core.invokeMethod(methodCreateChatByMessageId, getIdArguments(id));
+  Future<int> createChatByMessageIdAsync(int id) async {
+    return await core.invokeMethodAsync(methodCreateChatByMessageId, getIdArguments(id));
   }
 
-  Future<int> createGroupChat(bool verified, String name) async {
-    return await core.invokeMethod(methodCreateGroupChat, getCreateGroupArguments(verified, name));
+  Future<int> createGroupChatAsync(bool verified, String name) async {
+    return await core.invokeMethodAsync(methodCreateGroupChat, getCreateGroupArguments(verified, name));
   }
 
-  Future<List<int>> getContacts(int flags, String query) async {
-    return await core.invokeMethod(methodGetContacts, getContactsArguments(flags, query));
+  Future<List<int>> getContactsAsync(int flags, String query) async {
+    return await core.invokeMethodAsync(methodGetContacts, getContactsArguments(flags, query));
   }
 
-  Future<List<int>> getChatContacts(int chatId) async {
-    return await core.invokeMethod(methodGetChatContacts, getChatIdArguments(chatId));
+  Future<List<int>> getChatContactsAsync(int chatId) async {
+    return await core.invokeMethodAsync(methodGetChatContacts, getChatIdArguments(chatId));
   }
 
-  Future<List<int>> getBlockedContacts() async {
-    return await core.invokeMethod(methodGetBlockedContacts);
+  Future<List<int>> getBlockedContactsAsync() async {
+    return await core.invokeMethodAsync(methodGetBlockedContacts);
   }
 
-  Future<List<int>> getChatMessages(int chatId, [int flags = 0]) async {
-    return await core.invokeMethod(methodGetChatMessages, getChatMessageArguments(chatId, flags));
+  Future<List<int>> getChatMessagesAsync(int chatId, [int flags = 0]) async {
+    return await core.invokeMethodAsync(methodGetChatMessages, getChatMessageArguments(chatId, flags));
   }
 
-  Future<int> createChatMessage(int chatId, String text) async {
-    return await core.invokeMethod(methodCreateChatMessage, createChatMessageArguments(chatId, text));
+  Future<int> createChatMessageAsync(int chatId, String text) async {
+    return await core.invokeMethodAsync(methodCreateChatMessage, createChatMessageArguments(chatId, text));
   }
 
-  Future<int> createChatAttachmentMessage(int chatId, String path, int msgType, String mimeType, int duration, [String text]) async {
-    return await core.invokeMethod(
+  Future<int> createChatAttachmentMessageAsync(int chatId, String path, int msgType, String mimeType, int duration, [String text]) async {
+    return await core.invokeMethodAsync(
         methodCreateChatAttachmentMessage, getCreateAttachmentMessageArguments(chatId, path, msgType, mimeType, duration, text));
   }
 
-  Future<int> addContactToChat(int chatId, int contactId) async {
-    return await core.invokeMethod(methodAddContactToChat, getChatAndContactIdArguments(chatId, contactId));
+  Future<int> addContactToChatAsync(int chatId, int contactId) async {
+    return await core.invokeMethodAsync(methodAddContactToChat, getChatAndContactIdArguments(chatId, contactId));
   }
 
-  Future<int> getChatByContactId(int contactId) async {
-    return await core.invokeMethod(methodGetChatByContactId, getContactIdArguments(contactId));
+  Future<int> getChatByContactIdAsync(int contactId) async {
+    return await core.invokeMethodAsync(methodGetChatByContactId, getContactIdArguments(contactId));
   }
 
-  Future<int> getFreshMessageCount(int chatId) async {
-    return await core.invokeMethod(methodGetFreshMessageCount, getChatIdArguments(chatId));
+  Future<int> getFreshMessageCountAsync(int chatId) async {
+    return await core.invokeMethodAsync(methodGetFreshMessageCount, getChatIdArguments(chatId));
   }
 
-  Future<int> markNoticedChat(int chatId) async {
-    return await core.invokeMethod(methodMarkNoticedChat, getChatIdArguments(chatId));
+  Future<int> markNoticedChatAsync(int chatId) async {
+    return await core.invokeMethodAsync(methodMarkNoticedChat, getChatIdArguments(chatId));
   }
 
-  Future<int> deleteChat(int chatId) async {
-    return await core.invokeMethod(methodDeleteChat, getChatIdArguments(chatId));
+  Future<int> deleteChatAsync(int chatId) async {
+    return await core.invokeMethodAsync(methodDeleteChat, getChatIdArguments(chatId));
   }
 
-  Future<int> removeContactFromChat(int chatId, int contactId) async {
-    return await core.invokeMethod(methodRemoveContactFromChat, getChatAndContactIdArguments(chatId, contactId));
+  Future<int> removeContactFromChatAsync(int chatId, int contactId) async {
+    return await core.invokeMethodAsync(methodRemoveContactFromChat, getChatAndContactIdArguments(chatId, contactId));
   }
 
-  Future<void> exportKeys(String path) async {
-    return await core.invokeMethod(methodExportKeys, getExportImportArguments(path));
+  Future<void> exportKeysAsync(String path) async {
+    return await core.invokeMethodAsync(methodExportKeys, getExportImportArguments(path));
   }
 
-  Future<void> importKeys(String path) async {
-    return await core.invokeMethod(methodImportKeys, getExportImportArguments(path));
+  Future<void> importKeysAsync(String path) async {
+    return await core.invokeMethodAsync(methodImportKeys, getExportImportArguments(path));
   }
 
-  Future<List<int>> getFreshMessages() async {
-    return await core.invokeMethod(methodGetFreshMessages);
+  Future<List<int>> getFreshMessagesAsync() async {
+    return await core.invokeMethodAsync(methodGetFreshMessages);
   }
 
-  Future<void> forwardMessages(int chatId, List<int> msgIds) async {
-    return await core.invokeMethod(methodForwardMessages, getForwardMessageArguments(chatId, msgIds));
+  Future<void> forwardMessagesAsync(int chatId, List<int> msgIds) async {
+    return await core.invokeMethodAsync(methodForwardMessages, getForwardMessageArguments(chatId, msgIds));
   }
 
-  Future<String> initiateKeyTransfer() async {
-    return await core.invokeMethod(methodInitiateKeyTransfer);
+  Future<String> initiateKeyTransferAsync() async {
+    return await core.invokeMethodAsync(methodInitiateKeyTransfer);
   }
 
-  Future<bool> continueKeyTransfer(int messageId, String setupCode) async {
-    return await core.invokeMethod(methodContinueKeyTransfer, getContinueKeyTransferArguments(messageId, setupCode));
+  Future<bool> continueKeyTransferAsync(int messageId, String setupCode) async {
+    return await core.invokeMethodAsync(methodContinueKeyTransfer, getContinueKeyTransferArguments(messageId, setupCode));
   }
 
-  Future<void> markSeenMessages(List<int> msgIds) async {
+  Future<void> markSeenMessagesAsync(List<int> msgIds) async {
     if (msgIds.isEmpty) {
       return null;
     }
-    return await core.invokeMethod(methodMarkSeenMessages, getMessageIdsArguments(msgIds));
+    return await core.invokeMethodAsync(methodMarkSeenMessages, getMessageIdsArguments(msgIds));
   }
 
-  Future<String> getSecureJoinQr(int chatId) async {
-    return await core.invokeMethod(methodGetSecurejoinQr, getSecureJoinQrArguments(chatId));
+  Future<String> getSecureJoinQrAsync(int chatId) async {
+    return await core.invokeMethodAsync(methodGetSecurejoinQr, getSecureJoinQrArguments(chatId));
   }
 
-  Future<int> joinSecurejoinQr(String qrText) async {
-    return await core.invokeMethod(methodJoinSecurejoinQr, getQrTextArguments(qrText));
+  Future<int> joinSecurejoinQrAsync(String qrText) async {
+    return await core.invokeMethodAsync(methodJoinSecurejoinQr, getQrTextArguments(qrText));
   }
 
-  Future<List<dynamic>> checkQr(String qrText) async {
-    return await core.invokeMethod(methodCheckQr, getQrTextArguments(qrText));
+  Future<List<dynamic>> checkQrAsync(String qrText) async {
+    return await core.invokeMethodAsync(methodCheckQr, getQrTextArguments(qrText));
   }
 
-  Future<void> stopOngoingProcess() async {
-    return await core.invokeMethod(methodStopOngoingProcess);
+  Future<void> stopOngoingProcessAsync() async {
+    return await core.invokeMethodAsync(methodStopOngoingProcess);
   }
 
-  Future<void> deleteMessages(List<int> msgIds) async {
-    return await core.invokeMethod(methodDeleteMessages, getMessageIdsArguments(msgIds));
+  Future<void> deleteMessagesAsync(List<int> msgIds) async {
+    return await core.invokeMethodAsync(methodDeleteMessages, getMessageIdsArguments(msgIds));
   }
 
-  Future<void> starMessages(List<int> msgIds, int star) async {
-    await core.invokeMethod(methodStarMessages, getStarMessagesArguments(msgIds, star));
+  Future<void> starMessagesAsync(List<int> msgIds, int star) async {
+    await core.invokeMethodAsync(methodStarMessages, getStarMessagesArguments(msgIds, star));
     // Manually dispatching Event.msgsChanged as the core currently not supports this.
     // As soon as this is fixed in the core the following part should get removed.
     msgIds.forEach((msgId) {
@@ -332,80 +332,80 @@ class Context {
     });
   }
 
-  Future<int> setChatName(int chatId, String newName) async {
-    return await core.invokeMethod(methodSetChatName, getSetNameOrImageArguments(chatId, newName));
+  Future<int> setChatNameAsync(int chatId, String newName) async {
+    return await core.invokeMethodAsync(methodSetChatName, getSetNameOrImageArguments(chatId, newName));
   }
 
-  Future<int> setChatProfileImage(int chatId, String newImagePath) async {
-    return await core.invokeMethod(methodSetChatProfileImage, getSetNameOrImageArguments(chatId, newImagePath));
+  Future<int> setChatProfileImageAsync(int chatId, String newImagePath) async {
+    return await core.invokeMethodAsync(methodSetChatProfileImage, getSetNameOrImageArguments(chatId, newImagePath));
   }
 
-  Future<void> interruptIdleForIncomingMessages() async {
-    return await core.invokeMethod(methodInterruptIdleForIncomingMessages);
+  Future<void> interruptIdleForIncomingMessagesAsync() async {
+    return await core.invokeMethodAsync(methodInterruptIdleForIncomingMessages);
   }
 
-  Future<void> close() async {
-    return await core.invokeMethod(methodClose);
+  Future<void> closeAsync() async {
+    return await core.invokeMethodAsync(methodClose);
   }
 
-  Future<int> isCoiSupported() async {
-    return await core.invokeMethod(methodIsCoiSupported);
+  Future<int> isCoiSupportedAsync() async {
+    return await core.invokeMethodAsync(methodIsCoiSupported);
   }
 
-  Future<int> isCoiEnabled() async {
-    return await core.invokeMethod(methodIsCoiEnabled);
+  Future<int> isCoiEnabledAsync() async {
+    return await core.invokeMethodAsync(methodIsCoiEnabled);
   }
 
-  Future<int> isWebPushSupported() async {
-    return await core.invokeMethod(methodIsWebPushSupported);
+  Future<int> isWebPushSupportedAsync() async {
+    return await core.invokeMethodAsync(methodIsWebPushSupported);
   }
 
-  Future<String> getWebPushVapidKey() async {
-    return await core.invokeMethod(methodGetWebPushVapidKey);
+  Future<String> getWebPushVapidKeyAsync() async {
+    return await core.invokeMethodAsync(methodGetWebPushVapidKey);
   }
 
-  Future<void> subscribeWebPush(String uid, String json, int id) async {
-    return await core.invokeMethod(methodSubscribeWebPush, getWebPushSubscribeArguments(uid, json, id));
+  Future<void> subscribeWebPushAsync(String uid, String json, int id) async {
+    return await core.invokeMethodAsync(methodSubscribeWebPush, getWebPushSubscribeArguments(uid, json, id));
   }
 
-  Future<void> validateWebPush(String uid, String message, int id) async {
-    return await core.invokeMethod(methodValidateWebPush, getWebPushValidateArguments(uid, message, id));
+  Future<void> validateWebPushAsync(String uid, String message, int id) async {
+    return await core.invokeMethodAsync(methodValidateWebPush, getWebPushValidateArguments(uid, message, id));
   }
 
-  Future<void> getWebPushSubscription(String uid, int id) async {
-    return await core.invokeMethod(methodGetWebPushSubscription, getWebPushGetSubscriptionArguments(uid, id));
+  Future<void> getWebPushSubscriptionAsync(String uid, int id) async {
+    return await core.invokeMethodAsync(methodGetWebPushSubscription, getWebPushGetSubscriptionArguments(uid, id));
   }
 
-  Future<void> setCoiEnabled(int enable, int id) async {
-    return await core.invokeMethod(methodSetCoiEnabled, getSetCoiEnabledArguments(enable, id));
+  Future<void> setCoiEnabledAsync(int enable, int id) async {
+    return await core.invokeMethodAsync(methodSetCoiEnabled, getSetCoiEnabledArguments(enable, id));
   }
 
-  Future<void> setCoiMessageFilter(int mode, int id) async {
-    return await core.invokeMethod(methodSetCoiMessageFilter, getSetCoiMessageFilter(mode, id));
+  Future<void> setCoiMessageFilterAsync(int mode, int id) async {
+    return await core.invokeMethodAsync(methodSetCoiMessageFilter, getSetCoiMessageFilter(mode, id));
   }
 
-  Future<int> isCoiMessageFilterEnabled() async {
-    return await core.invokeMethod(methodIsCoiMessageFilterEnabled);
+  Future<int> isCoiMessageFilterEnabledAsync() async {
+    return await core.invokeMethodAsync(methodIsCoiMessageFilterEnabled);
   }
 
-  Future<String> getMessageInfo(int msgId) async {
-    return await core.invokeMethod(methodGetMessageInfo, getMessageIdArguments(msgId));
+  Future<String> getMessageInfoAsync(int msgId) async {
+    return await core.invokeMethodAsync(methodGetMessageInfo, getMessageIdArguments(msgId));
   }
 
-  Future<void> retrySendingPendingMessages() async {
-    return await core.invokeMethod(methodRetrySendingPendingMessages);
+  Future<void> retrySendingPendingMessagesAsync() async {
+    return await core.invokeMethodAsync(methodRetrySendingPendingMessages);
   }
 
-  Future<int> getContactIdByAddress(String address) async {
-    return await core.invokeMethod(methodGetContactIdByAddress, getContactIdByAddressArguments(address));
+  Future<int> getContactIdByAddressAsync(String address) async {
+    return await core.invokeMethodAsync(methodGetContactIdByAddress, getContactIdByAddressArguments(address));
   }
 
-  Future<int> getNextMedia(int messageId, int dir, {int messageTypeOne = 0, int messageTypeTwo = 0, int messageTypeThree = 0}) async {
-    return await core.invokeMethod(methodGetNextMedia, getNextMediaArguments(messageId, dir, messageTypeOne, messageTypeTwo, messageTypeThree));
+  Future<int> getNextMediaAsync(int messageId, int dir, {int messageTypeOne = 0, int messageTypeTwo = 0, int messageTypeThree = 0}) async {
+    return await core.invokeMethodAsync(methodGetNextMedia, getNextMediaArguments(messageId, dir, messageTypeOne, messageTypeTwo, messageTypeThree));
   }
 
-  Future<List<dynamic>> decryptInMemory(String contentType, String content, String senderAddress) async {
-    return await core.invokeMethod(methodDecryptInMemory, getDecryptInMemoryArguments(contentType, content, senderAddress));
+  Future<List<dynamic>> decryptInMemoryAsync(String contentType, String content, String senderAddress) async {
+    return await core.invokeMethodAsync(methodDecryptInMemory, getDecryptInMemoryArguments(contentType, content, senderAddress));
   }
 
   Map<String, dynamic> getKeyArguments(String key) => <String, dynamic>{Base.argumentKey: key};

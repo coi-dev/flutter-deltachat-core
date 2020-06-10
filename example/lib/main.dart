@@ -72,89 +72,89 @@ class _MyAppState extends State<MyApp> {
         _addListItem(text: "Init done");
         Context context = Context();
         _addListItem(text: "Context created");
-        bool isConfigured = await context.isConfigured();
+        bool isConfigured = await context.isConfiguredAsync();
         _addListItem(text: "isConfigured", assertion: false, result: isConfigured);
-        await context.setConfigValue("addr", "alice@ox.io", ObjectType.String);
+        await context.setConfigValueAsync("addr", "alice@ox.io", ObjectType.String);
         _addListItem(text: "setConfigValue addr alice@ox.io");
-        String getConfigAddrValue = await context.getConfigValue("addr");
+        String getConfigAddrValue = await context.getConfigValueAsync("addr");
         _addListItem(text: "getConfigValue addr", assertion: "alice@ox.io", result: getConfigAddrValue);
-        await context.setConfigValue(Context.configDisplayName, "Alice", ObjectType.String);
+        await context.setConfigValueAsync(Context.configDisplayName, "Alice", ObjectType.String);
         _addListItem(text: "setConfigValue displayname Alice");
-        String getConfigDisplayNameValue = await context.getConfigValue(Context.configDisplayName);
+        String getConfigDisplayNameValue = await context.getConfigValueAsync(Context.configDisplayName);
         _addListItem(text: "getConfigValue displayname", assertion: "Alice", result: getConfigDisplayNameValue);
-        await context.setConfigValue(Context.configSelfStatus, "My status", ObjectType.String);
+        await context.setConfigValueAsync(Context.configSelfStatus, "My status", ObjectType.String);
         _addListItem(text: "setConfigValue selfstatus My status");
-        String getConfigSelfStatusValue = await context.getConfigValue(Context.configSelfStatus);
+        String getConfigSelfStatusValue = await context.getConfigValueAsync(Context.configSelfStatus);
         _addListItem(text: "getConfigValue selfstatus", assertion: "My status", result: getConfigSelfStatusValue);
-        await context.setConfigValue(Context.configMailServer, "imap.ox.io", ObjectType.String);
+        await context.setConfigValueAsync(Context.configMailServer, "imap.ox.io", ObjectType.String);
         _addListItem(text: "setConfigValue mail_server imap.ox.io");
-        String getConfigMailServerValue = await context.getConfigValue(Context.configMailServer);
+        String getConfigMailServerValue = await context.getConfigValueAsync(Context.configMailServer);
         _addListItem(text: "getConfigValue mail_server", assertion: "imap.ox.io", result: getConfigMailServerValue);
-        await context.setConfigValue(Context.configMailUser, "alice@ox.io", ObjectType.String);
+        await context.setConfigValueAsync(Context.configMailUser, "alice@ox.io", ObjectType.String);
         _addListItem(text: "setConfigValue mail_user alice@ox.io");
-        String getConfigMailUserValue = await context.getConfigValue(Context.configMailUser);
+        String getConfigMailUserValue = await context.getConfigValueAsync(Context.configMailUser);
         _addListItem(text: "getConfigValue mail_user", assertion: "alice@ox.io", result: getConfigMailUserValue);
-        await context.setConfigValue(Context.configMailPassword, "password", ObjectType.String);
+        await context.setConfigValueAsync(Context.configMailPassword, "password", ObjectType.String);
         _addListItem(text: "setConfigValue mail_password password");
-        String getConfigMailPasswordValue = await context.getConfigValue(Context.configMailPassword);
+        String getConfigMailPasswordValue = await context.getConfigValueAsync(Context.configMailPassword);
         _addListItem(text: "getConfigValue mail_password", assertion: "password", result: getConfigMailPasswordValue);
-        await context.setConfigValue(Context.configMailPort, "148", ObjectType.String);
+        await context.setConfigValueAsync(Context.configMailPort, "148", ObjectType.String);
         _addListItem(text: "setConfigValue mail_port 148");
-        String getConfigMailPortValue = await context.getConfigValue(Context.configMailPort);
+        String getConfigMailPortValue = await context.getConfigValueAsync(Context.configMailPort);
         _addListItem(text: "getConfigValue mail_port", assertion: "148", result: getConfigMailPortValue);
-        await context.setConfigValue(Context.configSendServer, "smtp.ox.io", ObjectType.String);
+        await context.setConfigValueAsync(Context.configSendServer, "smtp.ox.io", ObjectType.String);
         _addListItem(text: "setConfigValue send_server smtp.ox.io");
-        String getConfigSendServerValue = await context.getConfigValue(Context.configSendServer);
+        String getConfigSendServerValue = await context.getConfigValueAsync(Context.configSendServer);
         _addListItem(text: "getConfigValue send_server", assertion: "smtp.ox.io", result: getConfigSendServerValue);
-        await context.setConfigValue(Context.configSendUser, "alice@ox.io", ObjectType.String);
+        await context.setConfigValueAsync(Context.configSendUser, "alice@ox.io", ObjectType.String);
         _addListItem(text: "setConfigValue send_user alice@ox.io");
-        String getConfigSendUserValue = await context.getConfigValue(Context.configSendUser);
+        String getConfigSendUserValue = await context.getConfigValueAsync(Context.configSendUser);
         _addListItem(text: "getConfigValue send_user", assertion: "alice@ox.io", result: getConfigSendUserValue);
-        await context.setConfigValue(Context.configSendPassword, "password", ObjectType.String);
+        await context.setConfigValueAsync(Context.configSendPassword, "password", ObjectType.String);
         _addListItem(text: "setConfigValue send_password password");
-        String getConfigSendPasswordValue = await context.getConfigValue(Context.configSendPassword);
+        String getConfigSendPasswordValue = await context.getConfigValueAsync(Context.configSendPassword);
         _addListItem(text: "getConfigValue send_password", assertion: "password", result: getConfigSendPasswordValue);
-        await context.setConfigValue(Context.configSendPort, "931", ObjectType.String);
+        await context.setConfigValueAsync(Context.configSendPort, "931", ObjectType.String);
         _addListItem(text: "setConfigValue send_port 931");
-        String getConfigSendPortValue = await context.getConfigValue(Context.configSendPort);
+        String getConfigSendPortValue = await context.getConfigValueAsync(Context.configSendPort);
         _addListItem(text: "getConfigValue send_port", assertion: "931", result: getConfigSendPortValue);
-        int contactId = await context.createContact("Bob", "bob@ox.io");
+        int contactId = await context.createContactAsync("Bob", "bob@ox.io");
         _addListItem(text: "createContact bob@ox.io", assertion: 10, result: contactId);
-        int contactId2 = await context.createContact(null, "charlie@ox.io");
+        int contactId2 = await context.createContactAsync(null, "charlie@ox.io");
         _addListItem(text: "createContact charlie@ox.io", assertion: 11, result: contactId2);
-        int chatId = await context.createChatByContactId(contactId);
+        int chatId = await context.createChatByContactIdAsync(contactId);
         _addListItem(text: "createChatByContactId", assertion: 10, result: chatId);
         ChatList chatList = ChatList();
-        await chatList.setup();
+        await chatList.setupAsync();
         int index = 0;
-        int id = await chatList.getChatId(index);
+        int id = await chatList.getChatIdAsync(index);
         _addListItem(text: "getChatId", assertion: 10, result: id);
-        var chatCnt = await chatList.getChatCnt();
+        var chatCnt = await chatList.getChatCntAsync();
         _addListItem(text: "getChatCnt", assertion: 1, result: chatCnt);
-        int chatIdFromChatList = await chatList.getChat(index);
+        int chatIdFromChatList = await chatList.getChatAsync(index);
         _addListItem(text: "getChat", assertion: 10, result: chatIdFromChatList);
-        await chatList.tearDown();
-        var groupChatId = await context.createGroupChat(false, "The group");
+        await chatList.tearDownAsync();
+        var groupChatId = await context.createGroupChatAsync(false, "The group");
         _addListItem(text: "createGroupChat", assertion: 11, result: groupChatId);
-        var groupAddResult = await context.addContactToChat(groupChatId, contactId);
+        var groupAddResult = await context.addContactToChatAsync(groupChatId, contactId);
         _addListItem(text: "addContactToChat", assertion: 1, result: groupAddResult);
         StreamController controller = StreamController();
         core.addListener(eventId: Event.configureProgress, streamController: controller);
         core.removeListener(controller);
-        var contactIds = await context.getContacts(2, null);
+        var contactIds = await context.getContactsAsync(2, null);
         _addListItem(text: "getContacts (context)", assertion: 3, result: contactIds.length);
-        var chatContactIds = await context.getChatContacts(chatId);
+        var chatContactIds = await context.getChatContactsAsync(chatId);
         _addListItem(text: "getChatContacts", assertion: 1, result: chatContactIds.length);
-        var freshMessageCount = await context.getFreshMessageCount(chatId);
+        var freshMessageCount = await context.getFreshMessageCountAsync(chatId);
         _addListItem(text: "getFreshMessageCount", assertion: 0, result: freshMessageCount);
-        await context.markNoticedChat(chatId);
+        await context.markNoticedChatAsync(chatId);
         _addListItem(text: "markNoticedChat");
-        await context.deleteChat(chatId);
-        await context.deleteChat(groupChatId);
+        await context.deleteChatAsync(chatId);
+        await context.deleteChatAsync(groupChatId);
         chatList = ChatList();
-        await chatList.setup();
-        var chatCntAfterDeletingChat = await chatList.getChatCnt();
-        await chatList.tearDown();
+        await chatList.setupAsync();
+        var chatCntAfterDeletingChat = await chatList.getChatCntAsync();
+        await chatList.tearDownAsync();
         _addListItem(text: "deleteChat", assertion: 0, result: chatCntAfterDeletingChat);
         await Future.delayed(const Duration(seconds: 1));
         core.tearDownAsync();
@@ -175,7 +175,7 @@ class _MyAppState extends State<MyApp> {
     if (information != null && information) {
       content = Text(text);
     } else {
-      var now = new DateTime.now().toIso8601String();
+      var now = DateTime.now().toIso8601String();
       if (assertion == null || result == null) {
         content = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -204,12 +204,12 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      home: new Scaffold(
-          appBar: new AppBar(
+    return MaterialApp(
+      home: Scaffold(
+          appBar: AppBar(
             title: const Text('delta_chat_core test suite'),
           ),
-          body: new ListView.builder(
+          body: ListView.builder(
               itemCount: items.length,
               itemBuilder: (BuildContext context, int index) {
                 return items[index];

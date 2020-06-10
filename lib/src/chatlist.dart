@@ -75,36 +75,36 @@ class ChatList extends Base {
   @override
   String get identifier => _identifier;
 
-  Future<void> setup([String query, int chatListType = typeNoSpecials]) async {
-    _id = await core.invokeMethod(methodChatListInternalSetup, getSetupArguments(chatListType, query));
+  Future<void> setupAsync([String query, int chatListType = typeNoSpecials]) async {
+    _id = await core.invokeMethodAsync(methodChatListInternalSetup, getSetupArguments(chatListType, query));
   }
 
-  Future<int> tearDown() async {
-    return await core.invokeMethod(methodChatListInternalTearDown, getDefaultArguments());
+  Future<int> tearDownAsync() async {
+    return await core.invokeMethodAsync(methodChatListInternalTearDown, getDefaultArguments());
   }
 
-  Future<int> getChatCnt() async {
-    return await core.invokeMethod(methodChatListGetCnt, getDefaultArguments());
+  Future<int> getChatCntAsync() async {
+    return await core.invokeMethodAsync(methodChatListGetCnt, getDefaultArguments());
   }
 
-  Future<int> getChatId(int index) async {
-    return await core.invokeMethod(methodChatListGetId, getIndexArguments(index));
+  Future<int> getChatIdAsync(int index) async {
+    return await core.invokeMethodAsync(methodChatListGetId, getIndexArguments(index));
   }
 
-  Future<int> getChatMsgId(int index) async {
-    return await core.invokeMethod(methodChatListGetMsgId, getIndexArguments(index));
+  Future<int> getChatMsgIdAsync(int index) async {
+    return await core.invokeMethodAsync(methodChatListGetMsgId, getIndexArguments(index));
   }
 
-  Future<int> getChat(int index) async {
-    return await core.invokeMethod(methodChatListGetChat, getIndexArguments(index));
+  Future<int> getChatAsync(int index) async {
+    return await core.invokeMethodAsync(methodChatListGetChat, getIndexArguments(index));
   }
 
-  Future<dynamic> getChatMsg(int index) async {
-    return await core.invokeMethod(methodChatListGetMsg, getIndexArguments(index));
+  Future<dynamic> getChatMsgAsync(int index) async {
+    return await core.invokeMethodAsync(methodChatListGetMsg, getIndexArguments(index));
   }
 
-  Future<List<dynamic>> getChatSummary(int index) async {
-    return await core.invokeMethod(methodChatListGetSummary, getIndexArguments(index));
+  Future<List<dynamic>> getChatSummaryAsync(int index) async {
+    return await core.invokeMethodAsync(methodChatListGetSummary, getIndexArguments(index));
   }
 
   @override

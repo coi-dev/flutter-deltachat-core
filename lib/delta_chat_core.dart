@@ -102,7 +102,7 @@ class DeltaChatCore {
     _logger.info("Creating new Dart core instance");
   }
 
-  Future<dynamic> invokeMethod(String method, [dynamic arguments]) async {
+  Future<dynamic> invokeMethodAsync(String method, [dynamic arguments]) async {
     if (!_init) {
       throw StateError("Core isn't initialized, couldn't perform invokeMethod for " + method);
     }
@@ -141,7 +141,7 @@ class DeltaChatCore {
     _init = false;
   }
 
-  Future<void> logout() async {
+  Future<void> logoutAsync() async {
     _logger.info("Logout started");
     _unregisterListeners();
     await _methodChannel.invokeMethod(methodBaseLogout);
