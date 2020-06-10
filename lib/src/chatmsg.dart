@@ -107,88 +107,88 @@ class ChatMsg extends Base {
   @override
   String get identifier => _identifier;
 
-  Future<int> getMessageId() async {
-    return await loadAndGetValue(methodMessageGetId);
+  Future<int> getMessageIdAsync() async {
+    return await loadAndGetValueAsync(methodMessageGetId);
   }
 
-  Future<String> getText() async {
-    return await loadAndGetValue(methodMessageGetText);
+  Future<String> getTextAsync() async {
+    return await loadAndGetValueAsync(methodMessageGetText);
   }
 
-  Future<int> getTimestamp() async {
-    return await loadAndGetValue(methodMessageGetTimestamp);
+  Future<int> getTimestampAsync() async {
+    return await loadAndGetValueAsync(methodMessageGetTimestamp);
   }
 
-  Future<int> getChatId() async {
-    return await loadAndGetValue(methodMessageGetChatId);
+  Future<int> getChatIdAsync() async {
+    return await loadAndGetValueAsync(methodMessageGetChatId);
   }
 
-  Future<int> getFromId() async {
-    return await loadAndGetValue(methodMessageGetFromId);
+  Future<int> getFromIdAsync() async {
+    return await loadAndGetValueAsync(methodMessageGetFromId);
   }
 
-  Future<bool> isOutgoing() async {
-    return await loadAndGetValue(methodMessageIsOutgoing);
+  Future<bool> isOutgoingAsync() async {
+    return await loadAndGetValueAsync(methodMessageIsOutgoing);
   }
 
-  Future<bool> hasFile() async {
-    return await loadAndGetValue(methodMessageHasFile);
+  Future<bool> hasFileAsync() async {
+    return await loadAndGetValueAsync(methodMessageHasFile);
   }
 
-  Future<int> getType() async {
-    return await loadAndGetValue(methodMessageGetType);
+  Future<int> getTypeAsync() async {
+    return await loadAndGetValueAsync(methodMessageGetType);
   }
 
-  Future<String> getFile() async {
-    return await loadAndGetValue(methodMessageGetFile);
+  Future<String> getFileAsync() async {
+    return await loadAndGetValueAsync(methodMessageGetFile);
   }
 
-  Future<int> getFileBytes() async {
-    return await loadAndGetValue(methodMessageGetFileBytes);
+  Future<int> getFileBytesAsync() async {
+    return await loadAndGetValueAsync(methodMessageGetFileBytes);
   }
 
-  Future<String> getFileName() async {
-    return await loadAndGetValue(methodMessageGetFilename);
+  Future<String> getFileNameAsync() async {
+    return await loadAndGetValueAsync(methodMessageGetFilename);
   }
 
-  Future<String> getFileMime() async {
-    return await loadAndGetValue(methodMessageGetFileMime);
+  Future<String> getFileMimeAsync() async {
+    return await loadAndGetValueAsync(methodMessageGetFileMime);
   }
 
-  Future<String> getSummaryText(int characterCount) async {
-    return await loadAndGetValue(methodMessageGetSummaryText, arguments: getSummaryArguments(characterCount));
+  Future<String> getSummaryTextAsync(int characterCount) async {
+    return await loadAndGetValueAsync(methodMessageGetSummaryText, arguments: getSummaryArguments(characterCount));
   }
 
-  Future<int> getState() async {
-    return await loadAndGetValue(methodMessageGetState);
+  Future<int> getStateAsync() async {
+    return await loadAndGetValueAsync(methodMessageGetState);
   }
 
-  Future<bool> isSetupMessage() async {
-    return await loadAndGetValue(methodMessageIsSetupMessage);
+  Future<bool> isSetupMessageAsync() async {
+    return await loadAndGetValueAsync(methodMessageIsSetupMessage);
   }
 
-  Future<bool> isInfo() async {
-    return await loadAndGetValue(methodMessageIsInfo);
+  Future<bool> isInfoAsync() async {
+    return await loadAndGetValueAsync(methodMessageIsInfo);
   }
 
-  Future<String> getSetupCodeBegin() async {
-    return await loadAndGetValue(methodMessageGetSetupCodeBegin);
+  Future<String> getSetupCodeBeginAsync() async {
+    return await loadAndGetValueAsync(methodMessageGetSetupCodeBegin);
   }
 
-  Future<int> showPadlock() async {
-    return await loadAndGetValue(methodMessageShowPadlock);
+  Future<int> showPadlockAsync() async {
+    return await loadAndGetValueAsync(methodMessageShowPadlock);
   }
 
-  Future<bool> isStarred() async {
-    return await loadAndGetValue(methodMessageIsStarred);
+  Future<bool> isStarredAsync() async {
+    return await loadAndGetValueAsync(methodMessageIsStarred);
   }
 
-  Future<int> getDuration() async {
-    return await loadAndGetValue(methodMessageGetDuration);
+  Future<int> getDurationAsync() async {
+    return await loadAndGetValueAsync(methodMessageGetDuration);
   }
 
-  Future<bool> isForwarded() async {
-    return await loadAndGetValue(methodMessageIsForwarded);
+  Future<bool> isForwardedAsync() async {
+    return await loadAndGetValueAsync(methodMessageIsForwarded);
   }
   
   @override

@@ -76,44 +76,44 @@ class Chat extends Base {
   @override
   String get identifier => _identifier;
 
-  Future<int> getChatId() async {
-    return await loadAndGetValue(methodChatGetId);
+  Future<int> getChatIdAsync() async {
+    return await loadAndGetValueAsync(methodChatGetId);
   }
 
-  Future<bool> isGroup() async {
-    return await loadAndGetValue(methodChatIsGroup);
+  Future<bool> isGroupAsync() async {
+    return await loadAndGetValueAsync(methodChatIsGroup);
   }
 
-  Future<int> getVisibility() async {
-    return await loadAndGetValue(methodChatGetVisibility);
+  Future<int> getVisibilityAsync() async {
+    return await loadAndGetValueAsync(methodChatGetVisibility);
   }
 
-  Future<int> getColor() async {
-    return await loadAndGetValue(methodChatGetColor);
+  Future<int> getColorAsync() async {
+    return await loadAndGetValueAsync(methodChatGetColor);
   }
 
-  Future<String> getName() async {
-    return await loadAndGetValue(methodChatGetName);
+  Future<String> getNameAsync() async {
+    return await loadAndGetValueAsync(methodChatGetName);
   }
 
-  Future<String> getProfileImage() async {
-    return await loadAndGetValue(methodChatGetProfileImage);
+  Future<String> getProfileImageAsync() async {
+    return await loadAndGetValueAsync(methodChatGetProfileImage);
   }
 
-  Future<bool> isUnpromoted() async {
-    return await loadAndGetValue(methodChatIsUnpromoted);
+  Future<bool> isUnpromotedAsync() async {
+    return await loadAndGetValueAsync(methodChatIsUnpromoted);
   }
 
-  Future<bool> isVerified() async {
-    return await loadAndGetValue(methodChatIsVerified);
+  Future<bool> isVerifiedAsync() async {
+    return await loadAndGetValueAsync(methodChatIsVerified);
   }
 
-  Future<bool> isSelfTalk() async {
-    return await loadAndGetValue(methodChatIsSelfTalk);
+  Future<bool> isSelfTalkAsync() async {
+    return await loadAndGetValueAsync(methodChatIsSelfTalk);
   }
 
-  Future<bool> isDeviceTalk() async {
-    return await loadAndGetValue(methodChatIsDeviceTalk);
+  Future<bool> isDeviceTalkAsync() async {
+    return await loadAndGetValueAsync(methodChatIsDeviceTalk);
   }
 
   @override

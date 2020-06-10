@@ -93,26 +93,26 @@ abstract class Base {
     setLastUpdate();
   }
 
-  Future<void> loadValue(String key, {Map<String, dynamic> arguments}) async {
+  Future<void> loadValueAsync(String key, {Map<String, dynamic> arguments}) async {
     if (!isValueLoaded(key)) {
-      _storedValues[key] = await core.invokeMethod(key, arguments ?? getDefaultArguments());
+      _storedValues[key] = await core.invokeMethodAsync(key, arguments ?? getDefaultArguments());
       _loadedValues[key] = true;
     }
   }
 
-  Future<dynamic> loadAndGetValue(String key, {Map<String, dynamic> arguments}) async {
-    await loadValue(key, arguments: arguments);
+  Future<dynamic> loadAndGetValueAsync(String key, {Map<String, dynamic> arguments}) async {
+    await loadValueAsync(key, arguments: arguments);
     return _storedValues[key];
   }
 
-  Future<void> loadValues({List<String> keys, Map<String, Map<String, dynamic>> keysAndArguments}) async {
+  Future<void> loadValuesAsync({List<String> keys, Map<String, Map<String, dynamic>> keysAndArguments}) async {
     if (keys != null && keys.isNotEmpty) {
       await Future.forEach(keys, (key) async {
-        await loadValue(key);
+        await loadValueAsync(key);
       });
     } else if (keysAndArguments != null && keysAndArguments.isNotEmpty) {
       await Future.forEach(keysAndArguments.entries, (keysAndArgument) async {
-        await loadValue(keysAndArgument.key, arguments: keysAndArgument.value);
+        await loadValueAsync(keysAndArgument.key, arguments: keysAndArgument.value);
       });
     }
   }
@@ -132,7 +132,7 @@ abstract class Base {
     _loadedValues.remove(key);
   }
 
-  Future<void> reloadValue(String key, {Map<String, dynamic> arguments, bool removeFromJavaCache = true}) async {
+  Future<void> reloadValueAsync(String key, {Map<String, dynamic> arguments, bool removeFromJavaCache = true}) async {
     var value = get(key);
     var reloadArguments = arguments ?? getDefaultArguments();
     if (removeFromJavaCache) {
@@ -142,22 +142,22 @@ abstract class Base {
       }
     }
     _loadedValues.remove(key);
-    var newValue = await loadAndGetValue(key, arguments: reloadArguments);
+    var newValue = await loadAndGetValueAsync(key, arguments: reloadArguments);
     if (value != newValue) {
       setLastUpdate();
     }
   }
 
-  Future<void> reloadValues({List<String> keys, Map<String, Map<String, dynamic>> keysAndArguments}) async {
+  Future<void> reloadValuesAsync({List<String> keys, Map<String, Map<String, dynamic>> keysAndArguments}) async {
     bool removeFromJavaCache = true;
     if (keys != null && keys.isNotEmpty) {
       Future.forEach(keys, (key) async {
-        await reloadValue(key, removeFromJavaCache: removeFromJavaCache);
+        await reloadValueAsync(key, removeFromJavaCache: removeFromJavaCache);
         removeFromJavaCache = false;
       });
     } else if (keysAndArguments != null && keysAndArguments.isNotEmpty) {
       for (int index = 0; index < keysAndArguments.length; index++) {
-        await reloadValue(keysAndArguments.keys.elementAt(index),
+        await reloadValueAsync(keysAndArguments.keys.elementAt(index),
             arguments: keysAndArguments.values.elementAt(index), removeFromJavaCache: removeFromJavaCache);
         removeFromJavaCache = false;
       }
