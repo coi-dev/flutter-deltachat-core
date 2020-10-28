@@ -1,3 +1,6 @@
+# Project on Hold
+Please note that this project is currently on hold. A full mail stack in pure Dart is being worked on at https://github.com/enough-software/enough_mail which is planned to replace Delta Chat Core for future email messaging apps by this team. Of course Delta Chat continues to thrive and is not affected by this fork's change.
+
 # Delta Chat Core Plugin
 
 The Delta Chat core plugin provides a Flutter / Dart wrapper for the [Delta Chat Core](https://github.com/deltachat/deltachat-core-rust) (DCC). This plugin interacts with the native platform and calls DCC to enable IMAP / SMTP based chats.
